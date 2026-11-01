@@ -27,7 +27,11 @@ def cmd_selfcheck(a: argparse.Namespace) -> int:
 
     def run(job):
         task, name, patch, expected = job
-        r = grading.grade(task, patch, out_root / task / name)
+        done = out_root / task / name / "result.json"
+        if a.resume and done.exists() and json.loads(done.read_text())["verdict"] in ("pass", "fail"):
+            r = json.loads(done.read_text())
+        else:
+            r = grading.grade(task, patch, out_root / task / name)
         ok = r["verdict"] == expected
         failed = [c["name"] for c in r["checks"] if not c["pass"]]
         print(f"{'ok ' if ok else 'BAD'} {task:28} {name:28} {r['verdict']:5} (want {expected}) {r['seconds']:6}s {failed[:3]}", flush=True)
@@ -166,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("tasks", nargs="*")
     s.add_argument("-j", "--jobs", type=int, default=2)
     s.add_argument("--out", default="results/selfcheck")
+    s.add_argument("--resume", action="store_true", help="reuse existing pass/fail results")
     s.set_defaults(fn=cmd_selfcheck)
     ag = sub.add_parser("agent", help="run Claude Code headless on tasks and grade the result")
     ag.add_argument("tasks", nargs="*")
