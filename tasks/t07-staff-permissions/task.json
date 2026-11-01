@@ -1,0 +1,7 @@
+{
+  "id": "t07-staff-permissions",
+  "title": "Staff accounts can change prices and manage colleagues",
+  "category": "permissions",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 1
+}

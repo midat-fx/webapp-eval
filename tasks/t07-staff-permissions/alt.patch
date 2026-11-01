@@ -1,0 +1,265 @@
+diff --git a/src/app/admin/actions.ts b/src/app/admin/actions.ts
+index f797cff..43f064c 100644
+--- a/src/app/admin/actions.ts
++++ b/src/app/admin/actions.ts
+@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
+ import { revalidatePath } from "next/cache";
+ import { db, schema as s } from "@/db";
+ import { setBookingStatus } from "@/lib/booking";
+-import { requireSession } from "@/lib/session";
++import { ownerAction, requireSession, type Session } from "@/lib/session";
+ 
+ export async function updateBookingStatus(formData: FormData): Promise<void> {
+   const session = await requireSession();
+@@ -19,8 +19,7 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
+   revalidatePath("/admin");
+ }
+ 
+-export async function saveService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++export const saveService = ownerAction(async (session: Session, formData: FormData) => {
+   const id = formData.get("id") ? String(formData.get("id")) : null;
+   const values = {
+     name: String(formData.get("name") ?? "").trim(),
+@@ -46,10 +45,9 @@ export async function saveService(formData: FormData): Promise<void> {
+     meta: values,
+   });
+   revalidatePath("/admin/services");
+-}
++});
+ 
+-export async function toggleService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++export const toggleService = ownerAction(async (session: Session, formData: FormData) => {
+   const id = String(formData.get("id"));
+   const [svc] = await db
+     .select()
+@@ -58,10 +56,9 @@ export async function toggleService(formData: FormData): Promise<void> {
+   if (!svc) return;
+   await db.update(s.services).set({ isActive: !svc.isActive }).where(eq(s.services.id, id));
+   revalidatePath("/admin/services");
+-}
++});
+ 
+-export async function saveStaff(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++export const saveStaff = ownerAction(async (session: Session, formData: FormData) => {
+   const name = String(formData.get("name") ?? "").trim();
+   if (!name) return;
+   await db.insert(s.staff).values({ businessId: session.businessId, name });
+@@ -73,10 +70,9 @@ export async function saveStaff(formData: FormData): Promise<void> {
+     meta: { name },
+   });
+   revalidatePath("/admin/staff");
+-}
++});
+ 
+-export async function toggleStaff(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++export const toggleStaff = ownerAction(async (session: Session, formData: FormData) => {
+   const id = String(formData.get("id"));
+   const [row] = await db
+     .select()
+@@ -85,10 +81,9 @@ export async function toggleStaff(formData: FormData): Promise<void> {
+   if (!row) return;
+   await db.update(s.staff).set({ isActive: !row.isActive }).where(eq(s.staff.id, id));
+   revalidatePath("/admin/staff");
+-}
++});
+ 
+-export async function toggleStaffService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++export const toggleStaffService = ownerAction(async (session: Session, formData: FormData) => {
+   const staffId = String(formData.get("staffId"));
+   const serviceId = String(formData.get("serviceId"));
+   // both must belong to this business
+@@ -113,4 +108,4 @@ export async function toggleStaffService(formData: FormData): Promise<void> {
+     await db.insert(s.staffServices).values({ staffId, serviceId });
+   }
+   revalidatePath("/admin/staff");
+-}
++});
+diff --git a/src/app/admin/analytics/page.tsx b/src/app/admin/analytics/page.tsx
+index 293e0ac..22da174 100644
+--- a/src/app/admin/analytics/page.tsx
++++ b/src/app/admin/analytics/page.tsx
+@@ -1,12 +1,12 @@
+ import { cohorts, revenueTrend, topClients, utilization } from "@/lib/analytics";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ import { TrendChart } from "./trend-chart";
+ 
+ const kzt = (n: number) => `${n.toLocaleString("en-GB")} ₸`;
+ const pct = (n: number) => `${Math.round(n * 100)}%`;
+ 
+ export default async function AnalyticsPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+   const [trend, util, cohortRows, clients] = await Promise.all([
+     revenueTrend(session.businessId, 30),
+     utilization(session.businessId, 30),
+diff --git a/src/app/admin/audit/page.tsx b/src/app/admin/audit/page.tsx
+index 792a918..9e211b9 100644
+--- a/src/app/admin/audit/page.tsx
++++ b/src/app/admin/audit/page.tsx
+@@ -1,9 +1,9 @@
+ import { desc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ 
+ export default async function AuditPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+   const rows = await db
+     .select({
+       id: s.auditLog.id,
+diff --git a/src/app/admin/layout.tsx b/src/app/admin/layout.tsx
+index cfccc03..4edacbd 100644
+--- a/src/app/admin/layout.tsx
++++ b/src/app/admin/layout.tsx
+@@ -3,14 +3,14 @@ import { requireSession } from "@/lib/session";
+ import { logout } from "@/app/login/actions";
+ 
+ const nav = [
+-  ["/admin", "Calendar"],
+-  ["/admin/clients", "Clients"],
+-  ["/admin/services", "Services"],
+-  ["/admin/staff", "Staff"],
+-  ["/admin/reports", "Reports"],
+-  ["/admin/analytics", "Analytics"],
+-  ["/admin/notifications", "Notifications"],
+-  ["/admin/audit", "Audit"],
++  ["/admin", "Calendar", false],
++  ["/admin/clients", "Clients", false],
++  ["/admin/services", "Services", true],
++  ["/admin/staff", "Staff", true],
++  ["/admin/reports", "Reports", true],
++  ["/admin/analytics", "Analytics", true],
++  ["/admin/notifications", "Notifications", true],
++  ["/admin/audit", "Audit", true],
+ ] as const;
+ 
+ export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+@@ -22,7 +22,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
+           <div className="flex items-center gap-6 overflow-x-auto">
+             <span className="text-lg font-bold">kezek</span>
+             <nav className="flex gap-4 text-sm">
+-              {nav.map(([href, label]) => (
++              {nav
++                .filter(([, , ownerOnly]) => !ownerOnly || session.role === "owner")
++                .map(([href, label]) => (
+                 <Link key={href} href={href} className="whitespace-nowrap text-zinc-600 hover:text-zinc-900">
+                   {label}
+                 </Link>
+diff --git a/src/app/admin/notifications/page.tsx b/src/app/admin/notifications/page.tsx
+index 35d81e5..3eab393 100644
+--- a/src/app/admin/notifications/page.tsx
++++ b/src/app/admin/notifications/page.tsx
+@@ -1,6 +1,6 @@
+ import { desc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ 
+ const statusStyle: Record<string, string> = {
+   pending: "bg-amber-100 text-amber-800",
+@@ -11,7 +11,7 @@ const statusStyle: Record<string, string> = {
+ };
+ 
+ export default async function NotificationsPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+ 
+   const queue = await db
+     .select()
+diff --git a/src/app/admin/reports/page.tsx b/src/app/admin/reports/page.tsx
+index 032a85a..3def1bd 100644
+--- a/src/app/admin/reports/page.tsx
++++ b/src/app/admin/reports/page.tsx
+@@ -1,10 +1,10 @@
+ import { and, desc, eq, gte, sql } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ import { RevenueChart } from "./revenue-chart";
+ 
+ export default async function ReportsPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+   const [biz] = await db.select().from(s.businesses).where(eq(s.businesses.id, session.businessId));
+   // Server component renders per request — "now" is legitimately request-scoped.
+   // eslint-disable-next-line react-hooks/purity
+diff --git a/src/app/admin/services/page.tsx b/src/app/admin/services/page.tsx
+index e380df2..24c24ae 100644
+--- a/src/app/admin/services/page.tsx
++++ b/src/app/admin/services/page.tsx
+@@ -1,10 +1,10 @@
+ import { asc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ import { saveService, toggleService } from "../actions";
+ 
+ export default async function ServicesPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+   const rows = await db
+     .select()
+     .from(s.services)
+diff --git a/src/app/admin/staff/page.tsx b/src/app/admin/staff/page.tsx
+index 80d223d..19803df 100644
+--- a/src/app/admin/staff/page.tsx
++++ b/src/app/admin/staff/page.tsx
+@@ -1,10 +1,10 @@
+ import { asc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { ownerPage } from "@/lib/session";
+ import { saveStaff, toggleStaff, toggleStaffService } from "../actions";
+ 
+ export default async function StaffPage() {
+-  const session = await requireSession();
++  const session = await ownerPage();
+   const masters = await db
+     .select()
+     .from(s.staff)
+diff --git a/src/lib/session.ts b/src/lib/session.ts
+index 95dba70..64af166 100644
+--- a/src/lib/session.ts
++++ b/src/lib/session.ts
+@@ -1,7 +1,7 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+ import { cookies } from "next/headers";
+-import { redirect } from "next/navigation";
++import { notFound, redirect } from "next/navigation";
+ import { redis } from "./redis";
+ import { SESSION_COOKIE } from "./session-cookie";
+ 
+@@ -47,6 +47,25 @@ export async function requireSession(): Promise<Session> {
+   return session;
+ }
+ 
++/**
++ * Pages only the owner may open. For anyone else the page doesn't exist —
++ * no hint that there is something behind the URL.
++ */
++export async function ownerPage(): Promise<Session> {
++  const session = await requireSession();
++  if (session.role !== "owner") notFound();
++  return session;
++}
++
++/** Wraps a server action so that it runs for the owner and silently does nothing for staff. */
++export function ownerAction(fn: (session: Session, formData: FormData) => Promise<void>) {
++  return async (formData: FormData): Promise<void> => {
++    const session = await requireSession();
++    if (session.role !== "owner") return;
++    await fn(session, formData);
++  };
++}
++
+ export async function destroySession(): Promise<void> {
+   const store = await cookies();
+   const token = store.get(SESSION_COOKIE)?.value;
