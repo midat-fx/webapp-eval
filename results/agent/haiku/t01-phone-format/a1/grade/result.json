@@ -1,0 +1,7 @@
+{
+  "verdict": "error",
+  "reason": "no result (docker exit 137)",
+  "checks": [],
+  "task": "t01-phone-format",
+  "seconds": 854.7
+}

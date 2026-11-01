@@ -125,6 +125,22 @@ def cmd_flake(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_regrade(a: argparse.Namespace) -> int:
+    """Re-grade saved agent patches whose grading is missing or hit an infra
+    error. Re-grading never re-runs the agent, so it costs no run budget."""
+    out_root = ROOT / a.out
+    for meta in sorted(out_root.glob("*/*/a*/meta.json")):
+        run = meta.parent
+        res = run / "grade" / "result.json"
+        if res.exists() and json.loads(res.read_text())["verdict"] in ("pass", "fail") and not a.all:
+            continue
+        task = json.loads(meta.read_text())["task"]
+        patch = run / "patch.diff"
+        r = grading.grade(task, patch, run / "grade") if patch.read_text().strip() else None
+        print(f"{run.relative_to(out_root)}: {r['verdict'] if r else 'empty patch'}", flush=True)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="webeval")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -155,6 +171,10 @@ def main(argv: list[str] | None = None) -> int:
     fl.add_argument("variant")
     fl.add_argument("-n", type=int, default=5)
     fl.set_defaults(fn=cmd_flake)
+    rg = sub.add_parser("regrade", help="re-grade saved agent patches (missing or infra-error results)")
+    rg.add_argument("--all", action="store_true")
+    rg.add_argument("--out", default="results/agent")
+    rg.set_defaults(fn=cmd_regrade)
     a = p.parse_args(argv)
     return a.fn(a)
 

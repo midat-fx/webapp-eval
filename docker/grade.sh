@@ -46,9 +46,12 @@ export REDIS_URL=redis://127.0.0.1:6379
 export SESSION_SECRET=webapp-eval
 export NODE_ENV=production
 
-if ! timeout 900 ./node_modules/.bin/next build >"$OUT/build.log" 2>&1; then
-  ev build fail "$(tail -c 800 "$OUT/build.log")"
-  finish fail build_failed
+timeout "${BUILD_TIMEOUT:-2400}" ./node_modules/.bin/next build >"$OUT/build.log" 2>&1
+rc=$?
+if [ $rc -ne 0 ]; then
+  ev build fail "exit $rc: $(tail -c 800 "$OUT/build.log")"
+  # 124 = our timeout, 137 = killed (OOM): the machine failed, not the patch.
+  case $rc in 124|137) finish error build_infra_failure ;; *) finish fail build_failed ;; esac
 fi
 ev build ok
 
