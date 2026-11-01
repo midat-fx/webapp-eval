@@ -1,0 +1,147 @@
+diff --git a/drizzle/0004_booking_unique_start.sql b/drizzle/0004_booking_unique_start.sql
+new file mode 100644
+index 0000000..be88d03
+--- /dev/null
++++ b/drizzle/0004_booking_unique_start.sql
+@@ -0,0 +1,2 @@
++-- A master can't have two confirmed bookings starting at the same time.
++CREATE UNIQUE INDEX "bookings_staff_start_unique" ON "bookings" ("staff_id", "start_at") WHERE "status" = 'confirmed';
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index ecdda1a..0417088 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1786183773099,
+       "tag": "0003_waitlist",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "7",
++      "when": 1793520000000,
++      "tag": "0004_booking_unique_start",
++      "breakpoints": true
+     }
+   ]
+-}
+\ No newline at end of file
++}
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..4df53de 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -159,57 +159,71 @@ export async function createBooking(opts: {
+       .values({ businessId, name: client.name, phone: client.phone })
+       .returning())[0];
+ 
+-  // Booking, audit trail and outbound messages commit together: a client can
+-  // never end up with a confirmation for a booking that was rolled back.
+-  const bookingId = await db.transaction(async (tx) => {
+-    const [booking] = await tx
+-      .insert(s.bookings)
+-      .values({
+-        businessId,
+-        staffId,
+-        serviceId,
+-        clientId: clientRow.id,
+-        startAt: new Date(slot.startMs),
+-        endAt: new Date(slot.endMs),
+-        status: "confirmed",
+-        priceKzt: service.priceKzt,
+-      })
+-      .returning();
+-
+-    await tx.insert(s.auditLog).values({
+-      businessId,
+-      action: "booking.create",
+-      entity: "booking",
+-      entityId: booking.id,
+-      meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
+-    });
++  try {
++    // Booking, audit trail and outbound messages commit together: a client can
++    // never end up with a confirmation for a booking that was rolled back.
++    const bookingId = await db.transaction(async (tx) => {
++      const [booking] = await tx
++        .insert(s.bookings)
++        .values({
++          businessId,
++          staffId,
++          serviceId,
++          clientId: clientRow.id,
++          startAt: new Date(slot.startMs),
++          endAt: new Date(slot.endMs),
++          status: "confirmed",
++          priceKzt: service.priceKzt,
++        })
++        .returning();
+ 
+-    await enqueue(tx, {
+-      businessId,
+-      topic: "booking.confirmed",
+-      payload: { bookingId: booking.id },
+-      dedupeKey: `booking.confirmed:${booking.id}`,
+-    });
++      await tx.insert(s.auditLog).values({
++        businessId,
++        action: "booking.create",
++        entity: "booking",
++        entityId: booking.id,
++        meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
++      });
+ 
+-    // Reminder the day before; retired automatically if the booking is
+-    // cancelled before the worker gets to it.
+-    const remindAt = new Date(slot.startMs - 24 * 3600_000);
+-    if (remindAt.getTime() > Date.now()) {
+       await enqueue(tx, {
+         businessId,
+-        topic: "booking.reminder",
++        topic: "booking.confirmed",
+         payload: { bookingId: booking.id },
+-        dedupeKey: `booking.reminder:${booking.id}`,
+-        availableAt: remindAt,
++        dedupeKey: `booking.confirmed:${booking.id}`,
+       });
+-    }
+ 
+-    return booking.id;
+-  });
++      // Reminder the day before; retired automatically if the booking is
++      // cancelled before the worker gets to it.
++      const remindAt = new Date(slot.startMs - 24 * 3600_000);
++      if (remindAt.getTime() > Date.now()) {
++        await enqueue(tx, {
++          businessId,
++          topic: "booking.reminder",
++          payload: { bookingId: booking.id },
++          dedupeKey: `booking.reminder:${booking.id}`,
++          availableAt: remindAt,
++        });
++      }
++
++      return booking.id;
++    });
+ 
+-  await redis().del(holdKey(staffId, slot.startMs));
+-  await publishCalendar(businessId, { type: "booking.created", bookingId });
+-  return { ok: true, bookingId };
++    await redis().del(holdKey(staffId, slot.startMs));
++    await publishCalendar(businessId, { type: "booking.created", bookingId });
++    return { ok: true, bookingId };
++  } catch (e) {
++    // 23505 = unique_violation: someone took this start time first.
++    if (isPgError(e, "23505")) return { ok: false, error: "slot_taken" };
++    throw e;
++  }
++}
++
++/** Drizzle wraps driver errors, so the pg code can sit a few `cause` links down. */
++function isPgError(error: unknown, code: string): boolean {
++  for (let e = error; e; e = (e as { cause?: unknown }).cause) {
++    if ((e as { code?: string }).code === code) return true;
++  }
++  return false;
+ }
+ 
+ export async function setBookingStatus(opts: {

@@ -1,0 +1,61 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..470e0e6 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, eq, gt, gte, inArray, lt } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -125,7 +125,17 @@ export type BookResult =
+   | { ok: true; bookingId: string }
+   | { ok: false; error: "hold_expired" | "slot_taken" };
+ 
+-export async function createBooking(opts: {
++// One booking at a time per master, so the overlap check below can't race.
++const bookingQueue = new Map<string, Promise<unknown>>();
++
++export async function createBooking(opts: Parameters<typeof createBookingNow>[0]): Promise<BookResult> {
++  const prev = bookingQueue.get(opts.staffId) ?? Promise.resolve();
++  const run = prev.catch(() => {}).then(() => createBookingNow(opts));
++  bookingQueue.set(opts.staffId, run);
++  return run;
++}
++
++async function createBookingNow(opts: {
+   businessId: string;
+   staffId: string;
+   serviceId: string;
+@@ -162,6 +172,21 @@ export async function createBooking(opts: {
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
+   const bookingId = await db.transaction(async (tx) => {
++    // Refuse if the master already has a confirmed booking in this range.
++    const clash = await tx
++      .select({ id: s.bookings.id })
++      .from(s.bookings)
++      .where(
++        and(
++          eq(s.bookings.staffId, staffId),
++          eq(s.bookings.status, "confirmed"),
++          lt(s.bookings.startAt, new Date(slot.endMs)),
++          gt(s.bookings.endAt, new Date(slot.startMs)),
++        ),
++      )
++      .limit(1);
++    if (clash.length > 0) return null;
++
+     const [booking] = await tx
+       .insert(s.bookings)
+       .values({
+@@ -206,6 +231,7 @@ export async function createBooking(opts: {
+ 
+     return booking.id;
+   });
++  if (!bookingId) return { ok: false, error: "slot_taken" };
+ 
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });

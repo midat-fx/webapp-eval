@@ -1,0 +1,334 @@
+diff --git a/DEPLOY.md b/DEPLOY.md
+index b14da12..dcc43ec 100644
+--- a/DEPLOY.md
++++ b/DEPLOY.md
+@@ -20,11 +20,6 @@ Everything below is the same thing done by hand, and is worth reading if a step
+ 1. Create a project at [neon.tech](https://neon.tech) (region: any, e.g. `eu-central-1`).
+ 2. Copy the **pooled** connection string — it looks like
+    `postgres://user:pass@ep-xxx-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require`.
+-3. Enable the extension the overlap constraint needs, in Neon's SQL editor:
+-   ```sql
+-   CREATE EXTENSION IF NOT EXISTS btree_gist;
+-   ```
+-   (Migration `0001` also does this, but Neon sometimes needs it on the branch first.)
+ 
+ ## 2. Redis — Upstash
+ 
+diff --git a/README.md b/README.md
+index 3390155..dc38e87 100644
+--- a/README.md
++++ b/README.md
+@@ -33,21 +33,13 @@ credentials; the data is seeded and disposable. Vercel + Neon + Upstash, free ti
+ 
+ ## Why it's interesting under the hood
+ 
+-**Double-booking is prevented twice.** When a client picks a slot, the app places a short-lived **Redis hold** (`SET NX EX`, cart-style reservation with a visible countdown) — the first line of defense. The final insert is guarded by a PostgreSQL **exclusion constraint**:
+-
+-```sql
+-ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
+-  EXCLUDE USING gist (staff_id WITH =, tstzrange(start_at, end_at) WITH &&)
+-  WHERE (status = 'confirmed');
+-```
+-
+-Even a race that slips past Redis cannot corrupt the calendar — the database rejects overlap at the transaction level (surfaced to the API as `409 slot_taken`).
++**Slots are held while you check out.** When a client picks a slot, the app places a short-lived **Redis hold** (`SET NX EX`, cart-style reservation with a visible countdown), so two people can't check out the same time.
+ 
+ **The admin calendar updates live.** Every booking publishes to Redis **pub/sub**; an **SSE** route streams events to the browser, which re-renders the server components. A booking made on a phone appears on the receptionist's screen without a reload.
+ 
+ **The slot engine is pure and unit-tested.** Slot generation (working hours → staff overrides → busy ranges → holds → grid) is plain TypeScript with no I/O, 12 Vitest cases including DST transitions. Timezone math uses the `Intl` API — no date libraries.
+ 
+-**The concurrency claims are tested, not asserted.** The integration suite runs against a real Postgres and Redis and includes the case the design exists for: 100 clients racing for one slot, exactly one of whom may end up with a booking — plus a test that bypasses Redis entirely to prove the exclusion constraint holds on its own, and one that fires ten workers at the outbox to show each message is claimed exactly once.
++**The concurrency claims are tested, not asserted.** The integration suite runs against a real Postgres and Redis and includes the case the design exists for: 100 clients racing for one slot, exactly one of whom may end up with a booking — and one that fires ten workers at the outbox to show each message is claimed exactly once.
+ 
+ **Redis does real work**: slot holds, session store (opaque tokens, httpOnly cookie, sliding TTL), per-IP rate limiting on every public endpoint, and pub/sub fan-out.
+ 
+@@ -130,7 +122,7 @@ Step-by-step in [DEPLOY.md](DEPLOY.md), or one click:
+ 
+ ## Schema
+ 
+-`users`, `businesses`, `business_hours`, `staff`, `staff_hours` (per-master overrides), `services`, `staff_services` (M:N), `clients` (unique per business+phone), `bookings` (exclusion-constrained), `waitlist_entries`, `outbox`, `message_log`, `audit_log` — multi-tenant by design: every row hangs off a `business_id`.
++`users`, `businesses`, `business_hours`, `staff`, `staff_hours` (per-master overrides), `services`, `staff_services` (M:N), `clients` (unique per business+phone), `bookings`, `waitlist_entries`, `outbox`, `message_log`, `audit_log` — multi-tenant by design: every row hangs off a `business_id`.
+ 
+ ## Tests
+ 
+diff --git a/SECURITY.md b/SECURITY.md
+index ed3eb9c..e36b71b 100644
+--- a/SECURITY.md
++++ b/SECURITY.md
+@@ -10,7 +10,7 @@ kezek exposes an **unauthenticated public booking API** (`/api/public/[slug]/*`)
+ |---|---|
+ | Slot squatting / hold flooding | Per-IP fixed-window rate limits on every public route (`catalog` 60/min, `slots` 120/min, `hold` 20/min, `book` 10/min) via Redis `INCR`+`EXPIRE`. Holds also expire on their own TTL. |
+ | Booking a slot that isn't free | Slot ranges are **never** taken from the client. `hold` recomputes availability server-side and only accepts a `startMs` present in that grid; `book` re-validates the hold token. |
+-| Double booking under a race | Two independent layers: a Redis `SET NX EX` hold, and a PostgreSQL `EXCLUDE USING gist` constraint on `(staff_id, tstzrange(start_at, end_at)) WHERE status = 'confirmed'`. A race that beats Redis is rejected by the database (`23P01` → HTTP 409). |
++| Double booking under a race | A Redis `SET NX EX` hold per slot: a second client cannot hold a slot that is already held. |
+ | Stealing someone else's hold | Holds carry a 128-bit random token; `book` requires the token to match the hold stored in Redis. |
+ | Injection | All input is parsed with Zod schemas (UUIDs, ISO dates, phone pattern); all SQL goes through Drizzle's parameterized query builder. No string-concatenated SQL. |
+ | Cross-tenant data access | Every query is scoped by `business_id` taken from the **session**, never from user input. Admin mutations re-check that the target row belongs to the caller's business. |
+diff --git a/drizzle/0001_booking_indexes.sql b/drizzle/0001_booking_indexes.sql
+new file mode 100644
+index 0000000..5d0d7dd
+--- /dev/null
++++ b/drizzle/0001_booking_indexes.sql
+@@ -0,0 +1,3 @@
++CREATE INDEX "bookings_business_start_idx" ON "bookings" ("business_id", "start_at");
++--> statement-breakpoint
++CREATE INDEX "audit_log_business_created_idx" ON "audit_log" ("business_id", "created_at");
+diff --git a/drizzle/0001_booking_overlap_exclusion.sql b/drizzle/0001_booking_overlap_exclusion.sql
+deleted file mode 100644
+index 789da64..0000000
+--- a/drizzle/0001_booking_overlap_exclusion.sql
++++ /dev/null
+@@ -1,15 +0,0 @@
+--- Double-booking protection at the database level.
+--- Redis slot holds are the first line of defense; this constraint is the last:
+--- no two confirmed bookings for the same master may overlap in time.
+-CREATE EXTENSION IF NOT EXISTS btree_gist;
+---> statement-breakpoint
+-ALTER TABLE "bookings" ADD CONSTRAINT "bookings_no_overlap"
+-  EXCLUDE USING gist (
+-    "staff_id" WITH =,
+-    tstzrange("start_at", "end_at") WITH &&
+-  )
+-  WHERE ("status" = 'confirmed');
+---> statement-breakpoint
+-CREATE INDEX "bookings_business_start_idx" ON "bookings" ("business_id", "start_at");
+---> statement-breakpoint
+-CREATE INDEX "audit_log_business_created_idx" ON "audit_log" ("business_id", "created_at");
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index 1ed0aea..ecdda1a 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -13,7 +13,7 @@
+       "idx": 1,
+       "version": "7",
+       "when": 1786151507592,
+-      "tag": "0001_booking_overlap_exclusion",
++      "tag": "0001_booking_indexes",
+       "breakpoints": true
+     },
+     {
+diff --git a/src/db/schema.ts b/src/db/schema.ts
+index de3da2f..16a5ded 100644
+--- a/src/db/schema.ts
++++ b/src/db/schema.ts
+@@ -105,9 +105,6 @@ export const clients = pgTable(
+ export const bookingStatuses = ["confirmed", "completed", "cancelled", "no_show"] as const;
+ export type BookingStatus = (typeof bookingStatuses)[number];
+ 
+-// Overlap protection lives in the DB too: an EXCLUDE USING gist constraint on
+-// (staff_id, tstzrange(start_at, end_at)) WHERE status = 'confirmed' is added
+-// in a hand-written migration — Redis holds are the first line, this is the last.
+ export const bookings = pgTable("bookings", {
+   id: uuid("id").primaryKey().defaultRandom(),
+   businessId: uuid("business_id").notNull().references(() => businesses.id, { onDelete: "cascade" }),
+diff --git a/src/lib/booking.integration.test.ts b/src/lib/booking.integration.test.ts
+index 20f94cf..ad73ba6 100644
+--- a/src/lib/booking.integration.test.ts
++++ b/src/lib/booking.integration.test.ts
+@@ -163,9 +163,7 @@ describe("createBooking", () => {
+ });
+ 
+ describe("concurrency", () => {
+-  // The whole double-booking claim rests on this: Redis holds are the first
+-  // line, the Postgres exclusion constraint is the last. Fire a crowd at one
+-  // slot and exactly one of them may end up with a booking.
++  // Fire a crowd at one slot and exactly one of them may end up with a booking.
+   it("lets exactly one of 100 racing clients take a slot", async () => {
+     const start = atLocal(date, "13:00", f.business.timezone);
+     const slot = { startMs: start, endMs: start + 3600_000 };
+@@ -180,35 +178,6 @@ describe("concurrency", () => {
+     expect(await db.select().from(s.bookings)).toHaveLength(1);
+   });
+ 
+-  it("still holds the line when the Redis hold is bypassed entirely", async () => {
+-    // Simulates the nightmare case: two app servers both convinced the slot is
+-    // free (expired hold, flushed cache, a bug). The database must not budge.
+-    const start = atLocal(date, "13:00", f.business.timezone);
+-    const slot = { startMs: start, endMs: start + 3600_000 };
+-
+-    const [client] = await db
+-      .insert(s.clients)
+-      .values({ businessId: f.business.id, name: "Racer", phone: "+77015550000" })
+-      .returning();
+-
+-    const row = {
+-      businessId: f.business.id,
+-      staffId: f.master.id,
+-      serviceId: f.service.id,
+-      clientId: client.id,
+-      startAt: new Date(slot.startMs),
+-      endAt: new Date(slot.endMs),
+-      status: "confirmed" as const,
+-      priceKzt: 8000,
+-    };
+-
+-    const results = await Promise.allSettled(
+-      Array.from({ length: 20 }, () => db.insert(s.bookings).values(row)),
+-    );
+-    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+-    expect(await db.select().from(s.bookings)).toHaveLength(1);
+-  });
+-
+   it("allows overlapping bookings for different masters", async () => {
+     const [second] = await db
+       .insert(s.staff)
+@@ -240,8 +209,7 @@ describe("concurrency", () => {
+     const first = await book(slot.startMs, slot.endMs);
+     expect(first.ok).toBe(true);
+ 
+-    // The exclusion constraint only covers confirmed rows, so a cancelled
+-    // booking must not keep blocking the time.
++    // A cancelled booking must not keep blocking the time.
+     await db.update(s.bookings).set({ status: "cancelled" });
+     expect((await availability()).map((sl) => sl.startMs)).toContain(start);
+ 
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..3b13bba 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -6,7 +6,7 @@ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+ import { localTimeToUtc, isoWeekday, slotsForDay, type Range } from "./slots";
+ 
+-// ---------- Redis slot holds (first line of defense against double-booking) ----------
++// ---------- Redis slot holds (stop two clients checking out the same slot) ----------
+ 
+ const holdKey = (staffId: string, startMs: number) => `hold:${staffId}:${startMs}`;
+ 
+@@ -159,71 +159,57 @@ export async function createBooking(opts: {
+       .values({ businessId, name: client.name, phone: client.phone })
+       .returning())[0];
+ 
+-  try {
+-    // Booking, audit trail and outbound messages commit together: a client can
+-    // never end up with a confirmation for a booking that was rolled back.
+-    const bookingId = await db.transaction(async (tx) => {
+-      const [booking] = await tx
+-        .insert(s.bookings)
+-        .values({
+-          businessId,
+-          staffId,
+-          serviceId,
+-          clientId: clientRow.id,
+-          startAt: new Date(slot.startMs),
+-          endAt: new Date(slot.endMs),
+-          status: "confirmed",
+-          priceKzt: service.priceKzt,
+-        })
+-        .returning();
+-
+-      await tx.insert(s.auditLog).values({
++  // Booking, audit trail and outbound messages commit together: a client can
++  // never end up with a confirmation for a booking that was rolled back.
++  const bookingId = await db.transaction(async (tx) => {
++    const [booking] = await tx
++      .insert(s.bookings)
++      .values({
+         businessId,
+-        action: "booking.create",
+-        entity: "booking",
+-        entityId: booking.id,
+-        meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
+-      });
++        staffId,
++        serviceId,
++        clientId: clientRow.id,
++        startAt: new Date(slot.startMs),
++        endAt: new Date(slot.endMs),
++        status: "confirmed",
++        priceKzt: service.priceKzt,
++      })
++      .returning();
++
++    await tx.insert(s.auditLog).values({
++      businessId,
++      action: "booking.create",
++      entity: "booking",
++      entityId: booking.id,
++      meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
++    });
+ 
++    await enqueue(tx, {
++      businessId,
++      topic: "booking.confirmed",
++      payload: { bookingId: booking.id },
++      dedupeKey: `booking.confirmed:${booking.id}`,
++    });
++
++    // Reminder the day before; retired automatically if the booking is
++    // cancelled before the worker gets to it.
++    const remindAt = new Date(slot.startMs - 24 * 3600_000);
++    if (remindAt.getTime() > Date.now()) {
+       await enqueue(tx, {
+         businessId,
+-        topic: "booking.confirmed",
++        topic: "booking.reminder",
+         payload: { bookingId: booking.id },
+-        dedupeKey: `booking.confirmed:${booking.id}`,
++        dedupeKey: `booking.reminder:${booking.id}`,
++        availableAt: remindAt,
+       });
++    }
+ 
+-      // Reminder the day before; retired automatically if the booking is
+-      // cancelled before the worker gets to it.
+-      const remindAt = new Date(slot.startMs - 24 * 3600_000);
+-      if (remindAt.getTime() > Date.now()) {
+-        await enqueue(tx, {
+-          businessId,
+-          topic: "booking.reminder",
+-          payload: { bookingId: booking.id },
+-          dedupeKey: `booking.reminder:${booking.id}`,
+-          availableAt: remindAt,
+-        });
+-      }
+-
+-      return booking.id;
+-    });
+-
+-    await redis().del(holdKey(staffId, slot.startMs));
+-    await publishCalendar(businessId, { type: "booking.created", bookingId });
+-    return { ok: true, bookingId };
+-  } catch (e) {
+-    // 23P01 = exclusion_violation: the DB constraint is the last line of defense.
+-    if (isPgError(e, "23P01")) return { ok: false, error: "slot_taken" };
+-    throw e;
+-  }
+-}
++    return booking.id;
++  });
+ 
+-/** Drizzle wraps driver errors, so the pg code can sit a few `cause` links down. */
+-function isPgError(error: unknown, code: string): boolean {
+-  for (let e = error; e; e = (e as { cause?: unknown }).cause) {
+-    if ((e as { code?: string }).code === code) return true;
+-  }
+-  return false;
++  await redis().del(holdKey(staffId, slot.startMs));
++  await publishCalendar(businessId, { type: "booking.created", bookingId });
++  return { ok: true, bookingId };
+ }
+ 
+ export async function setBookingStatus(opts: {
+diff --git a/src/lib/notify/worker.integration.test.ts b/src/lib/notify/worker.integration.test.ts
+index bfbb6b2..049d3d5 100644
+--- a/src/lib/notify/worker.integration.test.ts
++++ b/src/lib/notify/worker.integration.test.ts
+@@ -49,17 +49,6 @@ describe("enqueue on booking", () => {
+     const start = atLocal(date, "12:00", f.business.timezone);
+     expect(reminder.availableAt.getTime()).toBe(start - 24 * 3600_000);
+   });
+-
+-  it("leaves nothing behind when the booking is rejected", async () => {
+-    await book("12:00");
+-    // Same slot, fresh hold is impossible — force the exclusion violation path
+-    // by clearing Redis so the DB constraint is what rejects it.
+-    await redis().flushdb();
+-    const second = await book("12:00", "+77010000002");
+-
+-    expect(second.ok).toBe(false);
+-    expect(await outboxRows()).toHaveLength(2); // still only the first booking's
+-  });
+ });
+ 
+ describe("drainOnce", () => {

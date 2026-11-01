@@ -1,0 +1,7 @@
+{
+  "id": "t05-overlap-race",
+  "title": "Overlapping bookings for one master under concurrent checkout",
+  "category": "api-db-race",
+  "origin": "injected: the overlap exclusion constraint and its 409 mapping removed",
+  "instances": 2
+}
