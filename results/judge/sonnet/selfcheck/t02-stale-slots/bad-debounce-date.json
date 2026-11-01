@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t02-stale-slots/bad-debounce-date",
+  "task": "t02-stale-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only debounces date changes by 300ms and does not cancel or ignore in-flight requests, so an older response can still arrive after a newer one and overwrite the grid with the wrong day's times. Switching staff member is not addressed at all, and the date input is now controlled by a delayed state, so the picker can show a date that differs from the one whose times are displayed.\"}",
+  "cost_usd": 0.012107699999999999,
+  "is_error": false
+}

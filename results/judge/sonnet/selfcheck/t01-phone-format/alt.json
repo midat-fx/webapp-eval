@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t01-phone-format/alt",
+  "task": "t01-phone-format",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Both public routes now normalize the phone by stripping spaces, dots, dashes and parentheses, so `+7 (701) 555-12-34` becomes `+77015551234` before booking or joining the waitlist. Non-numbers like `call me` and `+7 701` still fail the 10-15 digit check. This assumes the routes pass the parsed value downstream and that the wizard has no client-side phone check of its own, neither of which the diff shows.\"}",
+  "cost_usd": 0.046106699999999994,
+  "is_error": false
+}

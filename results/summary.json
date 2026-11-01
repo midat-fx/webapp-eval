@@ -1,0 +1,281 @@
+{
+  "selfcheck": {
+    "agree": 62,
+    "total": 62,
+    "known_bad": 32,
+    "known_bad_caught": 32,
+    "by_task": {
+      "t01-phone-format": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-book-route-only",
+          "bad-no-canonical-form",
+          "bad-ui-only"
+        ],
+        "wrong": []
+      },
+      "t02-stale-slots": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-debounce-date",
+          "bad-drop-slow-responses",
+          "bad-lock-inputs-while-loading"
+        ],
+        "wrong": []
+      },
+      "t03-default-date-tz": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-browser-local-date",
+          "bad-default-only",
+          "bad-hardcoded-utc-plus-5"
+        ],
+        "wrong": []
+      },
+      "t04-sse-subscriber-leak": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-close-on-pagehide",
+          "bad-recycle-after-60s",
+          "bad-unsubscribe-without-quit"
+        ],
+        "wrong": []
+      },
+      "t05-overlap-race": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-check-then-insert",
+          "bad-constraint-without-409",
+          "bad-in-process-lock",
+          "bad-unique-start-time"
+        ],
+        "wrong": []
+      },
+      "t06-dst-slots": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-hardcoded-dst-dates",
+          "bad-platform-local-time",
+          "bad-ui-filter"
+        ],
+        "wrong": []
+      },
+      "t07-staff-permissions": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-owner-only-everything",
+          "bad-pages-only",
+          "bad-services-only"
+        ],
+        "wrong": []
+      },
+      "t08-status-transitions": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-disable-button-while-pending",
+          "bad-only-cancelled-is-final",
+          "bad-read-then-update"
+        ],
+        "wrong": []
+      },
+      "t09-booking-note": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-html-line-breaks",
+          "bad-no-length-limit",
+          "bad-placeholder-only",
+          "bad-ui-only"
+        ],
+        "wrong": []
+      },
+      "t10-wizard-a11y": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-axe-clean-only",
+          "bad-drop-low-contrast-text",
+          "bad-errors-not-announced"
+        ],
+        "wrong": []
+      }
+    }
+  },
+  "agents": {
+    "runs": 49,
+    "ledger_invocations": 50,
+    "table": {
+      "t01-phone-format": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t02-stale-slots": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t03-default-date-tz": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t04-sse-subscriber-leak": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t05-overlap-race": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t06-dst-slots": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t07-staff-permissions": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t08-status-transitions": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t09-booking-note": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t10-wizard-a11y": {
+        "claude-haiku-5-5": [
+          2,
+          2
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      }
+    },
+    "totals": {
+      "claude-haiku-5-5": [
+        29,
+        29
+      ],
+      "claude-sonnet-5-5": [
+        20,
+        20
+      ]
+    },
+    "stats": {
+      "claude-haiku-5-5": {
+        "mean_seconds": 86.82,
+        "mean_turns": 19.0,
+        "mean_cost_usd": 0.84,
+        "errors": 0,
+        "served_models": [
+          "claude-haiku-5-5"
+        ]
+      },
+      "claude-sonnet-5-5": {
+        "mean_seconds": 37.8,
+        "mean_turns": 8.15,
+        "mean_cost_usd": 0.19,
+        "errors": 0,
+        "served_models": [
+          "claude-sonnet-5-5"
+        ]
+      }
+    },
+    "contamination_flags": []
+  },
+  "judge": {},
+  "flake": []
+}

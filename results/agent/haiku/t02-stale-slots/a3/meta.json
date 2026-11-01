@@ -1,0 +1,28 @@
+{
+  "task": "t02-stale-slots",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 64.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 14,
+  "cost_usd": 0.464656,
+  "is_error": false,
+  "result_text": "The booking grid now always shows the times for the currently selected service, staff member and date, even when responses arrive out of order.\n\n**Cause:** every date or staff change fired a slots request, and whichever response arrived last overwrote the grid. A slow response for the first date could land after the second date's times, and the date picker still showed the second date.\n\n**Fix** (`src/app/[slug]/wizard.tsx`):\n- The slots fetch is now a `useEffect` keyed on slug, service, staff, and date. Its cleanup aborts the in-flight request, and a response is only applied if its request wasn't aborted.\n- The retry paths (failed hold, failed booking, \"Back\") bump a reload key instead of calling the old `loadSlots`, so they re-fetch through the same effect.\n- The \"Loading\u2026\" state still resets on selection change, so changing date or staff while loading keeps working.\n- The now-unused `useCallback` import is removed.\n\n**Verification:** `pnpm test` passes (12/12) and `pnpm build` succeeds. `tsc` reports one error in `src/app/layout.tsx`, which I didn't touch. I could not exercise the page in a browser because Postgres and Redis aren't running, so the throttled-network scenario is untested end to end.\n\nThe changes are uncommitted in the working tree.",
+  "stderr": "",
+  "patch_lines": 74,
+  "touched_outside_workdir": []
+}

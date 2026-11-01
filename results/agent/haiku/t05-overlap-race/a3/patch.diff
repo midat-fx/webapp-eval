@@ -1,0 +1,75 @@
+diff --git a/src/lib/booking.integration.test.ts b/src/lib/booking.integration.test.ts
+index ad73ba6..c430717 100644
+--- a/src/lib/booking.integration.test.ts
++++ b/src/lib/booking.integration.test.ts
+@@ -178,6 +178,24 @@ describe("concurrency", () => {
+     expect(await db.select().from(s.bookings)).toHaveLength(1);
+   });
+ 
++  // Holds are per start time, so these all get a hold, but their slots overlap.
++  it("lets exactly one of several overlapping starts take the master", async () => {
++    const base = atLocal(date, "13:00", f.business.timezone);
++    const offsets = [0, 15, 30, 45].map((m) => m * 60_000);
++
++    const attempts = await Promise.all(
++      offsets.map((off, i) =>
++        book(base + off, base + off + 3600_000, `+7701100000${i}`),
++      ),
++    );
++
++    expect(attempts.filter((r) => r.ok)).toHaveLength(1);
++    expect(attempts.filter((r) => !r.ok)).toEqual(
++      expect.arrayContaining([{ ok: false, error: "slot_taken" }]),
++    );
++    expect(await db.select().from(s.bookings)).toHaveLength(1);
++  });
++
+   it("allows overlapping bookings for different masters", async () => {
+     const [second] = await db
+       .insert(s.staff)
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..2e0fe17 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, eq, gt, gte, inArray, lt, sql } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -162,6 +162,24 @@ export async function createBooking(opts: {
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
+   const bookingId = await db.transaction(async (tx) => {
++    // Serialises bookings per master across every app server, so the overlap
++    // check below cannot be raced by a concurrent booking at a nearby start.
++    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${staffId}, 0))`);
++
++    const [clash] = await tx
++      .select({ id: s.bookings.id })
++      .from(s.bookings)
++      .where(
++        and(
++          eq(s.bookings.staffId, staffId),
++          eq(s.bookings.status, "confirmed"),
++          lt(s.bookings.startAt, new Date(slot.endMs)),
++          gt(s.bookings.endAt, new Date(slot.startMs)),
++        ),
++      )
++      .limit(1);
++    if (clash) return null;
++
+     const [booking] = await tx
+       .insert(s.bookings)
+       .values({
+@@ -207,6 +225,8 @@ export async function createBooking(opts: {
+     return booking.id;
+   });
+ 
++  if (!bookingId) return { ok: false, error: "slot_taken" };
++
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });
+   return { ok: true, bookingId };

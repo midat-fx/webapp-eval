@@ -1,0 +1,46 @@
+diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
+index 1a0aabc..8bd3e78 100644
+--- a/src/app/api/admin/events/route.ts
++++ b/src/app/api/admin/events/route.ts
+@@ -7,24 +7,32 @@ export const dynamic = "force-dynamic";
+ // SSE stream of calendar changes for the admin UI.
+ // Each connection gets its own Redis subscriber (a subscribing connection
+ // can't run other commands).
+-export async function GET() {
++export async function GET(request: Request) {
+   const session = await getSession();
+   if (!session) return new Response("unauthorized", { status: 401 });
+ 
+   const sub = redis().duplicate();
+-  await sub.subscribe(calendarChannel(session.businessId));
+   const encoder = new TextEncoder();
++  let heartbeat: ReturnType<typeof setInterval> | undefined;
++
++  const close = () => {
++    clearInterval(heartbeat);
++    sub.disconnect();
++  };
++  request.signal.addEventListener("abort", close);
+ 
+   const stream = new ReadableStream({
+-    start(controller) {
+-      controller.enqueue(encoder.encode(`event: hello\ndata: {}\n\n`));
+-      sub.on("message", (_channel, message) => {
+-        controller.enqueue(encoder.encode(`data: ${message}\n\n`));
++    async start(controller) {
++      const send = (chunk: string) => controller.enqueue(encoder.encode(chunk));
++      sub.on("message", (_channel, message) => send(`data: ${message}\n\n`));
++      await sub.subscribe(calendarChannel(session.businessId)).catch((err) => {
++        close();
++        throw err;
+       });
+-      setInterval(() => {
+-        controller.enqueue(encoder.encode(`: ping\n\n`));
+-      }, 25_000);
++      send(`event: hello\ndata: {}\n\n`);
++      heartbeat = setInterval(() => send(`: ping\n\n`), 25_000);
+     },
++    cancel: close,
+   });
+ 
+   return new Response(stream, {

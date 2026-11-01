@@ -1,0 +1,31 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "axe",
+      "name": "every wizard state passes axe",
+      "pass": false,
+      "detail": "Error: service list\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"color-contrast (serious): button:nth-child(1) > span:nth-child(1) > .text-zinc-400 | button:nth-child(2) > span:nth-child(1) > .text-zinc-400 | button:nth-child(3) > span:nth-child(1) > .text-zinc-400 | button:nth-child(4) > span:nth-child(1) > .text-zinc-400 | button:nth-child(5) > span:nth-child(1) > .text-zinc-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "fields have real labels and nothing visible was dropped",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveAttribute\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel(/date/i).first()\nExpected: \u001b[32m\"date\"\u001b[39m\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveAttribute\" getByLabel(/date/i).first() with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/date/i).first()\u001b[22m\n"
+    },
+    {
+      "kind": "playwright",
+      "name": "selection is exposed to assistive tech",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "errors are announced",
+      "pass": false,
+      "detail": "TimeoutError: locator.fill: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/name/i).first()\u001b[22m\n"
+    }
+  ],
+  "task": "t10-wizard-a11y",
+  "seconds": 106.4
+}

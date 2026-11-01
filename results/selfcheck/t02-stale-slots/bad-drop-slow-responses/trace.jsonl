@@ -1,0 +1,10 @@
+{"ts":"2026-11-01T13:21:54.038Z","step":"start","status":"ok","detail":"t02-stale-slots"}
+{"ts":"2026-11-01T13:21:54.052Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T13:21:54.078Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-01T13:22:03.298Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T13:22:05.705Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T13:22:06.483Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T13:22:07.558Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T13:22:20.414Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-01T13:22:20.480Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-01T13:22:20.517Z","step":"done","status":"auto","detail":"checks"}

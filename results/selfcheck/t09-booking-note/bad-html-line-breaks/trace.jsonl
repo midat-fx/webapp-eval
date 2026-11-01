@@ -1,0 +1,10 @@
+{"ts":"2026-11-01T13:24:53.491Z","step":"start","status":"ok","detail":"t09-booking-note"}
+{"ts":"2026-11-01T13:24:53.508Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T13:24:53.555Z","step":"apply","status":"ok","detail":"4 files touched"}
+{"ts":"2026-11-01T13:25:14.145Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T13:25:16.795Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T13:25:18.479Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T13:25:19.563Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T13:25:43.082Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-01T13:25:43.237Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-01T13:25:43.291Z","step":"done","status":"auto","detail":"checks"}

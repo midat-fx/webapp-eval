@@ -1,0 +1,29 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "axe",
+      "name": "every wizard state passes axe",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "fields have real labels and nothing visible was dropped",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /(^|\\W)Women's haircut/ }).or(getByRole('radio', { name: /(^|\\W)Women's haircut/ })).or(getByRole('option', { name: /(^|\\W)Women's haircut/ })).first()\nExpected substring: \u001b[32m\"60 min\"\u001b[39m\nReceived string:    \u001b[31m\"Women's haircut8,000 \u20b8\"\u001b[39m\nTimeout: 20000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('button', { name: /(^|\\W)Women's haircut/ }).or(getByRole('radio', { name: /(^|\\W)Women's haircut/ })).or(getByRole('option', { name: /(^"
+    },
+    {
+      "kind": "playwright",
+      "name": "selection is exposed to assistive tech",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "errors are announced",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/fully booked/)\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/fully booked/) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/fully booked/)\u001b[22m\n"
+    }
+  ],
+  "task": "t10-wizard-a11y",
+  "seconds": 85.0
+}

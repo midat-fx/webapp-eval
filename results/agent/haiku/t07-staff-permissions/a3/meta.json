@@ -1,0 +1,28 @@
+{
+  "task": "t07-staff-permissions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 107.9,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 32,
+  "cost_usd": 1.006285,
+  "is_error": false,
+  "result_text": "Staff logins are now limited to the Calendar and Clients, and every owner-only page and action is refused for them on the server. The changes are uncommitted in the working tree. `pnpm test` passes and `pnpm build` compiles. I could not exercise the pages in a browser because Postgres and Redis aren't running here.\n\n- **Guard:** `requireOwner()` in `src/lib/session.ts` wraps `requireSession()` and redirects non-owners to `/admin`.\n- **Server actions:** `saveService`, `toggleService`, `saveStaff`, `toggleStaff` and `toggleStaffService` in `src/app/admin/actions.ts` now call `requireOwner()` before anything touches the database. A replayed form submission from a staff login is redirected and changes nothing. `updateBookingStatus` stays open to staff so they can mark visits completed, no-show or cancelled.\n- **Pages:** Services, Staff, Reports, Analytics, Notifications and Audit call `requireOwner()`. A staff member who opens one of those URLs is sent to the calendar.\n- **Nav:** `src/app/admin/layout.tsx` hides the owner-only links, so staff see only Calendar and Clients.\n\nOwners see the same nav and behave as before.",
+  "stderr": "",
+  "patch_lines": 224,
+  "touched_outside_workdir": []
+}

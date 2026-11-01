@@ -14,7 +14,7 @@
         "both_bookings_on_that_client",
         "waitlist_entry_on_that_client"
       ],
-      "seconds": 89.7
+      "seconds": 52.0
     },
     {
       "task": "t01-phone-format",
@@ -23,7 +23,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 54.0
+      "seconds": 26.1
     },
     {
       "task": "t01-phone-format",
@@ -32,7 +32,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 34.3
+      "seconds": 28.0
     },
     {
       "task": "t01-phone-format",
@@ -44,7 +44,7 @@
         "waitlist accepts dashes",
         "waitlist_entry_on_that_client"
       ],
-      "seconds": 34.1
+      "seconds": 19.4
     },
     {
       "task": "t01-phone-format",
@@ -58,7 +58,7 @@
         "both_bookings_on_that_client",
         "waitlist_entry_on_that_client"
       ],
-      "seconds": 58.3
+      "seconds": 30.8
     },
     {
       "task": "t01-phone-format",
@@ -72,7 +72,7 @@
         "both_bookings_on_that_client",
         "waitlist_entry_on_that_client"
       ],
-      "seconds": 105.2
+      "seconds": 23.7
     },
     {
       "task": "t02-stale-slots",
@@ -86,7 +86,7 @@
         "late response for the previous staff member is ignored",
         "both_checks_booked"
       ],
-      "seconds": 52.1
+      "seconds": 32.3
     },
     {
       "task": "t02-stale-slots",
@@ -95,7 +95,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 43.5
+      "seconds": 27.1
     },
     {
       "task": "t02-stale-slots",
@@ -104,7 +104,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 62.3
+      "seconds": 27.4
     },
     {
       "task": "t02-stale-slots",
@@ -118,7 +118,7 @@
         "late response for the previous staff member is ignored",
         "both_checks_booked"
       ],
-      "seconds": 47.6
+      "seconds": 30.6
     },
     {
       "task": "t02-stale-slots",
@@ -130,7 +130,7 @@
         "late response for the previous date is ignored (1200 ms)",
         "both_checks_booked"
       ],
-      "seconds": 46.0
+      "seconds": 26.8
     },
     {
       "task": "t02-stale-slots",
@@ -144,7 +144,7 @@
         "late response for the previous staff member is ignored",
         "both_checks_booked"
       ],
-      "seconds": 76.2
+      "seconds": 20.9
     },
     {
       "task": "t03-default-date-tz",
@@ -609,7 +609,7 @@
         "admin calendar shows the note as plain text",
         "rejected_note_created_nothing"
       ],
-      "seconds": 103.4
+      "seconds": 81.0
     },
     {
       "task": "t09-booking-note",
@@ -618,7 +618,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 72.1
+      "seconds": 24.8
     },
     {
       "task": "t09-booking-note",
@@ -627,7 +627,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 44.2
+      "seconds": 25.8
     },
     {
       "task": "t09-booking-note",
@@ -638,7 +638,7 @@
       "failed_checks": [
         "admin calendar shows the note as plain text"
       ],
-      "seconds": 47.5
+      "seconds": 50.3
     },
     {
       "task": "t09-booking-note",
@@ -652,7 +652,7 @@
         "notes_within_limit",
         "rejected_note_created_nothing"
       ],
-      "seconds": 89.5
+      "seconds": 82.0
     },
     {
       "task": "t09-booking-note",
@@ -665,7 +665,7 @@
         "step 4 has no accessibility violations",
         "admin calendar shows the note as plain text"
       ],
-      "seconds": 135.2
+      "seconds": 222.3
     },
     {
       "task": "t09-booking-note",
@@ -679,7 +679,7 @@
         "admin calendar shows the note as plain text",
         "rejected_note_created_nothing"
       ],
-      "seconds": 109.2
+      "seconds": 90.1
     },
     {
       "task": "t10-wizard-a11y",
@@ -693,7 +693,7 @@
         "selection is exposed to assistive tech",
         "errors are announced"
       ],
-      "seconds": 85.4
+      "seconds": 106.4
     },
     {
       "task": "t10-wizard-a11y",
@@ -702,7 +702,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 78.2
+      "seconds": 45.4
     },
     {
       "task": "t10-wizard-a11y",
@@ -711,7 +711,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 56.8
+      "seconds": 47.2
     },
     {
       "task": "t10-wizard-a11y",
@@ -725,7 +725,7 @@
         "selection is exposed to assistive tech",
         "errors are announced"
       ],
-      "seconds": 101.9
+      "seconds": 100.7
     },
     {
       "task": "t10-wizard-a11y",
@@ -734,9 +734,10 @@
       "verdict": "fail",
       "ok": true,
       "failed_checks": [
-        "fields have real labels and nothing visible was dropped"
+        "fields have real labels and nothing visible was dropped",
+        "errors are announced"
       ],
-      "seconds": 47.3
+      "seconds": 85.0
     },
     {
       "task": "t10-wizard-a11y",
@@ -747,7 +748,7 @@
       "failed_checks": [
         "errors are announced"
       ],
-      "seconds": 31.4
+      "seconds": 36.6
     }
   ],
   "total": 62,

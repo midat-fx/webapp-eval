@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t01-phone-format/solution",
+  "task": "t01-phone-format",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A shared `phoneSchema` strips spaces, dashes, dots and parentheses before applying the original regex, and both the book and waitlist routes use it. So `+7 (701) 555-12-34` becomes `+77015551234` and is stored as the same client as the plain form, while `call me` and `+7 701` are still rejected. The one thing I couldn't check is whether the wizard also validates the phone client-side, since only the server routes are in the diff.\"}",
+  "cost_usd": 0.0366647,
+  "is_error": false
+}

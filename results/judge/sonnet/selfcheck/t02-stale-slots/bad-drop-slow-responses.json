@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t02-stale-slots/bad-drop-slow-responses",
+  "task": "t02-stale-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch discards any response that takes over 2 seconds instead of checking whether it still matches the current service, staff and date. A slow response for the current selection is dropped (leaving the grid stuck loading), and a stale response arriving within 2 seconds still overwrites the correct times, so out-of-order responses are not handled.\"}",
+  "cost_usd": 0.010366700000000001,
+  "is_error": false
+}

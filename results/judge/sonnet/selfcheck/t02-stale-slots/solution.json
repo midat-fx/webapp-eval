@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t02-stale-slots/solution",
+  "task": "t02-stale-slots",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Each load increments a ref counter and only the response matching the latest counter can set slots or the error, so out-of-order responses from a previous date or staff selection are discarded. Changing the selection mid-load still works because the effect re-runs and issues a new request.\"}",
+  "cost_usd": 0.020061700000000002,
+  "is_error": false
+}

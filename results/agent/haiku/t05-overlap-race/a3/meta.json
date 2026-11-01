@@ -1,0 +1,28 @@
+{
+  "task": "t05-overlap-race",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 96.1,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 19,
+  "cost_usd": 0.9524945,
+  "is_error": false,
+  "result_text": "Overlapping bookings for the same master are now blocked at the database level, so the losing client gets `409 slot_taken` instead of a double booking. The fix is in `createBooking` in `src/lib/booking.ts`, and the changes are uncommitted in the working tree.\n\n**What changed**\n- Inside the booking transaction, `createBooking` takes a Postgres transaction-scoped advisory lock keyed on the master's id. Concurrent checkouts for the same master, on any app server, now run one at a time.\n- Under that lock it checks for a `confirmed` booking whose time range overlaps the requested one. If it finds one, it returns `slot_taken`, which the existing route already maps to a 409.\n- Cancelled, completed and no-show bookings don't count, and different masters use different locks, so they don't block each other.\n- No migration or new dependency was needed.\n\n**Tests**\n- `pnpm test` (unit): 12 passing.\n- `pnpm build`: succeeds.\n- Lint is clean on the changed files, and `tsc` reports no errors in them. The one `tsc` error in `layout.tsx` is unrelated and comes from Next's generated types.\n- I added `lets exactly one of several overlapping starts take the master` to `src/lib/booking.integration.test.ts`. It races four bookings at 13:00, 13:15, 13:30 and 13:45, which all overlap. I could not run it because Postgres isn't running here.\n\n**Not covered**\n- Two requests with the same phone number, submitted at the same moment, can still hit a unique-constraint error on the client insert, which would be a 500. This happens before the slot check, and the issue's scenario uses different clients, so I left it alone. It is a small follow-up if you want it.",
+  "stderr": "",
+  "patch_lines": 75,
+  "touched_outside_workdir": []
+}

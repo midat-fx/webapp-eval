@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t01-phone-format/bad-ui-only",
+  "task": "t01-phone-format",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only strips formatting in the client-side wizard, so direct calls to the public API with `+7 (701) 555-12-34` are still rejected, and the server doesn't normalize to `+77015551234`, so the same number can still create duplicate clients. The issue explicitly requires API-level acceptance and one-client dedup.\"}",
+  "cost_usd": 0.012291700000000001,
+  "is_error": false
+}

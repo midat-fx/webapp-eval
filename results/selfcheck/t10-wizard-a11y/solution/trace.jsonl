@@ -1,0 +1,9 @@
+{"ts":"2026-11-01T13:39:20.012Z","step":"start","status":"ok","detail":"t10-wizard-a11y"}
+{"ts":"2026-11-01T13:39:20.040Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T13:39:20.156Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-01T13:39:48.163Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T13:39:51.451Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T13:39:52.757Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T13:39:53.856Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T13:40:04.170Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-01T13:40:04.214Z","step":"done","status":"auto","detail":"checks"}

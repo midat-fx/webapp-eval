@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 43.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 8,
+  "cost_usd": 0.43221999999999994,
+  "is_error": false,
+  "result_text": "The admin calendar's SSE route now releases its Redis subscriber and connection when the client disconnects. The fix is in `src/app/api/admin/events/route.ts`, and the change is uncommitted in the working tree.\n\nThe leak came from that route. Every request created a duplicated Redis connection, but nothing ever closed it, and the 25-second heartbeat interval was never cleared either. The route now:\n\n- Disconnects the subscriber and clears the heartbeat when the request is aborted or the stream is cancelled.\n- Cleans up if the initial subscribe fails.\n- Sends the `hello` event only after the subscription is confirmed.\n\nThe client-side `LiveRefresh` already closed its `EventSource` on unmount, so it's unchanged. Live updates for open tabs still go through the same channel.\n\nLint and the unit tests pass. I couldn't check the actual Redis connection count because Redis isn't installed here, so the fix is untested against a live server. `tsc` reports an error in `src/app/layout.tsx` (`LayoutProps`), which predates this change and isn't in the file I touched.",
+  "stderr": "",
+  "patch_lines": 46,
+  "touched_outside_workdir": []
+}

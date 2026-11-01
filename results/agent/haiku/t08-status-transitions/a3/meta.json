@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 40.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 13,
+  "cost_usd": 0.566789,
+  "is_error": false,
+  "result_text": "Only a confirmed booking can now change status, and it changes exactly once. The change is in `setBookingStatus` in `src/lib/booking.ts`, and it is left uncommitted in the working tree.\n\n- **Stale or resubmitted requests:** the UPDATE now requires `status = 'confirmed'`. A cancelled booking can no longer be marked completed, and a finished booking can no longer be cancelled. No audit entry, reminder change, cancellation message, waitlist offer or calendar event is produced for these.\n- **Simultaneous clicks:** under Postgres's default READ COMMITTED isolation, the second concurrent UPDATE waits for the first to commit, then re-checks the condition, matches nothing, and becomes a no-op. This holds across app servers because the database enforces it.\n- **Calendar event:** `booking.updated` is now published only when a change actually happened.\n\n`pnpm test` passes (12/12). I could not run the integration tests because Postgres and Redis aren't running here, so the concurrency behaviour is verified by reasoning, not by a race test. `tsc` reports one error in `src/app/layout.tsx` about `LayoutProps`; it is unrelated to this change.",
+  "stderr": "",
+  "patch_lines": 40,
+  "touched_outside_workdir": []
+}

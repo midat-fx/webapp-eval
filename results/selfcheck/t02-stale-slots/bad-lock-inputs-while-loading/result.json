@@ -1,0 +1,41 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "late response for the previous date is ignored (2500 ms)",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"date\"]')\nExpected: enabled\nReceived: disabled\nTimeout:  200ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" locator('input[type=\"date\"]') with timeout 200ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"date\"]')\u001b[22m\n\u001b[2m    8 \u00d7 locator resolved to <input disabled type=\"date\" min=\"2026-11-01\" value=\"2026-11-10\" class=\"mb-3 rounded-lg border border-zinc-300 px-3 py-2\"/>\u001b[22m\n\u001b[2m      - unexpected value \"disabled\"\u001b[22m\n"
+    },
+    {
+      "kind": "playwright",
+      "name": "late response for the previous date is ignored (1200 ms)",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('input[type=\"date\"]')\nExpected: enabled\nReceived: disabled\nTimeout:  200ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" locator('input[type=\"date\"]') with timeout 200ms\u001b[22m\n\u001b[2m  - waiting for locator('input[type=\"date\"]')\u001b[22m\n\u001b[2m    9 \u00d7 locator resolved to <input disabled type=\"date\" min=\"2026-11-01\" value=\"2026-11-15\" class=\"mb-3 rounded-lg border border-zinc-300 px-3 py-2\"/>\u001b[22m\n\u001b[2m      - unexpected value \"disabled\"\u001b[22m\n"
+    },
+    {
+      "kind": "playwright",
+      "name": "late response for the previous staff member is ignored",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: 'Madina', exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  200ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" getByRole('button', { name: 'Madina', exact: true }) with timeout 200ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Madina', exact: true })\u001b[22m\n\u001b[2m    9 \u00d7 locator resolved to <button disabled class=\"rounded-full border px-4 py-2 transition border-zinc-200 bg-white hover:border-zinc-400\">Madina</button>\u001b[22m\n\u001b[2m      - unexpected value \"di"
+    },
+    {
+      "kind": "playwright",
+      "name": "plain selection still loads times",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_booking_on_the_abandoned_day",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "both_checks_booked",
+      "pass": false,
+      "detail": "[{\"count\":\"0\"}]"
+    }
+  ],
+  "task": "t02-stale-slots",
+  "seconds": 20.9
+}

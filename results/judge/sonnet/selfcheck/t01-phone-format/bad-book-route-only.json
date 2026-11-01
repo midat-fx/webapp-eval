@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t01-phone-format/bad-book-route-only",
+  "task": "t01-phone-format",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only updates the book route's schema. The waitlist endpoint, which the issue says must also accept formatted numbers, is not changed, so it keeps rejecting them. Numbers without a leading '+' (e.g. '77015551234') are also not normalized to the canonical '+77015551234', so they could still create a separate client from the '+'-prefixed form.\"}",
+  "cost_usd": 0.0212957,
+  "is_error": false
+}

@@ -1,0 +1,28 @@
+{
+  "task": "t03-default-date-tz",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 52.7,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 16,
+  "cost_usd": 0.6257064999999999,
+  "is_error": false,
+  "result_text": "The booking date picker now opens on today's date in the business's timezone, and that date is also the earliest one it allows. The cause was that the wizard computed \"today\" with `new Date().toISOString()`, which gives the UTC date. Between midnight and 5 a.m. in Almaty, that is still yesterday.\n\nThe change is in `src/app/[slug]/wizard.tsx`. The initial date and the picker's `min` now both come from a new helper, `localDateISO(timezone)`, in `src/lib/slots.ts`. It formats the current instant in the business timezone, using the same `en-CA` pattern the admin and waitlist code already rely on. The server side was already correct, since slot availability filters past times against the current time.\n\n`pnpm test` passes, including two new unit tests for the helper. `pnpm build` succeeds. `tsc --noEmit` reports an error in `src/app/layout.tsx`, which I didn't touch. I haven't exercised the picker in a browser because the dev server needs Postgres and Redis, so that's unverified.\n\nChanges are uncommitted in the working tree.",
+  "stderr": "",
+  "patch_lines": 75,
+  "touched_outside_workdir": []
+}

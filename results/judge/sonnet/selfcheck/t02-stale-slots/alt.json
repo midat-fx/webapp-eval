@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t02-stale-slots/alt",
+  "task": "t02-stale-slots",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Each selection change aborts the previous request through an AbortController, both in the effect cleanup and at the start of loadSlots. An aborted fetch or body read rejects with AbortError, which is ignored, so a stale response can't call setSlots, and the latest selection still loads normally.\"}",
+  "cost_usd": 0.0210267,
+  "is_error": false
+}

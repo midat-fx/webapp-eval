@@ -1,0 +1,28 @@
+{
+  "task": "t06-dst-slots",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 81.2,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 14,
+  "cost_usd": 0.625445,
+  "is_error": false,
+  "result_text": "The booking page now gets opening and closing times right on clock-change days. The fix is in `localTimeToUtc` in `src/lib/slots.ts`.\n\nThe bug was that the function read the timezone's UTC offset at midnight UTC on the date, not at the requested time. On a clock-change day, the offset differs before and after the switch, so the whole day used the wrong one. Berlin on 28 March 2027 used +1 for a 10:00 CEST opening (+2) and gave 11:00. On 31 October 2027 the reverse happened and gave 09:00.\n\nThe function now reads the offset at the wall-clock time itself, with a second pass to settle the offset when the switch falls between the guess and the result. Every caller benefits: slot generation, the day-start lookup for busy bookings, and the admin page.\n\nI added regression tests to `src/lib/slots.test.ts` for the Berlin start and end days and the New York equivalents, including a full-day grid check. `pnpm test` passes (17 tests), and `pnpm build` and `pnpm lint` pass. The integration tests and the dev server weren't run, since Postgres and Redis aren't available here. Nothing is committed.",
+  "stderr": "",
+  "patch_lines": 81,
+  "touched_outside_workdir": []
+}

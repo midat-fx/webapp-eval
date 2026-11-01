@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t01-phone-format/bad-no-canonical-form",
+  "task": "t01-phone-format",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only loosens the regex and never normalizes the phone to `+77015551234`, so `+7 (701) 555-12-34` would be stored as typed and appear as a separate client from `+77015551234`. The loose pattern also admits strings like `----------` or `+7 701 555` with too few digits, so non-phone input is no longer rejected as before.\"}",
+  "cost_usd": 0.012414699999999999,
+  "is_error": false
+}

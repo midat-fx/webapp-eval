@@ -1,0 +1,28 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 45.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 11,
+  "cost_usd": 0.579848,
+  "is_error": false,
+  "result_text": "Phone numbers with spaces, dashes, dots or parentheses are now accepted for both booking and the waitlist, and stored in normalized form (`+77015551234`). Unit tests pass (23, including 11 new ones for the phone schema) and `pnpm build` succeeds. I haven't run the integration tests or exercised the endpoints against a live database, since Postgres and Redis aren't running here.\n\nThe cause was that both public routes validated the raw input with `/^\\+?\\d{10,15}$/`, so any formatting failed before normalization. The fix:\n\n- **`src/lib/phone.ts`** (new): a zod schema that strips spaces, dashes, dots and parentheses, then applies the same digit-count check as before. `call me` and `+7 701` are still rejected.\n- **`src/app/api/public/[slug]/book/route.ts`** and **`.../waitlist/route.ts`**: use that schema for `phone`.\n- **`src/lib/phone.test.ts`** (new): covers the accepted formats and the rejected inputs.\n\nBecause normalization happens at the route boundary, the client upsert in `createBooking` and `joinWaitlist` sees the canonical number, so `+7 (701) 555-12-34` and `+77015551234` resolve to one client. Code that calls the library functions directly still stores whatever string it is given. Nothing is committed.",
+  "stderr": "",
+  "patch_lines": 84,
+  "touched_outside_workdir": []
+}

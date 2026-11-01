@@ -39,3 +39,12 @@
 {"task": "t09-booking-note", "model": "sonnet", "attempt": 2}
 {"task": "t10-wizard-a11y", "model": "haiku", "attempt": 2}
 {"task": "t10-wizard-a11y", "model": "sonnet", "attempt": 2}
+{"task": "t01-phone-format", "model": "haiku", "attempt": 3}
+{"task": "t02-stale-slots", "model": "haiku", "attempt": 3}
+{"task": "t03-default-date-tz", "model": "haiku", "attempt": 3}
+{"task": "t04-sse-subscriber-leak", "model": "haiku", "attempt": 3}
+{"task": "t05-overlap-race", "model": "haiku", "attempt": 3}
+{"task": "t06-dst-slots", "model": "haiku", "attempt": 3}
+{"task": "t07-staff-permissions", "model": "haiku", "attempt": 3}
+{"task": "t08-status-transitions", "model": "haiku", "attempt": 3}
+{"task": "t09-booking-note", "model": "haiku", "attempt": 3}

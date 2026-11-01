@@ -1,0 +1,62 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "staff cannot open owner-only pages",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "staff navigation only links to what staff can use",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "replayed owner forms are refused for staff",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "the same replay still works for the owner",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "staff can still run the day",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "owner keeps every page and button",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_change_prices",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_hide_anything",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_staff_rows_created_by_staff",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_owner_audit_entries_by_staff",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "owner_changes_went_through",
+      "pass": true
+    }
+  ],
+  "task": "t07-staff-permissions",
+  "seconds": 75.0
+}

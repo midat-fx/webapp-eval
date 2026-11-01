@@ -1,0 +1,10 @@
+{"ts":"2026-11-01T13:19:32.700Z","step":"start","status":"ok","detail":"t01-phone-format"}
+{"ts":"2026-11-01T13:19:32.721Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T13:19:32.778Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-01T13:19:48.700Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T13:19:51.406Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T13:19:52.638Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T13:19:53.722Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T13:19:55.916Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-01T13:19:55.980Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-01T13:19:56.016Z","step":"done","status":"auto","detail":"checks"}
