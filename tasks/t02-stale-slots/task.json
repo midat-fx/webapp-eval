@@ -1,0 +1,7 @@
+{
+  "id": "t02-stale-slots",
+  "title": "Slot grid shows the times of a previously selected day",
+  "category": "ui-state",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 1
+}

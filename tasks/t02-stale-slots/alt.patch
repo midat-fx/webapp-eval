@@ -1,0 +1,43 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..02f111b 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -107,15 +107,28 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+ 
+   // Data lands asynchronously; loading state is `slots === null`,
+   // reset in the event handlers that change service/master/date.
++  // A new selection aborts the request for the previous one, so a slow
++  // response can never paint another day's times.
++  const inflight = useRef<AbortController | null>(null);
+   const loadSlots = useCallback(() => {
+     if (!service || !master) return;
+-    fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
++    inflight.current?.abort();
++    const ctl = new AbortController();
++    inflight.current = ctl;
++    fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`, {
++      signal: ctl.signal,
++    })
+       .then((r) => r.json())
+       .then((d) => setSlots(d.slots ?? []))
+-      .catch(() => setError("Could not load available times"));
++      .catch((e) => {
++        if (e.name !== "AbortError") setError("Could not load available times");
++      });
+   }, [slug, service, master, date]);
+ 
+-  useEffect(loadSlots, [loadSlots]);
++  useEffect(() => {
++    loadSlots();
++    return () => inflight.current?.abort();
++  }, [loadSlots]);
+ 
+   // Hold countdown (initial value is set in pickSlot)
+   useEffect(() => {

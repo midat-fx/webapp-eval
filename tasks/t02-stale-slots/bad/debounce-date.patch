@@ -1,0 +1,32 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..6559f28 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -91,6 +91,8 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [error, setError] = useState<string | null>(null);
+   const [done, setDone] = useState(false);
+   const [busy, setBusy] = useState(false);
++  // Fast date clicking fired overlapping requests; wait for the user to settle.
++  const dateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+ 
+   const fmtTime = useMemo(
+     () =>
+@@ -274,8 +276,10 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
+             onChange={(e) => {
+-              setDate(e.target.value);
++              const next = e.target.value;
+               setSlots(null);
++              if (dateTimer.current) clearTimeout(dateTimer.current);
++              dateTimer.current = setTimeout(() => setDate(next), 300);
+             }}
+             className="mb-3 rounded-lg border border-zinc-300 px-3 py-2"
+           />

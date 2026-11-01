@@ -1,0 +1,20 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..e3a61c6 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -109,9 +109,14 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   // reset in the event handlers that change service/master/date.
+   const loadSlots = useCallback(() => {
+     if (!service || !master) return;
++    const startedAt = Date.now();
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
++      .then((d) => {
++        // A response this slow belongs to a selection the user has moved on from.
++        if (Date.now() - startedAt > 2000) return;
++        setSlots(d.slots ?? []);
++      })
+       .catch(() => setError("Could not load available times"));
+   }, [slug, service, master, date]);
+ 

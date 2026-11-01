@@ -1,0 +1,21 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..d2ec1cb 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -247,6 +247,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             {service.staff.map((m) => (
+               <button
+                 key={m.id}
++                disabled={!!master && slots === null}
+                 onClick={() => {
+                   setMaster(m);
+                   setHold(null);
+@@ -273,6 +274,8 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             type="date"
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
++            // One request at a time: no changing the date until the times load.
++            disabled={slots === null}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);

@@ -209,3 +209,34 @@ export async function postAction(
   const res = await request.post(path, { multipart: fields, maxRedirects: 0 });
   return res.status();
 }
+
+/** Puts a confirmed booking straight into the database (fixture, not under test). */
+export async function insertBooking(p: {
+  staff: string;
+  service: string;
+  startMs: number;
+  minutes: number;
+  client?: string;
+  phone?: string;
+  status?: string;
+}): Promise<string> {
+  const b = await biz();
+  const [c] = await q<{ id: string }>(
+    `INSERT INTO clients (business_id, name, phone) VALUES ($1, $2, $3)
+     ON CONFLICT (business_id, phone) DO UPDATE SET name = EXCLUDED.name RETURNING id`,
+    [b.id, p.client ?? "Fixture Client", p.phone ?? "+77019990000"],
+  );
+  const [svc] = await q<{ id: string; price_kzt: number }>("SELECT id, price_kzt FROM services WHERE name = $1", [p.service]);
+  const [row] = await q<{ id: string }>(
+    `INSERT INTO bookings (business_id, staff_id, service_id, client_id, start_at, end_at, status, price_kzt)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+    [b.id, await staffId(p.staff), svc.id, c.id, new Date(p.startMs), new Date(p.startMs + p.minutes * 60_000),
+     p.status ?? "confirmed", svc.price_kzt],
+  );
+  return row.id;
+}
+
+/** Text of the slot buttons currently shown in the wizard grid. */
+export async function shownSlots(page: Page): Promise<string[]> {
+  return page.getByRole("button", { name: /^\d\d:\d\d$/ }).allTextContents();
+}
