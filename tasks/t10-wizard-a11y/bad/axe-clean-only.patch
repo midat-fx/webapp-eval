@@ -1,0 +1,39 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..742a170 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -207,7 +207,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       <section>
+         <h2 className="mb-2 font-semibold text-zinc-800">1 · Service</h2>
+         {!services ? (
+-          <p className="text-sm text-zinc-400">Loading…</p>
++          <p className="text-sm text-zinc-600">Loading…</p>
+         ) : (
+           <div className="grid gap-2">
+             {services.map((svc) => (
+@@ -227,7 +227,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+               >
+                 <span>
+                   {svc.name}
+-                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-400"}>
++                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-600"}>
+                     {" "}
+                     · {svc.durationMin} min
+                   </span>
+@@ -271,6 +271,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <h2 className="mb-2 font-semibold text-zinc-800">3 · Date and time</h2>
+           <input
+             type="date"
++            aria-label="Date"
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
+             onChange={(e) => {
+@@ -280,7 +281,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             className="mb-3 rounded-lg border border-zinc-300 px-3 py-2"
+           />
+           {!slots ? (
+-            <p className="text-sm text-zinc-400">Loading…</p>
++            <p className="text-sm text-zinc-600">Loading…</p>
+           ) : slots.length === 0 ? (
+             <WaitlistBox
+               slug={slug}

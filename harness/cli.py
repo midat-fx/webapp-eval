@@ -42,6 +42,72 @@ def cmd_selfcheck(a: argparse.Namespace) -> int:
     return 0 if summary["agree"] == summary["total"] else 1
 
 
+MODELS = {"haiku": "claude-haiku-5-5", "sonnet": "claude-sonnet-5-5"}
+
+
+def cmd_agent(a: argparse.Namespace) -> int:
+    """Real agent runs. Every invocation is appended to the ledger, so the
+    run budget can be audited from results/ alone."""
+    from harness import agent
+
+    out_root = ROOT / a.out
+    ledger = out_root / "ledger.jsonl"
+    out_root.mkdir(parents=True, exist_ok=True)
+    jobs = [
+        (t, m, n)
+        for n in range(1, a.attempts + 1)
+        for t in (a.tasks or grading.task_ids())
+        for m in a.models
+        if not (out_root / m / t / f"a{n}" / "meta.json").exists()
+    ]
+    budget_used = sum(1 for _ in ledger.open()) if ledger.exists() else 0
+    if budget_used + len(jobs) > a.budget:
+        print(f"refusing: {budget_used} runs used, {len(jobs)} requested, budget {a.budget}")
+        return 2
+
+    def run(job):
+        task, model, n = job
+        with ledger.open("a") as f:
+            f.write(json.dumps({"task": task, "model": model, "attempt": n}) + "\n")
+        r = agent.attempt(task, MODELS[model], out_root / model / task / f"a{n}")
+        print(f"{model:6} {task:28} a{n} {r['verdict']:5} {r['seconds']:7}s turns={r['num_turns']} cost={r['cost_usd']}", flush=True)
+        return r
+
+    with ThreadPoolExecutor(max_workers=a.jobs) as ex:
+        list(ex.map(run, jobs))
+    return 0
+
+
+def cmd_judge(a: argparse.Namespace) -> int:
+    from harness import judge
+
+    model = MODELS.get(a.model, a.model)
+    out_root = ROOT / "results" / "judge" / a.model
+    todo = [it for it in judge.items() if not (out_root / f"{it['id']}.json").exists()]
+    print(f"{len(todo)} patches to judge with {model}")
+
+    def run(it):
+        r = judge.judge(it["task"], it["patch"], model)
+        path = out_root / f"{it['id']}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        row = {k: it[k] for k in ("id", "task", "source", "truth")} | r
+        path.write_text(json.dumps(row, indent=2) + "\n")
+        print(f"{it['id']:60} truth={it['truth']:4} judge={r['verdict']}", flush=True)
+
+    with ThreadPoolExecutor(max_workers=a.jobs) as ex:
+        list(ex.map(run, todo))
+
+    rows = [json.loads(p.read_text()) for p in sorted(out_root.rglob("*.json")) if p.name != "summary.json"]
+    pairs = lambda rs: [(r["truth"], r["verdict"]) for r in rs]
+    summary = {"model": model, "overall": judge.agreement(pairs(rows)),
+               "unparsed": sum(r["verdict"] == "unparsed" for r in rows),
+               "by_source": {src: judge.agreement(pairs([r for r in rows if r["source"] == src]))
+                             for src in sorted({r["source"] for r in rows})}}
+    (out_root / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    print(json.dumps(summary, indent=2))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="webeval")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -55,6 +121,18 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("-j", "--jobs", type=int, default=2)
     s.add_argument("--out", default="results/selfcheck")
     s.set_defaults(fn=cmd_selfcheck)
+    ag = sub.add_parser("agent", help="run Claude Code headless on tasks and grade the result")
+    ag.add_argument("tasks", nargs="*")
+    ag.add_argument("--models", nargs="+", default=list(MODELS), choices=list(MODELS))
+    ag.add_argument("--attempts", type=int, default=1)
+    ag.add_argument("--budget", type=int, default=60)
+    ag.add_argument("-j", "--jobs", type=int, default=2)
+    ag.add_argument("--out", default="results/agent")
+    ag.set_defaults(fn=cmd_agent)
+    j = sub.add_parser("judge", help="LLM judge over every graded patch, scored against the verifiers")
+    j.add_argument("--model", default="sonnet")
+    j.add_argument("-j", "--jobs", type=int, default=3)
+    j.set_defaults(fn=cmd_judge)
     a = p.parse_args(argv)
     return a.fn(a)
 

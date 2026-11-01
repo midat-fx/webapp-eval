@@ -88,7 +88,7 @@ mkdir -p /opt/verify/specs
 cp /task/verify/*.spec.ts /opt/verify/specs/ 2>/dev/null
 cd /opt/verify
 if ls specs/*.spec.ts >/dev/null 2>&1; then
-  PW_JSON=$OUT/playwright.json ./node_modules/.bin/playwright test >"$OUT/playwright.log" 2>&1
+  PW_JSON=$OUT/playwright.json PW_OUTPUT=$OUT/test-results ./node_modules/.bin/playwright test >"$OUT/playwright.log" 2>&1
   ev playwright "exit:$?"
 fi
 if [ -f /task/verify/invariants.sql ]; then

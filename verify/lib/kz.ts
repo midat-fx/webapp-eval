@@ -104,11 +104,30 @@ export async function openWizard(page: Page): Promise<void> {
 export async function pickService(page: Page, name: string): Promise<void> {
   await page.getByRole("button", { name: new RegExp(`^${name}`) }).click();
 }
-export async function pickMaster(page: Page, name: string): Promise<void> {
+/**
+ * Picks a staff member and, by default, waits for the times that triggers.
+ * Most start states still have the out-of-order /slots bug (task t02), so a
+ * date picked before this first load lands could be overwritten by it.
+ */
+export async function pickMaster(page: Page, name: string, opts = { waitForSlots: true }): Promise<void> {
+  const loaded = opts.waitForSlots
+    ? page.waitForResponse((r) => r.url().includes("/slots?"), { timeout: 15_000 }).catch(() => undefined)
+    : undefined;
   await page.getByRole("button", { name, exact: true }).click();
+  await loaded;
 }
-export async function pickDate(page: Page, iso: string): Promise<void> {
+/**
+ * Sets the wizard date and, by default, waits for that date's times to load,
+ * so a following pickSlot can't click a button from the previous day's grid.
+ */
+export async function pickDate(page: Page, iso: string, opts = { waitForSlots: true }): Promise<void> {
+  const loaded = opts.waitForSlots
+    ? page
+        .waitForResponse((r) => r.url().includes("/slots?") && new URL(r.url()).searchParams.get("date") === iso, { timeout: 15_000 })
+        .catch(() => undefined)
+    : undefined;
   await page.locator('input[type="date"]').first().fill(iso);
+  await loaded;
 }
 export async function pickSlot(page: Page, hhmm: string): Promise<void> {
   await page.getByRole("button", { name: hhmm, exact: true }).click();

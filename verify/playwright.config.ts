@@ -8,7 +8,9 @@ export default defineConfig({
   timeout: 90_000,
   expect: { timeout: 20_000 },
   reporter: [["json", { outputFile: process.env.PW_JSON ?? "playwright.json" }], ["list"]],
+  outputDir: process.env.PW_OUTPUT ?? "test-results",
   use: {
+    actionTimeout: 20_000,
     baseURL: "http://localhost:3000",
     timezoneId: "Asia/Almaty",
     locale: "en-GB",

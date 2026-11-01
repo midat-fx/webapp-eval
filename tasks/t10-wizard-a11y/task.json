@@ -1,0 +1,7 @@
+{
+  "id": "t10-wizard-a11y",
+  "title": "Booking wizard fails an accessibility audit",
+  "category": "ui-a11y",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 1
+}

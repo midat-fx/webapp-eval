@@ -24,11 +24,11 @@ for (const [delay, dayA, dayB] of [[2500, 2, 3], [1200, 7, 6]]) {
     await openWizard(page);
     await pickService(page, "Women's haircut");
     await pickMaster(page, "Dana");
-    await pickDate(page, dateA);
+    await pickDate(page, dateA, { waitForSlots: false });
     await page.waitForTimeout(500);
     // The issue requires changing the selection while times are loading.
     await expect(page.locator('input[type="date"]')).toBeEnabled({ timeout: 200 });
-    await pickDate(page, dateB);
+    await pickDate(page, dateB, { waitForSlots: false });
     await expect.poll(async () => (await shownSlots(page))[0]).toBe("14:00");
     await page.waitForTimeout(delay + 800);
     const shown = await shownSlots(page);
@@ -58,13 +58,13 @@ test("late response for the previous staff member is ignored", async ({ page }) 
   await openWizard(page);
   await pickService(page, "Women's haircut");
   await pickMaster(page, "Madina");
-  await pickDate(page, date);
+  await pickDate(page, date, { waitForSlots: false });
   await expect.poll(async () => (await shownSlots(page))[0]).toBe("12:00");
   await delaySlots(page, 2000, (u) => u.searchParams.get("staffId") === dana);
-  await pickMaster(page, "Dana");
+  await pickMaster(page, "Dana", { waitForSlots: false });
   await page.waitForTimeout(500);
   await expect(page.getByRole("button", { name: "Madina", exact: true })).toBeEnabled({ timeout: 200 });
-  await pickMaster(page, "Madina");
+  await pickMaster(page, "Madina", { waitForSlots: false });
   await expect.poll(async () => (await shownSlots(page))[0]).toBe("12:00");
   await page.waitForTimeout(2600);
   expect((await shownSlots(page))[0], "grid must show Madina's day").toBe("12:00");

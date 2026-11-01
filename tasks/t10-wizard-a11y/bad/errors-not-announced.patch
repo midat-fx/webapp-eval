@@ -1,0 +1,155 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..b400a0e 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -50,19 +50,25 @@ function WaitlistBox({
+         to you.
+       </p>
+       <div className="mt-3 space-y-2">
+-        <input
+-          placeholder="Name"
+-          value={name}
+-          onChange={(e) => setName(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
+-        <input
+-          placeholder="+7701…"
+-          type="tel"
+-          value={phone}
+-          onChange={(e) => setPhone(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
++        <label className="block text-sm text-zinc-700">
++          Name
++          <input
++            placeholder="Name"
++            value={name}
++            onChange={(e) => setName(e.target.value)}
++            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2"
++          />
++        </label>
++        <label className="block text-sm text-zinc-700">
++          Phone
++          <input
++            placeholder="+7701…"
++            type="tel"
++            value={phone}
++            onChange={(e) => setPhone(e.target.value)}
++            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2"
++          />
++        </label>
+         <button
+           onClick={submit}
+           disabled={state === "sending" || !name.trim() || !phone.trim()}
+@@ -71,7 +77,9 @@ function WaitlistBox({
+           {state === "sending" ? "Joining…" : "Join the waitlist"}
+         </button>
+         {state === "error" && (
+-          <p className="text-sm text-red-600">That did not work — check the phone number and try again</p>
++          <p role="alert" className="text-sm text-red-700">
++            That did not work — check the phone number and try again
++          </p>
+         )}
+       </div>
+     </div>
+@@ -207,12 +215,13 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       <section>
+         <h2 className="mb-2 font-semibold text-zinc-800">1 · Service</h2>
+         {!services ? (
+-          <p className="text-sm text-zinc-400">Loading…</p>
++          <p className="text-sm text-zinc-500">Loading…</p>
+         ) : (
+           <div className="grid gap-2">
+             {services.map((svc) => (
+               <button
+                 key={svc.id}
++                aria-pressed={service?.id === svc.id}
+                 onClick={() => {
+                   setService(svc);
+                   setMaster(null);
+@@ -227,7 +236,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+               >
+                 <span>
+                   {svc.name}
+-                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-400"}>
++                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-500"}>
+                     {" "}
+                     · {svc.durationMin} min
+                   </span>
+@@ -247,6 +256,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             {service.staff.map((m) => (
+               <button
+                 key={m.id}
++                aria-pressed={master?.id === m.id}
+                 onClick={() => {
+                   setMaster(m);
+                   setHold(null);
+@@ -269,7 +279,11 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       {service && master && !hold && (
+         <section>
+           <h2 className="mb-2 font-semibold text-zinc-800">3 · Date and time</h2>
++          <label htmlFor="booking-date" className="mb-1 block text-sm text-zinc-700">
++            Date
++          </label>
+           <input
++            id="booking-date"
+             type="date"
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
+@@ -280,7 +294,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             className="mb-3 rounded-lg border border-zinc-300 px-3 py-2"
+           />
+           {!slots ? (
+-            <p className="text-sm text-zinc-400">Loading…</p>
++            <p className="text-sm text-zinc-500">Loading…</p>
+           ) : slots.length === 0 ? (
+             <WaitlistBox
+               slug={slug}
+@@ -316,19 +330,25 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             </span>
+           </p>
+           <div className="mt-3 space-y-3">
+-            <input
+-              placeholder="Name"
+-              value={name}
+-              onChange={(e) => setName(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
+-            <input
+-              placeholder="+7701…"
+-              type="tel"
+-              value={phone}
+-              onChange={(e) => setPhone(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
++            <label className="block text-sm text-zinc-700">
++              Name
++              <input
++                placeholder="Name"
++                value={name}
++                onChange={(e) => setName(e.target.value)}
++                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2"
++              />
++            </label>
++            <label className="block text-sm text-zinc-700">
++              Phone
++              <input
++                placeholder="+7701…"
++                type="tel"
++                value={phone}
++                onChange={(e) => setPhone(e.target.value)}
++                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2"
++              />
++            </label>
+             <div className="flex gap-2">
+               <button
+                 onClick={confirm}
+@@ -351,7 +371,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         </section>
+       )}
+ 
+-      {error && <p className="text-sm text-red-600">{error}</p>}
++      {error && <p className="text-sm text-red-700">{error}</p>}
+     </div>
+   );
+ }
