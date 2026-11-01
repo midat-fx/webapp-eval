@@ -29,6 +29,16 @@ class TaskLayout(unittest.TestCase):
             self.assertNotIn("/verify/", text, p)
 
 
+class PublishedResults(unittest.TestCase):
+    def test_no_host_paths_or_account_data(self):
+        bad = ("/Users/", "/var/folders/", "/private/var/", "rate_limit_event", "@gmail.com")
+        for f in (grading.ROOT / "results").rglob("*"):
+            if f.is_file() and f.suffix in (".json", ".jsonl", ".diff", ".md") and not f.name.endswith(".raw.jsonl"):
+                text = f.read_text(errors="replace")
+                for b in bad:
+                    self.assertNotIn(b, text, f"{f.relative_to(grading.ROOT)} contains {b!r}")
+
+
 class Judge(unittest.TestCase):
     def test_parse_verdict(self):
         self.assertEqual(judge.parse_verdict('Sure.\n{"verdict": "pass", "reason": "ok"}'), "pass")
