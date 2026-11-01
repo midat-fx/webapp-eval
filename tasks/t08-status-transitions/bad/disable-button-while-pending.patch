@@ -1,0 +1,44 @@
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index 68dc9d7..ecde934 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -6,6 +6,7 @@ import { requireSession } from "@/lib/session";
+ import { updateBookingStatus } from "./actions";
+ import { DatePicker } from "./date-picker";
+ import { LiveRefresh } from "./live";
++import { StatusButton } from "./status-button";
+ 
+ const statusStyle: Record<string, string> = {
+   confirmed: "border-sky-200 bg-sky-50",
+@@ -128,9 +129,7 @@ export default async function CalendarPage(ctx: {
+                             <form key={st} action={updateBookingStatus}>
+                               <input type="hidden" name="bookingId" value={r.id} />
+                               <input type="hidden" name="status" value={st} />
+-                              <button className="rounded border border-zinc-300 bg-white px-2 py-0.5 text-xs hover:bg-zinc-50">
+-                                {label}
+-                              </button>
++                              <StatusButton label={label} />
+                             </form>
+                           ))}
+                         </div>
+diff --git a/src/app/admin/status-button.tsx b/src/app/admin/status-button.tsx
+new file mode 100644
+index 0000000..0d080f6
+--- /dev/null
++++ b/src/app/admin/status-button.tsx
+@@ -0,0 +1,15 @@
++"use client";
++import { useFormStatus } from "react-dom";
++
++/** Disables itself while the status change is in flight: no double clicks. */
++export function StatusButton({ label }: { label: string }) {
++  const { pending } = useFormStatus();
++  return (
++    <button
++      disabled={pending}
++      className="rounded border border-zinc-300 bg-white px-2 py-0.5 text-xs hover:bg-zinc-50 disabled:opacity-50"
++    >
++      {label}
++    </button>
++  );
++}

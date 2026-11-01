@@ -1,0 +1,18 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..91f3bca 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,6 +233,13 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
++  // Terminal states stay terminal.
++  const [current] = await db
++    .select({ status: s.bookings.status })
++    .from(s.bookings)
++    .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)));
++  if (!current || current.status !== "confirmed") return;
++
+   await db.transaction(async (tx) => {
+     const [updated] = await tx
+       .update(s.bookings)

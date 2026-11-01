@@ -1,0 +1,28 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..7f81e86 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, eq, gte, inArray, lt, ne } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -237,7 +237,14 @@ export async function setBookingStatus(opts: {
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      // A cancelled booking is final: its slot may already be someone else's.
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          ne(s.bookings.status, "cancelled"),
++        ),
++      )
+       .returning();
+     if (!updated) return;
+     await tx.insert(s.auditLog).values({

@@ -1,0 +1,26 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..92f138b 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -234,12 +234,19 @@ export async function setBookingStatus(opts: {
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+   await db.transaction(async (tx) => {
++    // Lock the row first so concurrent status changes queue up behind us and
++    // then see the status we leave behind.
++    const [current] = await tx
++      .select({ status: s.bookings.status })
++      .from(s.bookings)
++      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .for("update");
++    if (!current || current.status !== "confirmed") return;
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(eq(s.bookings.id, bookingId))
+       .returning();
+-    if (!updated) return;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,

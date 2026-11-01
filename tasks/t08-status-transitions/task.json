@@ -1,0 +1,7 @@
+{
+  "id": "t08-status-transitions",
+  "title": "Booking status can change after it is final",
+  "category": "api-db-race",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 2
+}
