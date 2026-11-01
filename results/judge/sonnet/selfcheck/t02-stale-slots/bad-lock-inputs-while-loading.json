@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t02-stale-slots/bad-lock-inputs-while-loading",
+  "task": "t02-stale-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch disables the date input and staff buttons while times load, which sidesteps the race instead of fixing it and breaks the issue's explicit requirement that changing the selection while loading must keep working. It also doesn't handle out-of-order responses (e.g. a stale fetch after changing service, or an initial state where slots is null before a date is chosen, which could lock the date input).\"}",
+  "cost_usd": 0.010362699999999999,
+  "is_error": false
+}

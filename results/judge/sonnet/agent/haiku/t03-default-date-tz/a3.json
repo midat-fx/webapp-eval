@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t03-default-date-tz/a3",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The picker's initial value and its `min` both now come from `localDateISO(timezone)`, which formats the current instant in the business's timezone using `Intl.DateTimeFormat` with `en-CA` (YYYY-MM-DD). This works for any IANA timezone regardless of the visitor's timezone or UTC, and the new tests cover business dates both ahead of and behind UTC. I assumed `slots.ts` is pure (no server-only imports), since the existing tests import it without a database.\"}",
+  "cost_usd": 0.0274527,
+  "is_error": false
+}

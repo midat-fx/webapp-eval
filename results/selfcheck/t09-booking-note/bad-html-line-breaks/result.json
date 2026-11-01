@@ -25,7 +25,7 @@
       "kind": "playwright",
       "name": "admin calendar shows the note as plain text",
       "pass": false,
-      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' })\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' })\u001b[22m\n\u001b[2m    44 \u00d7 locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\""
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' })\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Api Note' }).filter({ hasText: 'onerror' })\u001b[22m\n\u001b[2m    43 \u00d7 locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\""
     },
     {
       "kind": "sql",
@@ -44,5 +44,5 @@
     }
   ],
   "task": "t09-booking-note",
-  "seconds": 50.3
+  "seconds": 44.4
 }

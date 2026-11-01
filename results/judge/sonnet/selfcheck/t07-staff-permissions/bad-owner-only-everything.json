@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/bad-owner-only-everything",
+  "task": "t07-staff-permissions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"`updateBookingStatus` was switched from `requireSession()` to `requireOwner()`, so staff can no longer mark bookings completed/no-show/cancelled. The issue explicitly says staff may do this on the Calendar, so it is a regression.\"}",
+  "cost_usd": 0.0322647,
+  "is_error": false
+}

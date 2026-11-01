@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/bad-unique-start-time",
+  "task": "t05-overlap-race",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The unique index only covers identical (staff_id, start_at) pairs, so the issue's own example (Dana 14:00\u201315:00 and 14:15\u201315:00, different start times) still produces two overlapping confirmed bookings. Preventing any overlap needs an exclusion constraint on a time range or a per-master lock with an overlap check inside the transaction.\"}",
+  "cost_usd": 0.0224807,
+  "is_error": false
+}

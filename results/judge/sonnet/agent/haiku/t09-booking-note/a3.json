@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t09-booking-note/a3",
+  "task": "t09-booking-note",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds a labelled 500-character Note textarea to step 4, with labels also added to Name and Phone. The API trims the note before checking length, so an over-long note fails validation before anything is created, and `note || null` stores an empty note as NULL. Inner line breaks are kept, and the admin card renders the note as escaped plain text with `whitespace-pre-wrap`.\"}",
+  "cost_usd": 0.039939699999999995,
+  "is_error": false
+}

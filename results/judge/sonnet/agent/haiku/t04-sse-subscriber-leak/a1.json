@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t04-sse-subscriber-leak/a1",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch tears down the subscriber on both request abort and stream cancel. `close` is idempotent: it clears the ping interval, removes the message listener and calls `sub.disconnect()`, which ends the subscription and the connection. Live updates are unchanged for open tabs, and the subscribe-failure and closed-during-subscribe paths are handled.\"}",
+  "cost_usd": 0.0277577,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t07-staff-permissions/a1",
+  "task": "t07-staff-permissions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A new `requireOwner` gate redirects any non-owner to `/admin`. It is applied to all five owner-only server actions (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService), so replayed submissions are refused on the server. It is also applied to the Services, Staff, Reports, Analytics, Notifications and Audit pages. The nav hides those links from staff. `updateBookingStatus`, Calendar and Clients keep `requireSession`, so staff keep their allowed access and owner behaviour is unchanged.\"}",
+  "cost_usd": 0.0444367,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t03-default-date-tz/a2",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds `todayInTimeZone`, which formats the current instant in the business timezone via `Intl.DateTimeFormat` parts. It uses that helper for both the initial `date` state and the input's `min`, so this works for any IANA timezone regardless of the visitor's timezone or UTC. The helper sits near the top of `slots.ts` beside other pure timezone helpers, so importing it into the client component looks safe.\"}",
+  "cost_usd": 0.022840700000000002,
+  "is_error": false
+}

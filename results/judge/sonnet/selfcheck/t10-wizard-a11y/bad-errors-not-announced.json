@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/bad-errors-not-announced",
+  "task": "t10-wizard-a11y",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The main wizard error paragraph (\\\"That time was just taken\\\", \\\"Check the name and phone\u2026\\\") only had its colour changed and has no role=\\\"alert\\\" or aria-live, so requirement 3 is still unmet for those errors. The patch also doesn't address contrast for the selected-state grey text (text-zinc-300 on a dark background is unverified), and the unselected service's durations may still fail depending on the button background.\"}",
+  "cost_usd": 0.024584699999999998,
+  "is_error": false
+}

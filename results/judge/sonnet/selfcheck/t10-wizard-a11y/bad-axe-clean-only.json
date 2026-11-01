@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/bad-axe-clean-only",
+  "task": "t10-wizard-a11y",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only adds a date aria-label and darkens the grey text. It does not label the name/phone fields, announce errors (no role=alert or aria-live), or expose service/staff selection to assistive tech (no aria-pressed or aria-checked), so requirements 1, 3 and 4 are not met.\"}",
+  "cost_usd": 0.013430699999999999,
+  "is_error": false
+}

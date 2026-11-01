@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t02-stale-slots/a3",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The slots fetch now lives in an effect keyed on slug, service, master, date and a reload counter, and its cleanup aborts the in-flight request. Both the `.then` and `.catch` handlers are guarded by `ctrl.signal.aborted`, so a late response for a superseded selection cannot overwrite the grid or set an error. Changing the selection mid-load still works, and the manual reload paths now go through the same abortable effect.\"}",
+  "cost_usd": 0.024874699999999996,
+  "is_error": false
+}

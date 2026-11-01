@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t06-dst-slots/solution",
+  "task": "t06-dst-slots",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The two-pass offset lookup in localTimeToUtc gives the right UTC instant for Berlin (28 Mar and 31 Oct 2027) and for New York clock-change days. It also handles times just before and after each transition. The new tests cover the Berlin cases, and the change is confined to the one function that had the once-per-day offset bug.\"}",
+  "cost_usd": 0.0335057,
+  "is_error": false
+}

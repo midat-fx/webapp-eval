@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t08-status-transitions/bad-read-then-update",
+  "task": "t08-status-transitions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The status check is a separate SELECT outside the transaction, and the UPDATE inside it is not conditioned on status = 'confirmed'. Two concurrent requests can both read 'confirmed', both pass the check, and both update and write audit entries, so the 'changes exactly once' requirement fails, including across app servers.\"}",
+  "cost_usd": 0.010328699999999998,
+  "is_error": false
+}

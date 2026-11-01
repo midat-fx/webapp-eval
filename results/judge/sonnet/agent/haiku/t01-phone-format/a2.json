@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t01-phone-format/a2",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A shared `phoneSchema` strips spaces, dashes, dots and parentheses, adds the leading `+`, and still requires 10\u201315 digits, so inputs like `call me` and `+7 701` are still rejected. It is used in both the book and waitlist routes, and `createBooking` and `joinWaitlist` also normalize the phone, so every variant is stored as `+77015551234` and maps to one client. The one thing I couldn't check is whether the booking wizard UI has its own client-side phone check, since the diff doesn't show it.\"}",
+  "cost_usd": 0.04004970000000001,
+  "is_error": false
+}

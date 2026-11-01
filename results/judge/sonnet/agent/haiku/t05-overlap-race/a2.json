@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t05-overlap-race/a2",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"createBooking now takes a row lock on the master (SELECT ... FOR UPDATE) inside the transaction, then checks for overlapping confirmed bookings with a strict interval test before inserting. This serializes concurrent checkouts across app servers. A loser gets `slot_taken` rather than a 500, only confirmed bookings block, and different masters and re-booking after a cancellation are unaffected. The added test covers overlapping starts racing for the same master.\"}",
+  "cost_usd": 0.0316767,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t01-phone-format/a3",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only changes the two API route schemas. The issue says the booking wizard itself shows 'Check the name and phone (format +7701\u2026)', which looks like a client-side check, and the waitlist form also reports failure. The diff doesn't touch either UI, so formatted numbers may still be blocked before they reach the API.\"}",
+  "cost_usd": 0.030868700000000002,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t03-default-date-tz/bad-browser-local-date",
+  "task": "t03-default-date-tz",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"`toLocaleDateString(\\\"en-CA\\\")` with no `timeZone` option formats the date in the visitor's browser timezone, not the business's configured timezone. The wizard already receives a `timezone` prop, but the patch never uses it. A visitor in Europe or anywhere else still sees the wrong date relative to the business, so the issue is not resolved.\"}",
+  "cost_usd": 0.010980700000000001,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/bad-close-on-pagehide",
+  "task": "t04-sse-subscriber-leak",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only adds a client-side `pagehide` handler that closes the EventSource, which the existing effect cleanup already does on unmount. It leaves the server route untouched, so there is still no guarantee that the Redis subscription and connection are released when the request aborts. The issue is a server-side leak, and this change does not address it.\"}",
+  "cost_usd": 0.009611699999999999,
+  "is_error": false
+}

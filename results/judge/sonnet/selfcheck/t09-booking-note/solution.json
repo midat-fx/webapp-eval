@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/solution",
+  "task": "t09-booking-note",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The Note textarea has an explicit label and maxLength 500. The API schema trims, caps at 500 (400 on failure, before anything is created) and maps blank to null, and the value is stored in `bookings.note`. The admin card renders it as an escaped React text node with `whitespace-pre-line`, so line breaks are kept. The only gap is that runs of spaces collapse visually, which is minor.\"}",
+  "cost_usd": 0.0490717,
+  "is_error": false
+}

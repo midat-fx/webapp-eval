@@ -14,5 +14,5 @@
     }
   ],
   "task": "t04-sse-subscriber-leak",
-  "seconds": 65.4
+  "seconds": 30.0
 }

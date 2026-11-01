@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/bad-html-line-breaks",
+  "task": "t09-booking-note",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The admin calendar renders the note with dangerouslySetInnerHTML without escaping, so a client-supplied note is injected as raw HTML (stored XSS). The issue requires plain text exactly as written, which this breaks.\"}",
+  "cost_usd": 0.0224517,
+  "is_error": false
+}

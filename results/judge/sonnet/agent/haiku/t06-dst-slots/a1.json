@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t06-dst-slots/a1",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"localTimeToUtc now resolves the offset at the candidate instant and refines it once, instead of using one offset taken at the start of the UTC date. I traced Berlin and New York on all four clock-change days, plus Auckland and an early-morning Berlin time. Each gives the correct UTC instant, so the first slot is at opening and the last ends at closing. I could not see slotsForDay, so a day whose opening hours span the clock change itself is unchecked.\"}",
+  "cost_usd": 0.0499287,
+  "is_error": false
+}

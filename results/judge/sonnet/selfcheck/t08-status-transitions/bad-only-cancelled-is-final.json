@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t08-status-transitions/bad-only-cancelled-is-final",
+  "task": "t08-status-transitions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only blocks transitions out of 'cancelled'. A completed or no-show booking can still be cancelled, which frees the slot and offers it to the waitlist. Completed and no-show can also still overwrite each other, so concurrent clicks still log both changes. The update is not restricted to status = 'confirmed', so a booking does not change exactly once.\"}",
+  "cost_usd": 0.0116417,
+  "is_error": false
+}

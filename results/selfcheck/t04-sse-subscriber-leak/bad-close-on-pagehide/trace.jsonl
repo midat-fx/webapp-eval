@@ -1,9 +1,9 @@
-{"ts":"2026-11-01T07:40:51.664Z","step":"start","status":"ok","detail":"t04-sse-subscriber-leak"}
-{"ts":"2026-11-01T07:40:51.723Z","step":"setup","status":"ok"}
-{"ts":"2026-11-01T07:40:51.906Z","step":"apply","status":"ok","detail":"2 files touched"}
-{"ts":"2026-11-01T07:41:29.914Z","step":"build","status":"ok"}
-{"ts":"2026-11-01T07:41:33.155Z","step":"services","status":"ok"}
-{"ts":"2026-11-01T07:41:35.153Z","step":"seed","status":"ok"}
-{"ts":"2026-11-01T07:41:36.300Z","step":"server","status":"ok","detail":"1 instance(s)"}
-{"ts":"2026-11-01T07:41:55.414Z","step":"playwright","status":"exit:1"}
-{"ts":"2026-11-01T07:41:55.565Z","step":"done","status":"auto","detail":"checks"}
+{"ts":"2026-11-01T13:58:34.677Z","step":"start","status":"ok","detail":"t04-sse-subscriber-leak"}
+{"ts":"2026-11-01T13:58:34.718Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T13:58:34.756Z","step":"apply","status":"ok","detail":"2 files touched"}
+{"ts":"2026-11-01T13:58:49.686Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T13:58:52.491Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T13:58:53.706Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T13:58:54.682Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T13:59:04.137Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-01T13:59:04.184Z","step":"done","status":"auto","detail":"checks"}

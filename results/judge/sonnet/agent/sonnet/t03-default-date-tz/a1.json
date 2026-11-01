@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t03-default-date-tz/a1",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The new `todayInTimezone` uses `Intl.DateTimeFormat` with the business timezone, so it works for any IANA zone, and both the initial `date` state and the `min` attribute now use it instead of the UTC date. The added test cases check out by hand, including the DST-end day for Los Angeles and the +14 offset for Kiritimati.\"}",
+  "cost_usd": 0.0255727,
+  "is_error": false
+}

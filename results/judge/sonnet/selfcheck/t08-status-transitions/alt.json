@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t08-status-transitions/alt",
+  "task": "t08-status-transitions",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch takes a `SELECT ... FOR UPDATE` row lock inside the transaction and returns early unless the status is `confirmed`. Competing or later attempts on any app server therefore see the committed status and do nothing, with no audit entry or follow-up side effects. Normal confirmed-to-completed, no-show or cancelled transitions still run as before.\"}",
+  "cost_usd": 0.0216017,
+  "is_error": false
+}

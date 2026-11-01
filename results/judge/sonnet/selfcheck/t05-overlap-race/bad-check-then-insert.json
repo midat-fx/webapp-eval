@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/bad-check-then-insert",
+  "task": "t05-overlap-race",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only adds a check-then-insert (SELECT overlap, then INSERT) inside a normal transaction, with no lock, serializable isolation, or DB exclusion constraint. Two concurrent checkouts, including on different app servers, can both see no clash under READ COMMITTED and both insert, so the race in the issue is still possible.\"}",
+  "cost_usd": 0.0128037,
+  "is_error": false
+}

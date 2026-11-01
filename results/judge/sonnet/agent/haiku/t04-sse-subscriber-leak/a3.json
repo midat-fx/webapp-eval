@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t04-sse-subscriber-leak/a3",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch cleans up on both request abort and stream cancel: it clears the heartbeat interval and calls sub.disconnect(), which drops the subscription and its connection. The live message forwarding and heartbeat are preserved, and a failed subscribe is also cleaned up.\"}",
+  "cost_usd": 0.0295777,
+  "is_error": false
+}

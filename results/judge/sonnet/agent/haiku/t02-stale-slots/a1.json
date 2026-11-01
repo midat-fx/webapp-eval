@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t02-stale-slots/a1",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The slots fetch now runs in an effect whose cleanup marks the response stale, so a late response for an earlier service, staff member or date is never applied. Changing the selection while loading still works, since each change starts a new fetch, and the manual reloads go through a reloadKey that keeps the same guard.\"}",
+  "cost_usd": 0.0253787,
+  "is_error": false
+}

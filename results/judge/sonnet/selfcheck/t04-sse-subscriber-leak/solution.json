@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/solution",
+  "task": "t04-sse-subscriber-leak",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The stream's cancel() handler clears the heartbeat interval and calls sub.quit(), which ends both the subscription and its dedicated Redis connection when the client disconnects. The message handler and live updates are unchanged, so open tabs keep updating. The patch relies on Next.js calling cancel() on client disconnect, which I believe it does, but I haven't confirmed that.\"}",
+  "cost_usd": 0.030555699999999998,
+  "is_error": false
+}

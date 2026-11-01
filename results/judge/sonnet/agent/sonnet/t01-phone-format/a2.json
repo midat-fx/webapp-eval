@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t01-phone-format/a2",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A shared `phoneSchema` strips spaces, dashes, dots and parentheses before validating, and the book and waitlist routes both use it, so direct API calls are covered. `createBooking` and `joinWaitlist` also normalize again, so `+7 (701) 555-12-34` is stored as `+77015551234` and lands on the same client record. Non-numbers like `call me` and `+7 701` are still rejected. The diff shows no client-side phone check in the wizard that would need changing.\"}",
+  "cost_usd": 0.039375700000000007,
+  "is_error": false
+}

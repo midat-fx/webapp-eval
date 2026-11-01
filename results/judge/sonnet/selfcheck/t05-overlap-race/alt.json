@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/alt",
+  "task": "t05-overlap-race",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch takes a per-master Postgres advisory transaction lock, then checks for overlapping confirmed bookings (start < new end, end > new start) before inserting. This serializes concurrent checkouts across app servers and ignores cancelled, completed and no-show bookings. The loser gets `slot_taken` instead of a 500, and other masters and re-bookings after cancellation are unaffected. I could not see the route's error mapping or any other booking-write paths such as reschedule, so I'm assuming `slot_taken` already maps to the 409.\"}",
+  "cost_usd": 0.0253787,
+  "is_error": false
+}

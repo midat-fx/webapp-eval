@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t08-status-transitions/bad-disable-button-while-pending",
+  "task": "t08-status-transitions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only disables the button client-side while a submission is pending. It adds no server-side check that the booking is confirmed and no atomic status transition, so stale tabs, resubmitted forms, and concurrent requests from different receptionists or app servers still overwrite status, write duplicate audit entries, and send cancellation messages and waitlist offers.\"}",
+  "cost_usd": 0.013203699999999999,
+  "is_error": false
+}

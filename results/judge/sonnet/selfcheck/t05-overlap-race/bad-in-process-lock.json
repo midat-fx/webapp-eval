@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/bad-in-process-lock",
+  "task": "t05-overlap-race",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The per-master serialization is an in-process Map promise queue, so it does nothing across the two app servers the issue mentions. The overlap check is a plain SELECT inside a default-isolation transaction with no DB-level lock or exclusion constraint, so concurrent requests on different servers can still both pass it and insert overlapping confirmed bookings.\"}",
+  "cost_usd": 0.014941700000000002,
+  "is_error": false
+}

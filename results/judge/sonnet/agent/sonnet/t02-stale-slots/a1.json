@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t02-stale-slots/a1",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Each fetch captures an incrementing request id, and the effect cleanup also bumps it when service, master or date changes. Responses and errors from superseded requests are therefore ignored, regardless of arrival order. Changing the selection while loading still works, since the new request becomes the current one.\"}",
+  "cost_usd": 0.0204167,
+  "is_error": false
+}

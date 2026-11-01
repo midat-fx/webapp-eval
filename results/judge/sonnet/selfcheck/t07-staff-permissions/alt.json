@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/alt",
+  "task": "t07-staff-permissions",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"All six owner-only pages now call `ownerPage()`, which returns 404 for non-owners. All five owner-only server actions are wrapped in `ownerAction`, which checks the role server-side and refuses staff, so a replayed form post does nothing. The nav hides the owner-only links from staff, `updateBookingStatus` is untouched so staff keep the Calendar and Clients, and owner behaviour is unchanged.\"}",
+  "cost_usd": 0.05383570000000001,
+  "is_error": false
+}

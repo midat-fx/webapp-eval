@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t06-dst-slots/alt",
+  "task": "t06-dst-slots",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch replaces the single start-of-day offset with a candidate-offset search, so wall times map to the correct UTC instant on both DST transition days. I traced Berlin on 2027-03-28 and 2027-10-31 and got 10:00 local both times, and skipped or ambiguous wall times fall back sensibly. I could only see the diff, so any other slot code outside `localTimeToUtc` is unchecked.\"}",
+  "cost_usd": 0.0371957,
+  "is_error": false
+}

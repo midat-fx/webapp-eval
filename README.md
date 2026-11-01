@@ -10,7 +10,76 @@ verifiers build the candidate's version of the app in a container with no
 network, drive it with Playwright, check PostgreSQL invariants after the
 scenario, and run axe-core on the UI it touches.
 
-<!-- RESULTS -->
+## Results
+
+Every number here is computed by `python3 -m harness.report` from files in
+[`results/`](results/) ([`results/summary.json`](results/summary.json)).
+
+**Verifiers: 63/63 self-check variants graded as expected**
+([`results/selfcheck/`](results/selfcheck/summary.json)). All ten start states
+fail, all ten reference and ten alternative fixes pass, and 33/33 known-bad
+patches are rejected.
+
+**Agents: 49/49 graded runs pass** (Claude Code headless, `claude -p`,
+[`results/agent/`](results/agent/)):
+
+| Task | Haiku 5.5 | Sonnet 5.5 |
+|---|---|---|
+| t01-phone-format | 3/3 | 2/2 |
+| t02-stale-slots | 3/3 | 2/2 |
+| t03-default-date-tz | 3/3 | 2/2 |
+| t04-sse-subscriber-leak | 3/3 | 2/2 |
+| t05-overlap-race | 3/3 | 2/2 |
+| t06-dst-slots | 3/3 | 2/2 |
+| t07-staff-permissions | 3/3 | 2/2 |
+| t08-status-transitions | 3/3 | 2/2 |
+| t09-booking-note | 3/3 | 2/2 |
+| t10-wizard-a11y | 2/2 | 2/2 |
+| **total** | **29/29** | **20/20** |
+| mean wall time | 87 s | 38 s |
+| mean turns | 19.0 | 8.2 |
+| mean cost (CLI-reported) | $0.84 | $0.19 |
+
+That's a ceiling. These ten tasks don't separate the two models on pass rate,
+only on effort: Haiku takes about 2.3× the turns, 2.3× the time and 4.4× the
+cost. Harder tasks are the obvious next step. Some other details:
+
+- 50 of a 60-run budget used ([`ledger.jsonl`](results/agent/ledger.jsonl)):
+  49 graded runs plus one lost to a harness incident. The remaining 10 runs
+  are not done yet, which is why some cells have 2 attempts.
+- 0/49 traces touched anything outside their workdir (`touched_outside_workdir`
+  in each `meta.json`).
+- Two wave-1 failures turned out to be the verifiers' fault, not the
+  agents'. Each one is in [`REGRADES.md`](results/agent/REGRADES.md); no
+  agent was ever re-run to improve a score.
+- The very first run (`haiku/t01-phone-format/a1`) used a shorter
+  disallowed-tools list (`meta.json` records the list for every run).
+
+**LLM judge vs. verifiers** (Sonnet 5.5, issue + diff only, no tools,
+[`results/judge/sonnet/`](results/judge/sonnet/summary.json)):
+
+| Patches | n | agreement | false accepts | false rejects |
+|---|---|---|---|---|
+| reference + alternative fixes | 20 | 19/20 | – | 1 |
+| known-bad patches | 33 | 33/33 | 0 | – |
+| agent patches | 49 | 47/49 | – | 2 |
+| **all** | **102** | **97.1 %, κ = 0.93** | **0** | **3** |
+
+The judge never accepted a wrong patch, but it couldn't be tested against an
+agent's wrong patch, because there weren't any. Its three false rejects all
+come from missing context: it assumed `redisSub` didn't exist because the
+diff didn't define it, and twice it guessed that the browser blocks formatted
+phone numbers before the API sees them, which the wizard test shows it
+doesn't.
+
+The judge's first pass also beat my own verifiers twice. It rejected my
+alternative fixes for t09 (the admin card collapsed the note's line breaks)
+and t04 (a second cleanup call could unsubscribe a newer tab), and both
+times it was right. The t09 verifier now checks the rendered text, and the
+old t09 alternative is a known-bad patch. Both alternatives are fixed and
+re-judged; the first versions and their verdicts are in
+[`results/judge/superseded/`](results/judge/superseded/).
+
 
 ## Tasks
 
@@ -45,7 +114,7 @@ lockfile fails the grading: there is no network to install anything.
 
 **The verifiers are tested too.** For every task the self-check grades the
 untouched start state (must fail), the reference fix and an independently
-written alternative fix (must pass), and two to four known-bad patches that
+written alternative fix (must pass), and three to five known-bad patches that
 an agent could plausibly write (must fail): partial fixes, UI-only fixes,
 fixes that hard-code the issue's own example, and fixes at the wrong layer —
 an in-process mutex where there are two servers, a unique index where the

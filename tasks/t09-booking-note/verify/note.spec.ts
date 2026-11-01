@@ -77,7 +77,9 @@ test("admin calendar shows the note as plain text", async ({ page }) => {
   await page.goto(`/admin?date=${upcoming(b.timezone, 3)}`);
   const card = page.locator("article", { hasText: "Note Writer" });
   await expect(card).toContainText("Allergic to ammonia dye.");
-  await expect(card).toContainText("Please use the gentle one.");
+  // toContainText normalises whitespace; innerText follows CSS, so a line
+  // break the card collapses into a space shows up here.
+  expect(await card.innerText()).toContain(NOTE);
   await page.goto(`/admin?date=${upcoming(b.timezone, 5)}`);
   await expect(page.locator("article", { hasText: "Api Note" }).filter({ hasText: "onerror" })).toHaveCount(1);
   await page.waitForTimeout(500);

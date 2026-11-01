@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t03-default-date-tz/bad-default-only",
+  "task": "t03-default-date-tz",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The initial date state now uses the business timezone, but the date picker's `min` attribute is not changed in this diff. If it still derives from `new Date().toISOString()` (UTC), yesterday remains selectable as the earliest date, which the issue explicitly says must also be fixed.\"}",
+  "cost_usd": 0.0112807,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/alt",
+  "task": "t04-sse-subscriber-leak",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch imports `redisSub` from `@/lib/redis`, but the diff never defines it, so the route may not compile. It also keeps one shared subscriber connection open after the last tab closes, whereas the issue says the subscription and its connection should go away. Separately, `stop()` can run twice (once on abort, once on cancel), and a second `unlisten()` can delete and unsubscribe a newer listener set for the same channel.\"}",
+  "cost_usd": 0.0239007,
+  "is_error": false
+}

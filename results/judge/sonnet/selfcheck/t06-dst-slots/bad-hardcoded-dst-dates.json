@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t06-dst-slots/bad-hardcoded-dst-dates",
+  "task": "t06-dst-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch hardcodes four specific dates (Berlin and New York in 2027), but the issue requires correct behaviour on every clock-change day, in any year and any timezone. Other zones and years remain broken, and the root cause (one offset taken per day) is untouched. The hardcoded shifts are also questionable: for times before the transition they would apply the wrong offset.\"}",
+  "cost_usd": 0.0122327,
+  "is_error": false
+}

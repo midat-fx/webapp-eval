@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t04-sse-subscriber-leak/a2",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The route now tears down the subscriber on both request abort and stream cancel. Cleanup is idempotent, clears the ping timer, unsubscribes, and quits the connection (falling back to disconnect). It also handles abort during subscribe and subscribe failure, and the live message forwarding to open tabs is unchanged. The only gap is that the diff doesn't show the client component, so any client-side leak of the EventSource on navigation can't be ruled out.\"}",
+  "cost_usd": 0.03340270000000001,
+  "is_error": false
+}

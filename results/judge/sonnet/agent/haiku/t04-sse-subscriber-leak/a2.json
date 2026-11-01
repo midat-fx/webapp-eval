@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t04-sse-subscriber-leak/a2",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch disconnects the per-tab Redis subscriber on both request abort and stream cancel, clears the ping interval, and guards enqueues after close, so connections are released when a tab closes while open tabs still receive live messages. The only gap is that an already-aborted request still starts an interval that is never cleared. It is a harmless no-op timer and does not affect the Redis connection.\"}",
+  "cost_usd": 0.0257107,
+  "is_error": false
+}

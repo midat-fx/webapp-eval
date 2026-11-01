@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t06-dst-slots/a1",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The root cause was `localTimeToUtc` applying the offset from the start of the date to every time that day. The patch now resolves the offset for the specific wall time, including DST-ambiguous and nonexistent times, and I traced Berlin 28 Mar and 31 Oct 2027 to the correct 10:00 local. It also fixes the admin day-end calculation to use the next local midnight instead of adding a fixed 24 hours.\"}",
+  "cost_usd": 0.042640700000000004,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t08-status-transitions/a3",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The UPDATE is now conditioned on status = 'confirmed', so it is atomic. Under Postgres READ COMMITTED a concurrent writer blocks on the row lock, re-evaluates the WHERE clause, and matches zero rows, which holds across app servers. The audit insert, cancellation message and waitlist offer sit after the early return, so they are skipped on a no-op, and the calendar publish is now skipped too.\"}",
+  "cost_usd": 0.013089699999999998,
+  "is_error": false
+}

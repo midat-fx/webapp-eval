@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t03-default-date-tz/alt",
+  "task": "t03-default-date-tz",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The server page now computes today's date in the business's configured timezone with Intl.DateTimeFormat('en-CA', {timeZone}), which gives YYYY-MM-DD for any IANA zone. It passes that value to the wizard as both the initial date and the picker's min, replacing the UTC-based toISOString calls that caused the bug, so the result no longer depends on the visitor's timezone.\"}",
+  "cost_usd": 0.024683700000000003,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t08-status-transitions/a1",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The `status = 'confirmed'` guard sits inside the UPDATE's WHERE clause, so under Postgres READ COMMITTED a concurrent writer waits on the row lock, re-checks the committed row, and matches nothing. That makes every later or competing attempt a no-op across app servers: no audit entry, outbox message, waitlist offer or calendar publish. The normal confirmed-to-final transition is unchanged, and the added tests cover both the already-completed cancel and the race.\"}",
+  "cost_usd": 0.0271757,
+  "is_error": false
+}

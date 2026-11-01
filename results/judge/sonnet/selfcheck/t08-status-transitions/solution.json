@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t08-status-transitions/solution",
+  "task": "t08-status-transitions",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The status check ('confirmed') is now part of the UPDATE's WHERE clause, so Postgres row locking makes concurrent attempts serialize and only one matches, even across app servers. Losing or stale attempts return early with no audit entry, no cancellation message, no waitlist offer and no publish, while normal confirmed-to-new-status transitions still work.\"}",
+  "cost_usd": 0.0126477,
+  "is_error": false
+}

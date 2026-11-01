@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t06-dst-slots/a2",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"`localTimeToUtc` now resolves the zone offset from the wall time itself with a second correction pass, instead of using the offset at the start of the date. I traced Berlin and New York spring-forward and fall-back dates, including wall times just before and after the transition, and each gives the correct UTC instant, so the first slot lands at opening and the last ends at closing. The added tests cover both Berlin transition days and a New York one.\"}",
+  "cost_usd": 0.03836970000000001,
+  "is_error": false
+}

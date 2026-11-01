@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t09-booking-note/a2",
+  "task": "t09-booking-note",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The Note textarea has a real label (htmlFor/id), a 500-character limit, and a counter. The API trims the note, stores empty or whitespace-only notes as NULL, and rejects notes over 500 characters through the existing zod 400 path. The admin card renders the note as escaped plain text with whitespace-pre-wrap, so line breaks are kept. The 500 limit is counted in UTF-16 units, so emoji count as two, which I judged an acceptable reading of 'characters'.\"}",
+  "cost_usd": 0.042676700000000005,
+  "is_error": false
+}

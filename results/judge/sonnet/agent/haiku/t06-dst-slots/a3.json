@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t06-dst-slots/a3",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"localTimeToUtc now reads the zone offset at the requested wall time with a standard two-pass correction instead of using the offset at midnight. Worked by hand, the Berlin and New York DST-start and DST-end cases give the expected UTC instants, and the slotsForDay tests cover opening and closing on those days. slotsForDay itself is not in the diff, so I'm assuming it derives its bounds from localTimeToUtc.\"}",
+  "cost_usd": 0.0422587,
+  "is_error": false
+}

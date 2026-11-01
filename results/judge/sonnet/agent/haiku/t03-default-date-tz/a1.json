@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t03-default-date-tz/a1",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds `todayISO(timezone)`, which formats the current instant as a calendar date in the business timezone via `Intl.DateTimeFormat('en-CA', { timeZone })`. The wizard now uses it for both the initial date and the picker's `min`, so any IANA timezone works regardless of the visitor's timezone or the UTC date. The new test covers the Almaty case where UTC is still the previous day.\"}",
+  "cost_usd": 0.028430699999999996,
+  "is_error": false
+}

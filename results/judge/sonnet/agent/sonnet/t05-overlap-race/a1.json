@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t05-overlap-race/a1",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Bookings are serialised per master with a row lock on the staff row, followed by an overlap check against confirmed bookings only (half-open range, so back-to-back slots still work). A GiST exclusion constraint is added as a cross-server backstop, and both a clash and a 23P01 violation return `slot_taken`. One residual risk: the migration will fail on a database that already contains overlapping confirmed bookings, such as Dana's.\"}",
+  "cost_usd": 0.0422877,
+  "is_error": false
+}

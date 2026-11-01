@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t08-status-transitions/a1",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The UPDATE now has a `status = 'confirmed'` condition, so only a confirmed booking can transition. Postgres row locking makes a concurrent second attempt re-check the condition and update nothing, even across app servers. The audit entry, reminder cancellation, cancellation message, waitlist offer and calendar publish all run only when the update succeeded, so later or competing attempts are no-ops while normal use still works.\"}",
+  "cost_usd": 0.0248567,
+  "is_error": false
+}

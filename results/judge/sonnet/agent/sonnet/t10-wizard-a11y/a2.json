@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t10-wizard-a11y/a2",
+  "task": "t10-wizard-a11y",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds labels with unique ids for the date, name and phone fields in both the wizard and the waitlist box, and keeps the placeholders. It darkens the duration and \\\"Loading\u2026\\\" text, adds role=\\\"alert\\\" to both error messages, and adds aria-pressed to the service and staff buttons. All four requirements are met and nothing visible is removed. Judged from the diff alone, I found no remaining violation.\"}",
+  "cost_usd": 0.0516347,
+  "is_error": false
+}

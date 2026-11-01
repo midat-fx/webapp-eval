@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/alt",
+  "task": "t04-sse-subscriber-leak",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch imports `redisSub` from \\\"@/lib/redis\\\", but the diff never defines it and the original code only used `redis()`, so the import likely doesn't exist and the build would break. Even if it exists, one shared subscriber connection is created on first use and never closed, so the connection does not go away after the last tab closes, as the issue expects.\"}",
+  "cost_usd": 0.0289037,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/bad-services-only",
+  "task": "t07-staff-permissions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"Only `saveService` and `toggleService` were switched to `requireOwner()` in `actions.ts`. The staff-page actions (`saveStaff`, `toggleStaff`, `toggleStaffService`) are not in the diff, so they presumably still use `requireSession()`. A staff login could therefore replay those submissions to add staff, hide colleagues or reassign services, which the issue says must be refused on the server.\"}",
+  "cost_usd": 0.0322107,
+  "is_error": false
+}

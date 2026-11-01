@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/solution",
+  "task": "t10-wizard-a11y",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch labels every field (date, name, phone in both forms), darkens the zinc-400 text to zinc-500, adds role=alert to the main and waitlist errors, and adds aria-pressed to the service and staff buttons. All visible content is kept. The main error is an always-present role=alert region, so it is announced when its text changes.\"}",
+  "cost_usd": 0.0406297,
+  "is_error": false
+}

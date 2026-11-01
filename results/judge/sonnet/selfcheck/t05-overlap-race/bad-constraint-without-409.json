@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/bad-constraint-without-409",
+  "task": "t05-overlap-race",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The exclusion constraint stops overlapping confirmed bookings at the database level, but the patch changes no application code. A losing insert raises Postgres error 23P01 (exclusion_violation), which nothing maps to `409 {\\\"error\\\":\\\"slot_taken\\\"}`, so the losing client would most likely get a 500, which the issue explicitly forbids.\"}",
+  "cost_usd": 0.0163017,
+  "is_error": false
+}

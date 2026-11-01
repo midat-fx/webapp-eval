@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t05-overlap-race/solution",
+  "task": "t05-overlap-race",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A partial GiST exclusion constraint on (staff_id, tstzrange(start_at, end_at)) for confirmed bookings enforces no overlap at the database level across app servers. It ignores non-confirmed statuses, allows back-to-back and different-master bookings, and createBooking maps the 23P01 violation to the existing slot_taken result instead of a 500.\"}",
+  "cost_usd": 0.0368627,
+  "is_error": false
+}

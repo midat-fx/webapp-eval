@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/alt",
+  "task": "t10-wizard-a11y",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch labels the date, name and phone fields (including the waitlist ones) with aria-label and darkens the low-contrast grey text to zinc-600. It adds an always-mounted aria-live region for both the main error and the waitlist error, and gives service and staff buttons radio roles with aria-checked inside labelled radiogroups. Nothing visible is removed, though the diff does not show whether other grey text elsewhere on the page still has low contrast.\"}",
+  "cost_usd": 0.0354917,
+  "is_error": false
+}

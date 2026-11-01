@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/bad-drop-low-contrast-text",
+  "task": "t10-wizard-a11y",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch deletes the service duration (\\\"\u00b7 60 min\\\") from the UI instead of making it readable. The issue says to keep the information and that nothing a sighted user sees today may disappear. The unselected-state contrast fix was never applied, and the selected service/staff buttons are only exposed via aria-pressed with no other change.\"}",
+  "cost_usd": 0.024836699999999996,
+  "is_error": false
+}

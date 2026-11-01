@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t04-sse-subscriber-leak/a1",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch tears down the subscriber (listeners, ping interval, unsubscribe, quit with a forced disconnect fallback) on both request abort and stream cancel, and also handles abort during subscribe and subscribe failure. Live updates are unchanged for open tabs, since the message listener is still attached synchronously in start().\"}",
+  "cost_usd": 0.029587699999999998,
+  "is_error": false
+}

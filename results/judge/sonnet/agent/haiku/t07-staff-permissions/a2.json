@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t07-staff-permissions/a2",
+  "task": "t07-staff-permissions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Every owner-only page (Services, Staff, Reports, Analytics, Notifications, Audit) and every mutating action in the diff (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService) now calls a new server-side requireOwner(), which redirects non-owners to /admin. Calendar status updates and Clients stay available to staff, the nav hides the owner-only links from them, and the owner flow is unchanged. The diff shows no other owner-only mutation left unguarded.\"}",
+  "cost_usd": 0.0413887,
+  "is_error": false
+}

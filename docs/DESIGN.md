@@ -88,13 +88,14 @@ use real time and many timezones instead.
 Every verifier change re-runs the whole matrix; the published numbers are in
 `results/selfcheck/`.
 
-### Race checks are probabilistic, so they are measured
+### Race checks are probabilistic
 
 Three known-bad patches are only wrong under concurrency (t05
 check-then-insert and in-process lock, t08 read-then-update). Their
 verifiers race many requests over several rounds and two servers, which makes
 a miss unlikely but not impossible. `harness.cli flake` grades the same patch
-repeatedly; the catch rates are in `results/flake/` and in the README.
+repeatedly and writes the catch rate to `results/flake/`. Those runs haven't
+been done yet, so the README makes no claim about catch rates.
 
 ### Time-dependent checks are made time-independent
 
@@ -163,10 +164,26 @@ pipelines use; the point is to measure how often it accepts patches the
 verifiers prove wrong. Agreement is reported as accuracy and Cohen's κ, with
 false-accept and false-reject rates split by where the patch came from.
 
+### The judge checks the verifiers too
+
+The judge's first pass rejected two of my alternative fixes, and it was right
+both times. The t09 alternative rendered the note without `white-space`
+handling, so line breaks collapsed on the card; the verifier missed it
+because Playwright's `toContainText` normalises whitespace. The t04
+alternative could run its cleanup twice (on abort and on cancel), and the
+second call could unsubscribe a tab that had opened in between. Both are
+fixed. The t09 verifier now compares `innerText`, which follows CSS, and the
+old alternative became `bad/collapsed-line-breaks.patch`. The first versions
+and the judge's verdicts on them are kept in `results/judge/superseded/`.
+That's the argument for running a cheap judge next to deterministic
+verifiers: its disagreements are a list of places to look.
+
 ## Known limitations
 
 - Ten tasks from one app: good for depth, says nothing about other stacks.
 - Agent sandboxing on the host is audited, not enforced.
-- Race verifiers are probabilistic (measured, see above).
+- Race verifiers are probabilistic, and their catch rate is not measured yet.
+- t04 can't trigger the abort-then-cancel race described above
+  deterministically, so a fix with that bug would still pass.
 - Each grading builds the app from scratch (~10–30 s on an idle machine,
   minutes when the host is loaded); fine for tens of runs, slow for thousands.

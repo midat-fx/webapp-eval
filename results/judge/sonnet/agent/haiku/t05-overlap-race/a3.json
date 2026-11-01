@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t05-overlap-race/a3",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"createBooking now takes a per-master Postgres advisory transaction lock, which works across app servers. It then checks for an overlapping confirmed booking (start < new end and end > new start) before inserting, and returns slot_taken (the 409 path) on a clash. Only confirmed bookings block time, other masters use a different lock key, and a test covers overlapping starts. One risk: only createBooking is changed, so any other path that creates or moves confirmed bookings (such as rescheduling) is not covered.\"}",
+  "cost_usd": 0.0296547,
+  "is_error": false
+}

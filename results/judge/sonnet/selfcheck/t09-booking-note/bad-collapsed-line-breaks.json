@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/bad-collapsed-line-breaks",
+  "task": "t09-booking-note",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The admin calendar renders the note in a plain `<blockquote>` with no `whitespace-pre-wrap`/`pre-line` style, so line breaks the client typed collapse into spaces. That violates 'line breaks are kept' and 'shown exactly as the client wrote it'. The rest (trim, NULL for empty, 500-char 400, labelled textarea) looks correct.\"}",
+  "cost_usd": 0.0165633,
+  "is_error": false
+}

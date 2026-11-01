@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/bad-recycle-after-60s",
+  "task": "t04-sse-subscriber-leak",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only recycles every stream on a 60s timer, so a closed tab's Redis subscription and connection linger up to a minute, not the 'few seconds' the issue requires. There is also still no cancel/abort handling, and the 25s ping setInterval is never cleared, so after controller.close() it will call enqueue on a closed controller and throw.\"}",
+  "cost_usd": 0.0134207,
+  "is_error": false
+}

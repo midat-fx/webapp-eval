@@ -1,8 +1,8 @@
 diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
-index 1a0aabc..ad68400 100644
+index 1a0aabc..2e90f95 100644
 --- a/src/app/api/admin/events/route.ts
 +++ b/src/app/api/admin/events/route.ts
-@@ -1,29 +1,61 @@
+@@ -1,29 +1,66 @@
  import { calendarChannel } from "@/lib/booking";
 -import { redis } from "@/lib/redis";
 +import { redisSub } from "@/lib/redis";
@@ -34,9 +34,14 @@ index 1a0aabc..ad68400 100644
 +    void sub.subscribe(channel);
 +  }
 +  set.add(fn);
++  // Abort and cancel can both fire: only the first call counts, and only this
++  // channel's current set may be dropped.
++  let done = false;
 +  return () => {
++    if (done) return;
++    done = true;
 +    set.delete(fn);
-+    if (set.size === 0) {
++    if (set.size === 0 && listeners.get(channel) === set) {
 +      listeners.delete(channel);
 +      void sub.unsubscribe(channel);
 +    }

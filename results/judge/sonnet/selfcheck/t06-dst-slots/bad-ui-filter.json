@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t06-dst-slots/bad-ui-filter",
+  "task": "t06-dst-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only filters slots client-side with hardcoded 10:00\u201320:00 hours, which hides the symptom instead of fixing the server-side slot generation on DST days. It breaks other businesses with different hours, and it cannot restore slots that were shifted or lost (e.g. the last slot ending by closing time), so correct local hours are still not produced for every day and timezone.\"}",
+  "cost_usd": 0.010912700000000001,
+  "is_error": false
+}

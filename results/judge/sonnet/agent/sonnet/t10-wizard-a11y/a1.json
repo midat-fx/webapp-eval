@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t10-wizard-a11y/a1",
+  "task": "t10-wizard-a11y",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Every field gets a visible label (date, name, phone in both the booking form and the waitlist box) with unique `useId` ids, and the placeholders are kept. The grey durations and \\\"Loading\u2026\\\" move from zinc-400 to zinc-600, which has enough contrast. All three errors render as `role=\\\"alert\\\"`, and the service and staff buttons expose `aria-pressed`. Nothing visible is removed.\"}",
+  "cost_usd": 0.0489387,
+  "is_error": false
+}

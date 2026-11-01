@@ -27,7 +27,7 @@
       "kind": "playwright",
       "name": "admin calendar shows the note as plain text",
       "pass": false,
-      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('article').filter({ hasText: 'Note Writer' })\nExpected substring: \u001b[32m\"Allergic to ammonia dye.\"\u001b[39m\nReceived string:    \u001b[31m\"12:00\u201313:00confirmedWomen's haircutNote Writer \u00b7 +77013330001 \u00b7 8,000 \u20b8\u2713 CompletedNo-showCancel\"\u001b[39m\nTimeout: 20000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('article').filter({ hasText: 'Note Writer' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Note Writer' })\u001b[22m\n\u001b[2m    40 \u00d7 locator re"
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('article').filter({ hasText: 'Note Writer' })\nExpected substring: \u001b[32m\"Allergic to ammonia dye.\"\u001b[39m\nReceived string:    \u001b[31m\"12:00\u201313:00confirmedWomen's haircutNote Writer \u00b7 +77013330001 \u00b7 8,000 \u20b8\u2713 CompletedNo-showCancel\"\u001b[39m\nTimeout: 20000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('article').filter({ hasText: 'Note Writer' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Note Writer' })\u001b[22m\n\u001b[2m    43 \u00d7 locator re"
     },
     {
       "kind": "sql",
@@ -43,9 +43,9 @@
       "kind": "sql",
       "name": "rejected_note_created_nothing",
       "pass": false,
-      "detail": "[{\"id\":\"46532c2c-92d7-4dab-af1c-33e743d5f879\"}]"
+      "detail": "[{\"id\":\"1cc75582-413e-4d59-96c1-36eb0301d1ab\"}]"
     }
   ],
   "task": "t09-booking-note",
-  "seconds": 90.1
+  "seconds": 45.7
 }

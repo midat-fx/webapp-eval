@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t06-dst-slots/bad-platform-local-time",
+  "task": "t06-dst-slots",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch builds the time with `new Date(y, m-1, d, hh, mm)`, which uses the server's system timezone and discards the `timeZone` argument (`void timeZone`). Slots for a Berlin or New York business are therefore computed in the server's local zone, which breaks every day, not just DST days, unless the server happens to run in that zone.\"}",
+  "cost_usd": 0.010860700000000001,
+  "is_error": false
+}

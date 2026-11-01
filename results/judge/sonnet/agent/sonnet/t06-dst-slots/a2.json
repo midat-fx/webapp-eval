@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t06-dst-slots/a2",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"localTimeToUtc now resolves the offset around the wall time instead of at the start of the date. It returns 08:00 UTC for Berlin 10:00 on 28 Mar 2027 and 09:00 UTC on 31 Oct 2027. Ambiguous times resolve to the earlier instant and nonexistent times shift forward by the gap. This works for any year or zone, and slotsForDay should then follow local opening hours. The caveats are that slotsForDay and tzOffsetMinutes are not in the diff, and I can't confirm the test file imports localTimeToUtc.\"}",
+  "cost_usd": 0.0421437,
+  "is_error": false
+}

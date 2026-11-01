@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t02-stale-slots/a2",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The slots fetch now lives in an effect that aborts its request on cleanup, so a slow response for a previous service, staff or date can no longer overwrite the grid. Abort errors are ignored and the new selection still loads. The retry paths now go through a reload counter, so they keep working.\"}",
+  "cost_usd": 0.025060699999999998,
+  "is_error": false
+}

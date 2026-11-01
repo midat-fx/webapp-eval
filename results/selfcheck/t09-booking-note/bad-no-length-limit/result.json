@@ -32,7 +32,7 @@
       "kind": "sql",
       "name": "notes_within_limit",
       "pass": false,
-      "detail": "[{\"id\":\"b6876f14-2c29-4373-a99c-41841b10bcfc\",\"length\":501}]"
+      "detail": "[{\"id\":\"e8e07d90-50bd-4d56-b96d-77ba05aed688\",\"length\":501}]"
     },
     {
       "kind": "sql",
@@ -43,9 +43,9 @@
       "kind": "sql",
       "name": "rejected_note_created_nothing",
       "pass": false,
-      "detail": "[{\"id\":\"b6876f14-2c29-4373-a99c-41841b10bcfc\"}]"
+      "detail": "[{\"id\":\"e8e07d90-50bd-4d56-b96d-77ba05aed688\"}]"
     }
   ],
   "task": "t09-booking-note",
-  "seconds": 82.0
+  "seconds": 41.9
 }

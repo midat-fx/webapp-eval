@@ -217,7 +217,7 @@
       "failed_checks": [
         "closed tabs release their Redis subscriber and connection"
       ],
-      "seconds": 59.7
+      "seconds": 38.1
     },
     {
       "task": "t04-sse-subscriber-leak",
@@ -226,7 +226,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 110.0
+      "seconds": 29.0
     },
     {
       "task": "t04-sse-subscriber-leak",
@@ -235,7 +235,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 77.8
+      "seconds": 29.4
     },
     {
       "task": "t04-sse-subscriber-leak",
@@ -246,7 +246,7 @@
       "failed_checks": [
         "closed tabs release their Redis subscriber and connection"
       ],
-      "seconds": 65.4
+      "seconds": 30.0
     },
     {
       "task": "t04-sse-subscriber-leak",
@@ -257,7 +257,7 @@
       "failed_checks": [
         "closed tabs release their Redis subscriber and connection"
       ],
-      "seconds": 70.3
+      "seconds": 29.7
     },
     {
       "task": "t04-sse-subscriber-leak",
@@ -268,7 +268,7 @@
       "failed_checks": [
         "closed tabs release their Redis subscriber and connection"
       ],
-      "seconds": 70.2
+      "seconds": 32.2
     },
     {
       "task": "t05-overlap-race",
@@ -609,7 +609,7 @@
         "admin calendar shows the note as plain text",
         "rejected_note_created_nothing"
       ],
-      "seconds": 81.0
+      "seconds": 84.5
     },
     {
       "task": "t09-booking-note",
@@ -618,7 +618,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 24.8
+      "seconds": 24.3
     },
     {
       "task": "t09-booking-note",
@@ -627,7 +627,18 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 25.8
+      "seconds": 24.4
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "bad-collapsed-line-breaks",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 22.6
     },
     {
       "task": "t09-booking-note",
@@ -638,7 +649,7 @@
       "failed_checks": [
         "admin calendar shows the note as plain text"
       ],
-      "seconds": 50.3
+      "seconds": 44.4
     },
     {
       "task": "t09-booking-note",
@@ -652,7 +663,7 @@
         "notes_within_limit",
         "rejected_note_created_nothing"
       ],
-      "seconds": 82.0
+      "seconds": 41.9
     },
     {
       "task": "t09-booking-note",
@@ -665,7 +676,7 @@
         "step 4 has no accessibility violations",
         "admin calendar shows the note as plain text"
       ],
-      "seconds": 222.3
+      "seconds": 82.9
     },
     {
       "task": "t09-booking-note",
@@ -679,7 +690,7 @@
         "admin calendar shows the note as plain text",
         "rejected_note_created_nothing"
       ],
-      "seconds": 90.1
+      "seconds": 45.7
     },
     {
       "task": "t10-wizard-a11y",
@@ -751,6 +762,6 @@
       "seconds": 36.6
     }
   ],
-  "total": 62,
-  "agree": 62
+  "total": 63,
+  "agree": 63
 }

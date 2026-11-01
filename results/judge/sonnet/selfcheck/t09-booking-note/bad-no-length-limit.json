@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/bad-no-length-limit",
+  "task": "t09-booking-note",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The zod schema in the book route has no `.max(500)` on `note`, so the public API accepts notes longer than 500 characters instead of returning `400 bad_request`; only the textarea's `maxLength` limits it, and that is client-side.\"}",
+  "cost_usd": 0.0231947,
+  "is_error": false
+}

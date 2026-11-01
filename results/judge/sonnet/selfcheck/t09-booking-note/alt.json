@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/alt",
+  "task": "t09-booking-note",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The Note textarea is wrapped in a real label, the server trims the note, stores empty or whitespace-only notes as NULL, keeps line breaks, and returns 400 bad_request for over-500 notes before anything is created. The admin card renders the note as escaped plain text with whitespace-pre-wrap, and no existing behaviour is broken.\"}",
+  "cost_usd": 0.04417070000000001,
+  "is_error": false
+}

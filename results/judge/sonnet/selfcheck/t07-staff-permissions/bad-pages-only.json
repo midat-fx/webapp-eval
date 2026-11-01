@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/bad-pages-only",
+  "task": "t07-staff-permissions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only guards the page components and hides nav links; it never touches the server actions in src/app/admin/actions.ts (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService). These remain callable by a staff session replaying a form POST, violating the explicit requirement that every owner-only change be refused on the server.\"}",
+  "cost_usd": 0.0254857,
+  "is_error": false
+}

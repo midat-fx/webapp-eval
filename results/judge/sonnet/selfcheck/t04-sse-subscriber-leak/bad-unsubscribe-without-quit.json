@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/bad-unsubscribe-without-quit",
+  "task": "t04-sse-subscriber-leak",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The cancel() handler only calls sub.unsubscribe(), which removes the channel subscription but leaves the duplicated ioredis connection open, so the connection leak the issue describes persists; it needs sub.quit() or disconnect(). Also, if the client disconnects while the heartbeat/message callbacks are firing, enqueue on a closed controller can throw, and the sub.on('message') listener is not removed.\"}",
+  "cost_usd": 0.011042699999999999,
+  "is_error": false
+}

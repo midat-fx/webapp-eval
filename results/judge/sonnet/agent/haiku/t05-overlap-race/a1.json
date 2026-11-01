@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t05-overlap-race/a1",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A gist exclusion constraint on (staff_id, tstzrange(start_at, end_at)) restricted to status='confirmed' makes overlapping confirmed bookings impossible across app servers. Cancelled, completed and no-show bookings, other masters and re-bookings stay allowed, and createBooking maps the constraint violation to the normal slot_taken result, which is the 409 response. I could not check the driver's error shape or the unseen status-change paths, and the migration would fail if production already holds overlapping confirmed bookings like Dana's.\"}",
+  "cost_usd": 0.13788969999999998,
+  "is_error": false
+}

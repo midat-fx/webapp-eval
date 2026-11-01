@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/alt",
+  "task": "t09-booking-note",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The admin card renders the note in a plain <blockquote> with no white-space handling (e.g. whitespace-pre-wrap), so the line breaks the API preserves collapse into single spaces on screen. That breaks the requirement that the note is shown exactly as the client wrote it.\"}",
+  "cost_usd": 0.038720700000000004,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t01-phone-format/a1",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only changes the two API routes. The booking wizard's 'Check the name and phone (format +7701\u2026)' message looks like client-side validation, and the diff doesn't touch it, so a number with spaces or dashes would likely still be blocked before reaching the API. The waitlist form's validation is also unchanged. Existing clients saved without a leading '+' could also end up duplicated.\"}",
+  "cost_usd": 0.031933699999999995,
+  "is_error": false
+}

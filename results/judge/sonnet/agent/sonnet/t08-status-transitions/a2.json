@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t08-status-transitions/a2",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The UPDATE now requires status = 'confirmed', so under Postgres's default READ COMMITTED isolation a concurrent attempt waits on the row lock, re-checks the condition, and updates zero rows, even across app servers. The audit entry, cancellation message and waitlist offer sit after the early return, so a losing or stale attempt skips them, and the first valid change still goes through.\"}",
+  "cost_usd": 0.0184007,
+  "is_error": false
+}

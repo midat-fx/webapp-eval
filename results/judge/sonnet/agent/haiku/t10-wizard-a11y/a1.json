@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t10-wizard-a11y/a1",
+  "task": "t10-wizard-a11y",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds real labels to the date, name and phone fields, including the waitlist box. It darkens the low-contrast greys (duration, Loading\u2026, hold text) to zinc-600. It adds role=alert to the general and waitlist errors, and role=status to the waitlist success message. It adds aria-pressed to the service and staff buttons, with a visual \u2713 marker as well. Placeholders and all existing visible content are kept.\"}",
+  "cost_usd": 0.048251699999999995,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t05-overlap-race/a2",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A partial gist exclusion constraint on (staff_id, tstzrange(start_at, end_at)) WHERE status='confirmed' makes overlapping confirmed bookings for one master impossible at the database level, on any app server. Cancelled, completed and no-show bookings, other masters, and back-to-back slots (half-open range) are unaffected. The insert transaction rolls back on violation, and the 23P01 error (including when wrapped in a cause) is mapped to `slot_taken`.\"}",
+  "cost_usd": 0.0421167,
+  "is_error": false
+}

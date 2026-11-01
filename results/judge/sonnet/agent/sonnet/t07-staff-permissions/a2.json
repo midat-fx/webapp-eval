@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t07-staff-permissions/a2",
+  "task": "t07-staff-permissions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A new requireOwner() guard now protects all six owner-only pages (services, staff, reports, analytics, notifications, audit) and every mutating server action (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService), so replayed form posts are refused server-side. The nav hides owner links for staff, while updateBookingStatus and the calendar and clients pages remain available to staff and nothing changes for the owner.\"}",
+  "cost_usd": 0.0461747,
+  "is_error": false
+}

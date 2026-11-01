@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t03-default-date-tz/solution",
+  "task": "t03-default-date-tz",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Both the initial date and the input's `min` now use `Intl.DateTimeFormat('en-CA', { timeZone: timezone })`, which yields YYYY-MM-DD for today in the business's configured timezone. This works for any IANA zone and is independent of the visitor's timezone and of UTC.\"}",
+  "cost_usd": 0.017957699999999997,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t01-phone-format/a1",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Both public routes now strip spaces, dashes, dots and parentheses before validating with the same regex, so \\\"call me\\\" and \\\"+7 701\\\" are still rejected. createBooking and joinWaitlist also normalize the phone before any client lookup or insert, so formatted and unformatted input resolve to one client stored as +77015551234.\"}",
+  "cost_usd": 0.0375927,
+  "is_error": false
+}

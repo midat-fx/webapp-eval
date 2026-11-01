@@ -1,0 +1,78 @@
+diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
+index 1a0aabc..ad68400 100644
+--- a/src/app/api/admin/events/route.ts
++++ b/src/app/api/admin/events/route.ts
+@@ -1,29 +1,61 @@
+ import { calendarChannel } from "@/lib/booking";
+-import { redis } from "@/lib/redis";
++import { redisSub } from "@/lib/redis";
+ import { getSession } from "@/lib/session";
+ 
+ export const dynamic = "force-dynamic";
+ 
+ // SSE stream of calendar changes for the admin UI.
+-// Each connection gets its own Redis subscriber (a subscribing connection
+-// can't run other commands).
+-export async function GET() {
++// One shared Redis subscriber per process fans messages out to the open
++// streams; a stream unregisters itself when the browser goes away, and the
++// channel is dropped when its last listener leaves.
++type Listener = (message: string) => void;
++const listeners = new Map<string, Set<Listener>>();
++let wired = false;
++
++function listen(channel: string, fn: Listener): () => void {
++  const sub = redisSub();
++  if (!wired) {
++    sub.on("message", (ch, message) => listeners.get(ch)?.forEach((l) => l(message)));
++    wired = true;
++  }
++  let set = listeners.get(channel);
++  if (!set) {
++    set = new Set();
++    listeners.set(channel, set);
++    void sub.subscribe(channel);
++  }
++  set.add(fn);
++  return () => {
++    set.delete(fn);
++    if (set.size === 0) {
++      listeners.delete(channel);
++      void sub.unsubscribe(channel);
++    }
++  };
++}
++
++export async function GET(req: Request) {
+   const session = await getSession();
+   if (!session) return new Response("unauthorized", { status: 401 });
+ 
+-  const sub = redis().duplicate();
+-  await sub.subscribe(calendarChannel(session.businessId));
+   const encoder = new TextEncoder();
++  let stop = () => {};
+ 
+   const stream = new ReadableStream({
+     start(controller) {
+       controller.enqueue(encoder.encode(`event: hello\ndata: {}\n\n`));
+-      sub.on("message", (_channel, message) => {
+-        controller.enqueue(encoder.encode(`data: ${message}\n\n`));
+-      });
+-      setInterval(() => {
+-        controller.enqueue(encoder.encode(`: ping\n\n`));
+-      }, 25_000);
++      const unlisten = listen(calendarChannel(session.businessId), (message) =>
++        controller.enqueue(encoder.encode(`data: ${message}\n\n`)),
++      );
++      const heartbeat = setInterval(() => controller.enqueue(encoder.encode(`: ping\n\n`)), 25_000);
++      stop = () => {
++        clearInterval(heartbeat);
++        unlisten();
++      };
++      req.signal.addEventListener("abort", () => stop());
++    },
++    cancel() {
++      stop();
+     },
+   });
+ 

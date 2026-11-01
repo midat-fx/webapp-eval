@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/bad-ui-only",
+  "task": "t09-booking-note",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only changes the wizard UI and the admin calendar. The server-side booking API is untouched, so nothing trims the note, stores empty or whitespace-only notes as NULL, saves the note on the booking, or rejects notes over 500 characters with 400 bad_request (maxLength on the textarea does not protect the public API). The wizard also sends the note, but the API never persists it.\"}",
+  "cost_usd": 0.0160177,
+  "is_error": false
+}

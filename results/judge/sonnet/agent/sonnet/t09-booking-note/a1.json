@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t09-booking-note/a1",
+  "task": "t09-booking-note",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds a labelled optional Note textarea (maxLength 500) to step 4 and relabels the Name and Phone inputs. The API trims the note, stores empty or whitespace-only notes as NULL, keeps inner line breaks, and rejects notes over 500 characters through the existing zod 400 path. The admin calendar card renders the note as escaped plain text with preserved line breaks.\"}",
+  "cost_usd": 0.0409157,
+  "is_error": false
+}

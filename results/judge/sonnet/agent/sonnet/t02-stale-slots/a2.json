@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t02-stale-slots/a2",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Each fetch takes an incrementing request id and records its selection key. A response is applied only if it is the newest request and the key still matches the current selection, so out-of-order responses for an old date or staff member are dropped. The newest request still sets slots or error, so changing the selection mid-load keeps working.\"}",
+  "cost_usd": 0.0239737,
+  "is_error": false
+}

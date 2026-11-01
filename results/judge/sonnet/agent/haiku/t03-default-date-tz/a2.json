@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t03-default-date-tz/a2",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds localDateISO, which formats the current instant in the business timezone with Intl en-CA (YYYY-MM-DD). The wizard now uses it for both the initial date and the picker's min, so both follow the business timezone rather than UTC or the visitor's locale. The new tests cover timezones ahead of and behind UTC.\"}",
+  "cost_usd": 0.025918700000000003,
+  "is_error": false
+}

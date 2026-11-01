@@ -41,7 +41,7 @@ index 7f577bf..96e3326 100644
                >
                  {busy ? "Confirming…" : "Confirm booking"}
 diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
-index 68dc9d7..fecbbc2 100644
+index 68dc9d7..cb2b568 100644
 --- a/src/app/admin/page.tsx
 +++ b/src/app/admin/page.tsx
 @@ -45,6 +45,7 @@ export default async function CalendarPage(ctx: {
@@ -56,7 +56,7 @@ index 68dc9d7..fecbbc2 100644
                          <span className="text-xs text-zinc-500">{statusLabel[r.status]}</span>
                        </div>
                        <div className="mt-1">{r.serviceName}</div>
-+                      {r.note ? <blockquote className="my-1 border-l-2 border-amber-400 pl-2 italic">{r.note}</blockquote> : null}
++                      {r.note ? <blockquote className="my-1 border-l-2 border-amber-400 pl-2 italic whitespace-pre-wrap">{r.note}</blockquote> : null}
                        <div className="text-zinc-600">
                          {r.clientName} · {r.clientPhone} · {r.priceKzt.toLocaleString("en-GB")} ₸
                        </div>

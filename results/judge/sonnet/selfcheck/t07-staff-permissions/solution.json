@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/solution",
+  "task": "t07-staff-permissions",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A new `requireOwner()` redirects non-owners to /admin. It guards all six owner-only pages (services, staff, reports, analytics, notifications, audit) and all the service and staff server actions, so a replayed form post is refused on the server. The layout shows staff only the Calendar and Clients links, and `updateBookingStatus` still uses `requireSession`, so owners and staff keep their calendar access.\"}",
+  "cost_usd": 0.0465667,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t07-staff-permissions/a1",
+  "task": "t07-staff-permissions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Every owner-only server action (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService) and the Services, Staff, Reports, Analytics, Notifications and Audit pages now call requireOwner(), which redirects non-owners to /admin, so replayed form submissions are refused server-side. The layout hides owner-only nav links for staff, while Calendar, Clients and updateBookingStatus stay on requireSession(), so the owner's behaviour is unchanged.\"}",
+  "cost_usd": 0.0458947,
+  "is_error": false
+}

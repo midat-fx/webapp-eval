@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t09-booking-note/bad-placeholder-only",
+  "task": "t09-booking-note",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The Note textarea has only a placeholder and no label (no <label>, aria-label or aria-labelledby), which the issue explicitly forbids and which will fail axe's label rule on step 4.\"}",
+  "cost_usd": 0.021730700000000002,
+  "is_error": false
+}

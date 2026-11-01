@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t03-default-date-tz/bad-hardcoded-utc-plus-5",
+  "task": "t03-default-date-tz",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch hardcodes UTC+5 (Almaty) instead of using the business's configured `timezone` prop that BookingWizard already receives, so it gives the wrong date for any business in a different timezone, which the issue explicitly requires ('for any business timezone, not just Almaty').\"}",
+  "cost_usd": 0.0121437,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t08-status-transitions/a2",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The `status = 'confirmed'` guard sits in the UPDATE's WHERE clause, so Postgres row locking makes a competing writer re-check the row and match nothing, even across app servers. The audit entry, cancellation message and waitlist offer all come after the early `return false`, and the calendar publish is skipped when nothing changed.\"}",
+  "cost_usd": 0.018689699999999997,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t10-wizard-a11y/a2",
+  "task": "t10-wizard-a11y",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch labels the date, name and phone fields with unique `useId`-based ids and keeps the placeholders. It darkens the duration and \\\"Loading\u2026\\\" text to zinc-600, and adds `role=\\\"alert\\\"` to the wizard and waitlist errors. It also adds `aria-pressed` plus a visible \u2713 to the selected service and staff buttons, without removing anything a sighted user sees today.\"}",
+  "cost_usd": 0.0565527,
+  "is_error": false
+}

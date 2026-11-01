@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t09-booking-note/a1",
+  "task": "t09-booking-note",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds a properly labelled Note textarea (maxLength 500), validates the API with zod max(500), which returns 400 on failure, and stores `note?.trim() || null`, so blank notes become NULL and inner line breaks survive. The admin card renders the note as escaped plain text with whitespace-pre-wrap. The one gap is that the 500-character limit is checked before trimming, so a note padded with whitespace could be rejected even if its trimmed length is 500 or less. The issue doesn't clearly require otherwise.\"}",
+  "cost_usd": 0.0518257,
+  "is_error": false
+}
