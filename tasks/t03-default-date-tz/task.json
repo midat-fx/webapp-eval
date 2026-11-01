@@ -1,0 +1,7 @@
+{
+  "id": "t03-default-date-tz",
+  "title": "Wizard pre-selects the UTC date instead of the business's date",
+  "category": "timezone",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 1
+}

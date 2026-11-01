@@ -1,0 +1,56 @@
+diff --git a/src/app/[slug]/page.tsx b/src/app/[slug]/page.tsx
+index 4ad1139..39f0da9 100644
+--- a/src/app/[slug]/page.tsx
++++ b/src/app/[slug]/page.tsx
+@@ -6,13 +6,15 @@ export default async function PublicBookingPage(ctx: { params: Promise<{ slug: s
+   const { slug } = await ctx.params;
+   const biz = await businessBySlug(slug);
+   if (!biz) notFound();
++  // The business's calendar day decides what "today" is, on the server, once.
++  const today = new Intl.DateTimeFormat("en-CA", { timeZone: biz.timezone }).format(new Date());
+   return (
+     <main className="mx-auto max-w-lg p-4 sm:p-8">
+       <header className="mb-6">
+         <h1 className="text-3xl font-bold text-zinc-900">{biz.name}</h1>
+         <p className="text-sm text-zinc-500">Online booking · {biz.timezone}</p>
+       </header>
+-      <BookingWizard slug={slug} timezone={biz.timezone} />
++      <BookingWizard slug={slug} timezone={biz.timezone} today={today} />
+     </main>
+   );
+ }
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..8c6fe1b 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -78,11 +78,19 @@ function WaitlistBox({
+   );
+ }
+ 
+-export function BookingWizard({ slug, timezone }: { slug: string; timezone: string }) {
++export function BookingWizard({
++  slug,
++  timezone,
++  today,
++}: {
++  slug: string;
++  timezone: string;
++  today: string;
++}) {
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
++  const [date, setDate] = useState(today);
+   const [slots, setSlots] = useState<Slot[] | null>(null);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+@@ -272,7 +280,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={today}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);

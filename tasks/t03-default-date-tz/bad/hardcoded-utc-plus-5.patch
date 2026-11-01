@@ -1,0 +1,32 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..85dd5d4 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -6,6 +6,9 @@ type Service = { id: string; name: string; durationMin: number; priceKzt: number
+ type Slot = { startMs: number; endMs: number };
+ type Hold = { holdToken: string; expiresInSec: number; slot: Slot };
+ 
++// Almaty is UTC+5 all year round (no DST since 2024).
++const almatyToday = () => new Date(Date.now() + 5 * 3600_000).toISOString().slice(0, 10);
++
+ const fmtPrice = (kzt: number) => `${kzt.toLocaleString("en-GB")} ₸`;
+ 
+ /** Offered instead of an empty slot grid: a full day is a lead, not a dead end. */
+@@ -82,7 +85,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
++  const [date, setDate] = useState(() => almatyToday());
+   const [slots, setSlots] = useState<Slot[] | null>(null);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+@@ -272,7 +275,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={almatyToday()}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);
