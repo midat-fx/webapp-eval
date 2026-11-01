@@ -1,0 +1,7 @@
+{
+  "id": "t01-phone-format",
+  "title": "Formatted phone numbers are rejected at checkout",
+  "category": "ui-form",
+  "origin": "existing behaviour at the pinned commit",
+  "instances": 1
+}

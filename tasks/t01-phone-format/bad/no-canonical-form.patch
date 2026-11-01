@@ -1,0 +1,26 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..9c43657 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -11,7 +11,7 @@ const body = z.object({
+   endMs: z.number().int(),
+   holdToken: z.string().min(16),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().trim().regex(/^\+?[\d\s().-]{10,20}$/),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..f171a4d 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -9,7 +9,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().trim().regex(/^\+?[\d\s().-]{10,20}$/),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {

@@ -1,0 +1,7 @@
+.cache/
+.docker/
+node_modules/
+/verify/specs/
+__pycache__/
+*.pyc
+/work/

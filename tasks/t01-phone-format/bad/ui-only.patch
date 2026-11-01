@@ -1,0 +1,32 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..d5d231d 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -6,6 +6,9 @@ type Service = { id: string; name: string; durationMin: number; priceKzt: number
+ type Slot = { startMs: number; endMs: number };
+ type Hold = { holdToken: string; expiresInSec: number; slot: Slot };
+ 
++// The API wants bare digits; people type spaces and dashes.
++const cleanPhone = (v: string) => v.replace(/[\s\-.()]/g, "");
++
+ const fmtPrice = (kzt: number) => `${kzt.toLocaleString("en-GB")} ₸`;
+ 
+ /** Offered instead of an empty slot grid: a full day is a lead, not a dead end. */
+@@ -38,7 +41,7 @@ function WaitlistBox({
+     const res = await fetch(`/api/public/${slug}/waitlist`, {
+       method: "POST",
+       headers: { "content-type": "application/json" },
+-      body: JSON.stringify({ serviceId, staffId, date, name, phone }),
++      body: JSON.stringify({ serviceId, staffId, date, name, phone: cleanPhone(phone) }),
+     });
+     setState(res.ok ? "joined" : "error");
+   }
+@@ -158,7 +161,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         endMs: hold.slot.endMs,
+         holdToken: hold.holdToken,
+         name,
+-        phone,
++        phone: cleanPhone(phone),
+       }),
+     });
+     setBusy(false);

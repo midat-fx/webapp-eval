@@ -1,0 +1,51 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..d664f1e 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -1,5 +1,6 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
++import { normalizePhone } from "@/lib/phone";
+ import { createBooking } from "@/lib/booking";
+ import { businessBySlug, clientIp } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
+@@ -11,7 +12,7 @@ const body = z.object({
+   endMs: z.number().int(),
+   holdToken: z.string().min(16),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().transform((v, ctx) => normalizePhone(v) ?? (ctx.addIssue({ code: "custom", message: "bad phone" }), z.NEVER)),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..a921f75 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -1,5 +1,6 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
++import { normalizePhone } from "@/lib/phone";
+ import { businessBySlug, clientIp } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
+ import { joinWaitlist } from "@/lib/waitlist";
+@@ -9,7 +10,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().transform((v, ctx) => normalizePhone(v) ?? (ctx.addIssue({ code: "custom", message: "bad phone" }), z.NEVER)),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/lib/phone.ts b/src/lib/phone.ts
+new file mode 100644
+index 0000000..3359354
+--- /dev/null
++++ b/src/lib/phone.ts
+@@ -0,0 +1,5 @@
++/** Digits with an optional leading +, or null if it isn't a phone number. */
++export function normalizePhone(raw: string): string | null {
++  const compact = raw.trim().replace(/[ ().-]+/g, "");
++  return /^\+?[0-9]{10,15}$/.test(compact) ? compact : null;
++}
