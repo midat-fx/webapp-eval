@@ -14,7 +14,11 @@ real UI state (a four-step wizard, an SSE-driven admin calendar).
   (App Router conventions, Drizzle, server actions). Ten toy repos would
   measure "can it read a 50-line file".
 - Pinning the commit makes every start state reproducible from a clean clone:
-  the image clones kezek at that SHA, nothing is vendored.
+  the image clones kezek at that SHA, nothing is vendored. A pin is only as
+  good as the upstream history, though: on 2026-11-01 kezek's history was
+  rewritten, and the pinned commit `99211bb` became `6242b34`. Its tree is the
+  same (`a54260b`), so every patch and verdict still holds; only the pin
+  changed, and the earlier results were produced against `99211bb`.
 
 Two kinds of task:
 
