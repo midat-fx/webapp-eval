@@ -57,6 +57,10 @@ class AgentTrace(unittest.TestCase):
         self.assertNotIn(home, clean)
         self.assertIn("$WORK/src", clean)
 
+    def test_sanitize_drops_rate_limit_events(self):
+        text = '{"type":"rate_limit_event","rate_limit_info":{}}\n{"type":"assistant"}\n'
+        self.assertEqual(agent.sanitize(text, Path("/w")), '{"type":"assistant"}\n')
+
     def test_touched_outside_flags_reads_of_the_benchmark(self):
         work = Path("/tmp/w")
         line = json.dumps({"type": "assistant", "message": {"content": [

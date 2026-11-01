@@ -141,6 +141,19 @@ def cmd_regrade(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_scrub(a: argparse.Namespace) -> int:
+    """Re-apply trace sanitising to every published agent trace (idempotent)."""
+    from harness import agent
+
+    for t in sorted((ROOT / "results" / "agent").glob("*/*/a*/trace.jsonl")):
+        text = t.read_text()
+        clean = agent.sanitize(text, Path("/nonexistent-workdir"))
+        if clean != text:
+            t.write_text(clean)
+            print(f"scrubbed {t.relative_to(ROOT)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="webeval")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -175,6 +188,8 @@ def main(argv: list[str] | None = None) -> int:
     rg.add_argument("--all", action="store_true")
     rg.add_argument("--out", default="results/agent")
     rg.set_defaults(fn=cmd_regrade)
+    sc = sub.add_parser("scrub", help="strip host paths and account events from published traces")
+    sc.set_defaults(fn=cmd_scrub)
     a = p.parse_args(argv)
     return a.fn(a)
 

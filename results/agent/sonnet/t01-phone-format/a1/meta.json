@@ -1,0 +1,28 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 59.1,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 10,
+  "cost_usd": 0.2838524,
+  "is_error": false,
+  "result_text": "Phone numbers with spaces, dashes, dots and parentheses are now accepted when booking and when joining the waitlist, including direct API calls. Unit tests (including new ones for the phone helper) and `pnpm build` pass. I couldn't run the integration tests or the dev server, so the one-client-in-the-admin-list behavior isn't checked end to end.\n\n- **Normalization:** a new helper in `src/lib/phone.ts` strips whitespace, dashes, dots and parentheses, then applies the same check as before (optional `+`, then 10\u201315 digits).\n- **API routes:** both `book` and `waitlist` normalize the phone before validating, so `+7 (701) 555-12-34` and `+77015551234` both become `+77015551234`. `call me`, `+7 701` and `+7+701 555 12 34` are still rejected with a 400.\n- **One client:** `createBooking` and `joinWaitlist` also normalize before looking up or inserting the client, so any caller of those functions ends up with the same client row.\n- **Wizard message:** I reworded the booking wizard's error from \"format +7701\u2026\" to \"Check the name and phone number\", since any common format now works. The waitlist form still shows its generic \"That did not work \u2014 check the phone number and try again\" message, and I left it alone.\n\nI didn't add a migration. Previously only unformatted numbers passed validation, so existing client rows shouldn't contain formatted phones.",
+  "stderr": "",
+  "patch_lines": 136,
+  "touched_outside_workdir": []
+}

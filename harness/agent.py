@@ -82,10 +82,11 @@ def agent_env() -> dict[str, str]:
 
 
 def sanitize(text: str, work: Path) -> str:
-    """Traces are published: no host paths in them."""
+    """Traces are published: no host paths, no account rate-limit/billing events."""
     for real in {str(work), str(work.resolve())}:
         text = text.replace(real, "$WORK")
-    return text.replace(str(Path.home()), "~")
+    text = text.replace(str(Path.home()), "~")
+    return "".join(l for l in text.splitlines(keepends=True) if '"type":"rate_limit_event"' not in l)
 
 
 def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:

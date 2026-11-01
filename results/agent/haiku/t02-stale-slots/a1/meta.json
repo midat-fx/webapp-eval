@@ -1,0 +1,28 @@
+{
+  "task": "t02-stale-slots",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 66.2,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 16,
+  "cost_usd": 0.679492,
+  "is_error": false,
+  "result_text": "The booking grid now ignores responses for a date or staff member the customer has already moved away from, so it always shows times for the current selection. The change is confined to `src/app/[slug]/wizard.tsx`, left uncommitted.\n\n- **Root cause:** each slot request wrote its result to the grid whenever it arrived, so a slow response for the first date could overwrite the second date's times.\n- **Fix:** slot loading now runs inside the effect that depends on service, staff, and date. A cleanup flag discards any response once the selection has changed.\n- **Retry paths:** the failed-hold, failed-booking and \"Back\" paths previously called a stale copy of the loader and could refetch the old date. They now bump a reload counter, so they go through the same guarded effect.\n- **Responsiveness:** changing date or staff while times are loading still works; the grid shows \"Loading\u2026\" until the latest response lands.\n\n`pnpm test` passes (12/12) and ESLint is clean on the file. The only type error is a pre-existing one in `src/app/layout.tsx`. I could not exercise the page in a browser because the dev server needs Postgres and Redis, and there is no DOM test library installed, so the race fix is verified by reading the code rather than by a run.\n\nOne edge case remains outside this fix: if the customer clicks a time and then switches staff or service before the hold request returns, the hold can still be shown for the previous selection. The confirm step would then fail rather than book the wrong slot silently. Guarding that would mean checking the selection after the hold request resolves; I can add it if you want.",
+  "stderr": "",
+  "patch_lines": 82,
+  "touched_outside_workdir": []
+}

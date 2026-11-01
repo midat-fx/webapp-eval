@@ -1,0 +1,41 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..d3a3bf5 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -107,15 +107,26 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+ 
+   // Data lands asynchronously; loading state is `slots === null`,
+   // reset in the event handlers that change service/master/date.
++  const slotsRequestId = useRef(0);
+   const loadSlots = useCallback(() => {
++    const id = ++slotsRequestId.current;
+     if (!service || !master) return;
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
+-      .catch(() => setError("Could not load available times"));
++      .then((d) => {
++        if (id === slotsRequestId.current) setSlots(d.slots ?? []);
++      })
++      .catch(() => {
++        if (id === slotsRequestId.current) setError("Could not load available times");
++      });
+   }, [slug, service, master, date]);
+ 
+-  useEffect(loadSlots, [loadSlots]);
++  useEffect(() => {
++    loadSlots();
++    return () => {
++      slotsRequestId.current++;
++    };
++  }, [loadSlots]);
+ 
+   // Hold countdown (initial value is set in pickSlot)
+   useEffect(() => {

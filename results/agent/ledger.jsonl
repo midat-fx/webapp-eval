@@ -1,1 +1,6 @@
 {"task": "t01-phone-format", "model": "haiku", "attempt": 1}
+{"task": "t01-phone-format", "model": "sonnet", "attempt": 1}
+{"task": "t02-stale-slots", "model": "haiku", "attempt": 1}
+{"task": "t02-stale-slots", "model": "sonnet", "attempt": 1}
+{"task": "t03-default-date-tz", "model": "haiku", "attempt": 1}
+{"task": "t03-default-date-tz", "model": "sonnet", "attempt": 1}

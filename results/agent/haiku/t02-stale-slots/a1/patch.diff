@@ -1,0 +1,82 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..8e18461 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useEffect, useMemo, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -84,6 +84,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [master, setMaster] = useState<Master | null>(null);
+   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+   const [slots, setSlots] = useState<Slot[] | null>(null);
++  const [reloadKey, setReloadKey] = useState(0);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+   const [name, setName] = useState("");
+@@ -105,17 +106,28 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       .catch(() => setError("Could not load services"));
+   }, [slug]);
+ 
+-  // Data lands asynchronously; loading state is `slots === null`,
+-  // reset in the event handlers that change service/master/date.
+-  const loadSlots = useCallback(() => {
++  // Loading state is `slots === null`, reset in the handlers that change selection.
++  // A response is applied only if the selection has not changed since its request.
++  useEffect(() => {
+     if (!service || !master) return;
++    let stale = false;
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
+-      .catch(() => setError("Could not load available times"));
+-  }, [slug, service, master, date]);
++      .then((d) => {
++        if (!stale) setSlots(d.slots ?? []);
++      })
++      .catch(() => {
++        if (!stale) setError("Could not load available times");
++      });
++    return () => {
++      stale = true;
++    };
++  }, [slug, service, master, date, reloadKey]);
+ 
+-  useEffect(loadSlots, [loadSlots]);
++  function reloadSlots() {
++    setSlots(null);
++    setReloadKey((k) => k + 1);
++  }
+ 
+   // Hold countdown (initial value is set in pickSlot)
+   useEffect(() => {
+@@ -136,7 +148,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+     setBusy(false);
+     if (!res.ok) {
+       setError("That time was just taken — pick another one");
+-      loadSlots();
++      reloadSlots();
+       return;
+     }
+     const h: Hold = await res.json();
+@@ -173,7 +185,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       );
+       if (d.error !== "bad_request") {
+         setHold(null);
+-        loadSlots();
++        reloadSlots();
+       }
+       return;
+     }
+@@ -340,7 +352,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+               <button
+                 onClick={() => {
+                   setHold(null);
+-                  loadSlots();
++                  reloadSlots();
+                 }}
+                 className="rounded-lg border border-zinc-300 px-4 py-2"
+               >
