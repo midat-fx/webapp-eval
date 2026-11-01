@@ -1,0 +1,19 @@
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index 0ae9530..c15b98e 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -36,10 +36,10 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+-  // The zone's offset is taken once, at the start of the date: building an
+-  // Intl formatter is the expensive part, and a day has a single offset.
+-  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
+-  return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
++  // Let the platform resolve DST for the wall time instead of doing offset
++  // arithmetic by hand.
++  void timeZone;
++  return new Date(y, m - 1, d, hh, mm).getTime();
+ }
+ 
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */

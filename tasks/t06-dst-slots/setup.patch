@@ -1,0 +1,52 @@
+diff --git a/README.md b/README.md
+index 3390155..3d41df9 100644
+--- a/README.md
++++ b/README.md
+@@ -45,7 +45,7 @@ Even a race that slips past Redis cannot corrupt the calendar — the database r
+ 
+ **The admin calendar updates live.** Every booking publishes to Redis **pub/sub**; an **SSE** route streams events to the browser, which re-renders the server components. A booking made on a phone appears on the receptionist's screen without a reload.
+ 
+-**The slot engine is pure and unit-tested.** Slot generation (working hours → staff overrides → busy ranges → holds → grid) is plain TypeScript with no I/O, 12 Vitest cases including DST transitions. Timezone math uses the `Intl` API — no date libraries.
++**The slot engine is pure and unit-tested.** Slot generation (working hours → staff overrides → busy ranges → holds → grid) is plain TypeScript with no I/O, 11 Vitest cases. Timezone math uses the `Intl` API — no date libraries.
+ 
+ **The concurrency claims are tested, not asserted.** The integration suite runs against a real Postgres and Redis and includes the case the design exists for: 100 clients racing for one slot, exactly one of whom may end up with a booking — plus a test that bypasses Redis entirely to prove the exclusion constraint holds on its own, and one that fires ten workers at the outbox to show each message is claimed exactly once.
+ 
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index e79bf01..ff1de20 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -18,12 +18,6 @@ describe("localTimeToUtc", () => {
+       Date.UTC(2026, 7, 10, 5, 0),
+     );
+   });
+-  it("handles a DST-transition day without drifting", () => {
+-    // US spring forward 2026-03-08: 10:00 EDT = 14:00 UTC
+-    expect(localTimeToUtc("2026-03-08", "10:00", "America/New_York")).toBe(
+-      Date.UTC(2026, 2, 8, 14, 0),
+-    );
+-  });
+ });
+ 
+ describe("isoWeekday", () => {
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index a3d7b95..0ae9530 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -36,13 +36,10 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+-  const naive = Date.UTC(y, m - 1, d, hh, mm);
+-  // Two-pass: estimate offset at the naive instant, then re-check at the
+-  // corrected instant so DST transitions resolve correctly.
+-  const offset1 = tzOffsetMinutes(timeZone, naive);
+-  const guess = naive - offset1 * 60000;
+-  const offset2 = tzOffsetMinutes(timeZone, guess);
+-  return naive - offset2 * 60000;
++  // The zone's offset is taken once, at the start of the date: building an
++  // Intl formatter is the expensive part, and a day has a single offset.
++  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
++  return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
+ }
+ 
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */

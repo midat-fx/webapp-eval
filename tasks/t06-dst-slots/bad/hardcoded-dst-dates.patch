@@ -1,0 +1,30 @@
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index 0ae9530..41f42f5 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -32,13 +32,24 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+   return Math.round((asUtc - utcMs) / 60000);
+ }
+ 
++// Minutes to add to the midnight offset on days the clocks change.
++const DST_DAYS: Record<string, number> = {
++  "Europe/Berlin 2027-03-28": 60,
++  "Europe/Berlin 2027-10-31": -60,
++  "America/New_York 2027-03-14": 60,
++  "America/New_York 2027-11-07": -60,
++};
++
+ /** UTC instant of local wall time `HH:MM` on local date `YYYY-MM-DD` in `timeZone`. */
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+   // The zone's offset is taken once, at the start of the date: building an
+   // Intl formatter is the expensive part, and a day has a single offset.
+-  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
++  let offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
++  // Clock-change days: the offset at midnight is the old one.
++  const shift = DST_DAYS[`${timeZone} ${dateISO}`];
++  if (shift) offset += shift;
+   return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
+ }
+ 

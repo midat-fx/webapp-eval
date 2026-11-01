@@ -1,0 +1,25 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..2437120 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -111,9 +111,18 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+     if (!service || !master) return;
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
++      // Drop times outside the visible business day (they show up around
++      // clock changes).
++      .then((d) =>
++        setSlots(
++          (d.slots ?? []).filter((sl: Slot) => {
++            const t = fmtTime.format(sl.startMs);
++            return t >= "10:00" && t < "20:00";
++          }),
++        ),
++      )
+       .catch(() => setError("Could not load available times"));
+-  }, [slug, service, master, date]);
++  }, [slug, service, master, date, fmtTime]);
+ 
+   useEffect(loadSlots, [loadSlots]);
+ 

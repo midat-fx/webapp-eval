@@ -1,0 +1,7 @@
+{
+  "id": "t06-dst-slots",
+  "title": "Wrong opening times on daylight-saving days",
+  "category": "timezone",
+  "origin": "injected: the zone offset is computed once per date",
+  "instances": 1
+}
