@@ -1,0 +1,17 @@
+diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
+index 1a0aabc..8a988c3 100644
+--- a/src/app/api/admin/events/route.ts
++++ b/src/app/api/admin/events/route.ts
+@@ -24,6 +24,12 @@ export async function GET() {
+       setInterval(() => {
+         controller.enqueue(encoder.encode(`: ping\n\n`));
+       }, 25_000);
++      // Recycle every stream after a minute so abandoned ones can't pile up;
++      // EventSource reconnects on its own.
++      setTimeout(() => {
++        void sub.quit();
++        controller.close();
++      }, 60_000);
+     },
+   });
+ 

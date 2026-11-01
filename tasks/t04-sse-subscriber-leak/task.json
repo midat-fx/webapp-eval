@@ -1,0 +1,7 @@
+{
+  "id": "t04-sse-subscriber-leak",
+  "title": "Live calendar leaks a Redis subscriber per closed tab",
+  "category": "sse",
+  "origin": "injected: stream cleanup removed from the SSE route",
+  "instances": 1
+}

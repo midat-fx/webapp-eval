@@ -1,0 +1,19 @@
+diff --git a/src/app/admin/live.tsx b/src/app/admin/live.tsx
+index 7a82327..cc2b4bc 100644
+--- a/src/app/admin/live.tsx
++++ b/src/app/admin/live.tsx
+@@ -9,7 +9,13 @@ export function LiveRefresh() {
+   useEffect(() => {
+     const es = new EventSource("/api/admin/events");
+     es.onmessage = () => router.refresh();
+-    return () => es.close();
++    // Close the stream as the tab goes away so the server can let go of it.
++    const close = () => es.close();
++    window.addEventListener("pagehide", close);
++    return () => {
++      window.removeEventListener("pagehide", close);
++      es.close();
++    };
+   }, [router]);
+   return null;
+ }
