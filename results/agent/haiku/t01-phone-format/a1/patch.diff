@@ -1,0 +1,87 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..c40584d 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -3,6 +3,7 @@ import { z } from "zod";
+ import { createBooking } from "@/lib/booking";
+ import { businessBySlug, clientIp } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
++import { phoneSchema } from "@/lib/phone";
+ 
+ const body = z.object({
+   serviceId: z.uuid(),
+@@ -11,7 +12,7 @@ const body = z.object({
+   endMs: z.number().int(),
+   holdToken: z.string().min(16),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: phoneSchema,
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..9da6b22 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { businessBySlug, clientIp } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
++import { phoneSchema } from "@/lib/phone";
+ import { joinWaitlist } from "@/lib/waitlist";
+ 
+ const body = z.object({
+@@ -9,7 +10,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: phoneSchema,
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/lib/phone.test.ts b/src/lib/phone.test.ts
+new file mode 100644
+index 0000000..d81c8fd
+--- /dev/null
++++ b/src/lib/phone.test.ts
+@@ -0,0 +1,24 @@
++import { describe, expect, it } from "vitest";
++import { phoneSchema } from "./phone";
++
++const parse = (v: string) => phoneSchema.safeParse(v);
++
++describe("phoneSchema", () => {
++  it.each([
++    ["+7 701 555 12 34", "+77015551234"],
++    ["+7 (701) 555-12-34", "+77015551234"],
++    ["+7-701-555-12-34", "+77015551234"],
++    ["+7.701.555.12.34", "+77015551234"],
++    ["  +77015551234  ", "+77015551234"],
++    ["77015551234", "+77015551234"],
++  ])("normalizes %j to %s", (input, expected) => {
++    expect(parse(input)).toEqual({ success: true, data: expected });
++  });
++
++  it.each(["call me", "+7 701", "+7 701 555 12 3a", "++77015551234", "+7701555123456789", ""])(
++    "rejects %j",
++    (input) => {
++      expect(parse(input).success).toBe(false);
++    },
++  );
++});
+diff --git a/src/lib/phone.ts b/src/lib/phone.ts
+new file mode 100644
+index 0000000..f4a329c
+--- /dev/null
++++ b/src/lib/phone.ts
+@@ -0,0 +1,9 @@
++import { z } from "zod";
++
++const FORMATTING = /[\s().\-‐‑‒–—]/g;
++
++export const phoneSchema = z
++  .string()
++  .transform((raw) => raw.replace(FORMATTING, ""))
++  .pipe(z.string().regex(/^\+?\d{10,15}$/))
++  .transform((digits) => (digits.startsWith("+") ? digits : `+${digits}`));

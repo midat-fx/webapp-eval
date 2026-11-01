@@ -108,6 +108,23 @@ def cmd_judge(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_flake(a: argparse.Namespace) -> int:
+    """Grade the same variant N times: how often a race-dependent verifier
+    catches a wrong patch, and how often a correct one survives."""
+    want = {v[0]: v for v in grading.variants(a.task)}[a.variant]
+    out_root = ROOT / "results" / "flake" / a.task / a.variant
+    verdicts = []
+    for i in range(1, a.n + 1):
+        r = grading.grade(a.task, want[1], out_root / f"run{i}")
+        verdicts.append(r["verdict"])
+        print(f"{a.task} {a.variant} run{i}: {r['verdict']} {r['seconds']}s", flush=True)
+    summary = {"task": a.task, "variant": a.variant, "expected": want[2], "verdicts": verdicts,
+               "as_expected": sum(v == want[2] for v in verdicts), "n": a.n}
+    (out_root / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    print(json.dumps(summary))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="webeval")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -133,6 +150,11 @@ def main(argv: list[str] | None = None) -> int:
     j.add_argument("--model", default="sonnet")
     j.add_argument("-j", "--jobs", type=int, default=3)
     j.set_defaults(fn=cmd_judge)
+    fl = sub.add_parser("flake", help="grade one variant repeatedly")
+    fl.add_argument("task")
+    fl.add_argument("variant")
+    fl.add_argument("-n", type=int, default=5)
+    fl.set_defaults(fn=cmd_flake)
     a = p.parse_args(argv)
     return a.fn(a)
 

@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verifiers:
+    # Builds the grading image and checks every hidden verifier against its
+    # reference fix, an alternative fix, the untouched start state and the
+    # known-bad patches. No agent runs and no API keys here.
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make test JOBS=2
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selfcheck
+          path: .cache/selfcheck

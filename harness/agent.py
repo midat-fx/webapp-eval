@@ -36,6 +36,12 @@ Your change will be checked by hidden end-to-end tests against the issue.
 """
 
 
+DISALLOWED = [
+    "WebFetch", "WebSearch", "SendMessage", "PushNotification", "RemoteTrigger",
+    "CronCreate", "CronDelete", "ScheduleWakeup", "Workflow", "DesignSync",
+]
+
+
 def run(cmd: list[str], cwd: Path | None = None, **kw) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True, **kw)
 
@@ -91,7 +97,8 @@ def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:
         "--model", model,
         "--safe-mode",
         "--permission-mode", "bypassPermissions",
-        "--disallowedTools", "WebFetch", "WebSearch",
+        # No web, and nothing that reaches outside the working copy.
+        "--disallowedTools", *DISALLOWED,
         "--output-format", "stream-json", "--verbose",
         "--no-session-persistence",
     ]
@@ -121,6 +128,7 @@ def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:
         "model": model,
         "served_model": init.get("model"),
         "claude_version": run(["claude", "--version"]).stdout.strip(),
+        "disallowed_tools": DISALLOWED,
         "seconds": elapsed,
         "timed_out": timed_out,
         "exit_code": proc.returncode,

@@ -1,0 +1,16 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "seconds": 82.9,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 12,
+  "cost_usd": 0.9047595000000002,
+  "is_error": false,
+  "result_text": "Booking and waitlist now accept phone numbers with spaces, dashes, dots or parentheses, and store them as `+77015551234`. Unit tests (24) and `pnpm build` pass. I did not run the integration tests because Postgres and Redis aren't running here.\n\n- **Shared schema:** `src/lib/phone.ts` strips spaces, dashes, dots and parentheses, validates the 10\u201315 digits, and adds a leading `+` if it's missing.\n- **Routes:** both `api/public/[slug]/book` and `api/public/[slug]/waitlist` use that schema, so the normalized value is what reaches the client upsert. This applies to direct API calls too.\n- **Still rejected:** `call me`, `+7 701`, and similar inputs fail as before.\n- **Tests:** `src/lib/phone.test.ts` covers the issue's formats and the rejected inputs.\n\nTwo things to be aware of:\n- The client upsert matches on exact phone, so any client already stored without a `+` (for example `77015551234`) won't merge with a new booking that now normalizes to `+77015551234`. A one-off data fix would be needed for those rows; I didn't write one.\n- I left the wizard's error text and UI unchanged, so the \"format +7701\u2026\" hint still shows only when the server rejects a number.",
+  "stderr": "",
+  "patch_lines": 87,
+  "touched_outside_workdir": []
+}
