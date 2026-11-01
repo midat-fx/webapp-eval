@@ -8,6 +8,8 @@ APP=/opt/kezek
 OUT=/out
 TRACE=$OUT/trace.jsonl
 : >"$TRACE"
+# We run as root; hand /out back to whoever owns the mount so the host can clean up.
+trap 'chown -R "$(stat -c %u:%g "$OUT")" "$OUT" 2>/dev/null' EXIT
 
 ev() { # ev <step> <status> [detail]  -> one JSONL trace line
   node -e 'const [s,st,d]=process.argv.slice(1);console.log(JSON.stringify({ts:new Date().toISOString(),step:s,status:st,detail:d||undefined}))' \

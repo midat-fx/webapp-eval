@@ -69,6 +69,9 @@ def grade(task: str, patch: Path | None, out_dir: Path, timeout: int = 1500) -> 
         shutil.copy(logs / "trace.jsonl", out_dir / "trace.jsonl")
     keep = CACHE / "logs" / out_dir.relative_to(ROOT).as_posix().replace("/", "__")
     shutil.rmtree(keep, ignore_errors=True)
-    shutil.move(str(logs), keep)
+    try:
+        shutil.move(str(logs), keep)
+    except OSError:  # a killed container never handed /out back (Linux: root-owned)
+        pass
     shutil.rmtree(work, ignore_errors=True)
     return result
