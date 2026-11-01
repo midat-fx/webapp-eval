@@ -1,0 +1,28 @@
+{
+  "task": "t09-booking-note",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 32.2,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 5,
+  "cost_usd": 0.2066486,
+  "is_error": false,
+  "result_text": "The optional Note field is in. I couldn't run the booking flow here (no Postgres, Redis or dev server). I only ran `tsc` and `pnpm test`: the 12 unit tests pass, and the one `tsc` error, in `src/app/layout.tsx`, comes from a file I didn't touch. Nothing has been run against the booking API, the database or axe.\n\n- **Booking page:** `wizard.tsx` step 4 now has a \"Note (optional)\" textarea limited to 500 characters, with a real `<label>`. Name and phone only had placeholders, which axe flags as missing labels, so I gave them visible labels too. The note is sent with the booking, and the 400 error message now mentions the note.\n- **Booking API:** `src/app/api/public/[slug]/book/route.ts` trims the note before checking its length. A note over 500 characters gets `400 bad_request` and nothing is created. A missing, empty or whitespace-only note becomes `null`. Line breaks inside the note are kept.\n- **Storage:** `createBooking` in `src/lib/booking.ts` writes the note to the existing `bookings.note` column. It trims again and stores `null` if the note is empty.\n- **Admin calendar:** `src/app/admin/page.tsx` shows the note on the booking's card as plain text. React escapes it, and line breaks and long words are handled with `whitespace-pre-wrap break-words`.\n\nThe 500-character limit counts JavaScript string length, so an emoji counts as 2 characters on the page and in the API.",
+  "stderr": "",
+  "patch_lines": 170,
+  "touched_outside_workdir": []
+}

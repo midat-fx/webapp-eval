@@ -1,0 +1,161 @@
+diff --git a/drizzle/0004_booking_no_overlap.sql b/drizzle/0004_booking_no_overlap.sql
+new file mode 100644
+index 0000000..50c9ed0
+--- /dev/null
++++ b/drizzle/0004_booking_no_overlap.sql
+@@ -0,0 +1,3 @@
++CREATE EXTENSION IF NOT EXISTS btree_gist;
++--> statement-breakpoint
++ALTER TABLE "bookings" ADD CONSTRAINT "bookings_staff_no_overlap" EXCLUDE USING gist ("staff_id" WITH =, tstzrange("start_at", "end_at") WITH &&) WHERE ("status" = 'confirmed');
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index ecdda1a..ec77e8a 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1786183773099,
+       "tag": "0003_waitlist",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "7",
++      "when": 1786190000000,
++      "tag": "0004_booking_no_overlap",
++      "breakpoints": true
+     }
+   ]
+-}
+\ No newline at end of file
++}
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..3f60450 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -121,6 +121,16 @@ export async function getAvailability(opts: {
+ 
+ // ---------- Booking creation ----------
+ 
++const PG_EXCLUSION_VIOLATION = "23P01";
++
++function isExclusionViolation(err: unknown): boolean {
++  for (let e = err as { code?: string; cause?: unknown } | undefined, i = 0; e && i < 5; i++) {
++    if (e.code === PG_EXCLUSION_VIOLATION) return true;
++    e = e.cause as typeof e;
++  }
++  return false;
++}
++
+ export type BookResult =
+   | { ok: true; bookingId: string }
+   | { ok: false; error: "hold_expired" | "slot_taken" };
+@@ -157,55 +167,72 @@ export async function createBooking(opts: {
+     (await db
+       .insert(s.clients)
+       .values({ businessId, name: client.name, phone: client.phone })
+-      .returning())[0];
++      .onConflictDoNothing()
++      .returning())[0] ??
++    (await db
++      .select()
++      .from(s.clients)
++      .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, client.phone))))[0];
+ 
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
+-  const bookingId = await db.transaction(async (tx) => {
+-    const [booking] = await tx
+-      .insert(s.bookings)
+-      .values({
+-        businessId,
+-        staffId,
+-        serviceId,
+-        clientId: clientRow.id,
+-        startAt: new Date(slot.startMs),
+-        endAt: new Date(slot.endMs),
+-        status: "confirmed",
+-        priceKzt: service.priceKzt,
+-      })
+-      .returning();
++  // The DB's exclusion constraint on (staff, time range) is the final arbiter
++  // of overlaps; a loser of the race gets an exclusion violation here.
++  let bookingId: string;
++  try {
++    bookingId = await insertBooking();
++  } catch (err) {
++    if (isExclusionViolation(err)) return { ok: false, error: "slot_taken" };
++    throw err;
++  }
+ 
+-    await tx.insert(s.auditLog).values({
+-      businessId,
+-      action: "booking.create",
+-      entity: "booking",
+-      entityId: booking.id,
+-      meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
+-    });
++  async function insertBooking(): Promise<string> {
++    return db.transaction(async (tx) => {
++      const [booking] = await tx
++        .insert(s.bookings)
++        .values({
++          businessId,
++          staffId,
++          serviceId,
++          clientId: clientRow.id,
++          startAt: new Date(slot.startMs),
++          endAt: new Date(slot.endMs),
++          status: "confirmed",
++          priceKzt: service.priceKzt,
++        })
++        .returning();
+ 
+-    await enqueue(tx, {
+-      businessId,
+-      topic: "booking.confirmed",
+-      payload: { bookingId: booking.id },
+-      dedupeKey: `booking.confirmed:${booking.id}`,
+-    });
++      await tx.insert(s.auditLog).values({
++        businessId,
++        action: "booking.create",
++        entity: "booking",
++        entityId: booking.id,
++        meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
++      });
+ 
+-    // Reminder the day before; retired automatically if the booking is
+-    // cancelled before the worker gets to it.
+-    const remindAt = new Date(slot.startMs - 24 * 3600_000);
+-    if (remindAt.getTime() > Date.now()) {
+       await enqueue(tx, {
+         businessId,
+-        topic: "booking.reminder",
++        topic: "booking.confirmed",
+         payload: { bookingId: booking.id },
+-        dedupeKey: `booking.reminder:${booking.id}`,
+-        availableAt: remindAt,
++        dedupeKey: `booking.confirmed:${booking.id}`,
+       });
+-    }
+ 
+-    return booking.id;
+-  });
++      // Reminder the day before; retired automatically if the booking is
++      // cancelled before the worker gets to it.
++      const remindAt = new Date(slot.startMs - 24 * 3600_000);
++      if (remindAt.getTime() > Date.now()) {
++        await enqueue(tx, {
++          businessId,
++          topic: "booking.reminder",
++          payload: { bookingId: booking.id },
++          dedupeKey: `booking.reminder:${booking.id}`,
++          availableAt: remindAt,
++        });
++      }
++
++      return booking.id;
++    });
++  }
+ 
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });

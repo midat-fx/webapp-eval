@@ -1,0 +1,72 @@
+diff --git a/src/lib/booking.integration.test.ts b/src/lib/booking.integration.test.ts
+index ad73ba6..b28c24b 100644
+--- a/src/lib/booking.integration.test.ts
++++ b/src/lib/booking.integration.test.ts
+@@ -178,6 +178,21 @@ describe("concurrency", () => {
+     expect(await db.select().from(s.bookings)).toHaveLength(1);
+   });
+ 
++  // Holds are keyed by start time, so these two never contend for the same hold.
++  it("never lets two overlapping starts both book the same master", async () => {
++    const start = atLocal(date, "14:00", f.business.timezone);
++    const attempts = await Promise.all(
++      Array.from({ length: 20 }, (_, i) => {
++        const offset = (i % 4) * 15 * 60_000;
++        return book(start + offset, start + offset + 3600_000, `+7701000${String(i).padStart(4, "0")}`);
++      }),
++    );
++
++    expect(attempts.filter((r) => r.ok)).toHaveLength(1);
++    expect(attempts.filter((r) => !r.ok && r.error === "slot_taken").length).toBeGreaterThan(0);
++    expect(await db.select().from(s.bookings)).toHaveLength(1);
++  });
++
+   it("allows overlapping bookings for different masters", async () => {
+     const [second] = await db
+       .insert(s.staff)
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..0e129be 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, eq, gt, gte, inArray, lt } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -161,7 +161,25 @@ export async function createBooking(opts: {
+ 
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
++  // The master's row lock serialises concurrent checkouts across app servers,
++  // so the overlap check below cannot race with another insert for this master.
+   const bookingId = await db.transaction(async (tx) => {
++    await tx.select({ id: s.staff.id }).from(s.staff).where(eq(s.staff.id, staffId)).for("update");
++
++    const [clash] = await tx
++      .select({ id: s.bookings.id })
++      .from(s.bookings)
++      .where(
++        and(
++          eq(s.bookings.staffId, staffId),
++          eq(s.bookings.status, "confirmed"),
++          lt(s.bookings.startAt, new Date(slot.endMs)),
++          gt(s.bookings.endAt, new Date(slot.startMs)),
++        ),
++      )
++      .limit(1);
++    if (clash) return null;
++
+     const [booking] = await tx
+       .insert(s.bookings)
+       .values({
+@@ -206,6 +224,7 @@ export async function createBooking(opts: {
+ 
+     return booking.id;
+   });
++  if (!bookingId) return { ok: false, error: "slot_taken" };
+ 
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });

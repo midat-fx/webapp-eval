@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 61.1,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 10,
+  "cost_usd": 0.39468250000000005,
+  "is_error": false,
+  "result_text": "The SSE route now releases its Redis subscriber and ping timer when the client disconnects. Unit tests pass and `pnpm build` succeeds, but I couldn't run Redis here, so the connection-count behaviour is unverified.\n\nThe leak was in `src/app/api/admin/events/route.ts`. Each request opened a `redis().duplicate()` connection and a 25-second `setInterval`, and nothing cleaned either up. The change:\n\n- `GET` takes the `Request`. On `request.signal` abort, or when the stream is cancelled, it clears the interval and calls `sub.disconnect()`, which closes the connection and drops the subscription.\n- Writes go through a `send` helper that stops enqueuing once the stream is closed, so a late Redis message can't throw into a dead controller.\n- Live updates for open tabs are unchanged: the subscriber and the `message` handler are still set up the same way.\n\nThe client in `src/app/admin/live.tsx` already closes its `EventSource` on unmount, so no client change was needed. I haven't committed.",
+  "stderr": "",
+  "patch_lines": 50,
+  "touched_outside_workdir": []
+}

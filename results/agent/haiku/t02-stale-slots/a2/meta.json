@@ -1,0 +1,28 @@
+{
+  "task": "t02-stale-slots",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 43.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 13,
+  "cost_usd": 0.4672990000000001,
+  "is_error": false,
+  "result_text": "The booking grid now always shows times for the service, staff member and date currently selected, whatever order the responses arrive in. The fix is in `src/app/[slug]/wizard.tsx`, and the changes are uncommitted in the working tree.\n\nThe cause was that each slots request had no cancellation, so a slow response for an earlier date or staff member could overwrite the grid after a newer one had already rendered. Now the slots fetch lives in an effect that aborts its request when the selection changes, so a stale response is dropped. The manual reloads after a failed hold, a failed booking, and the \"Back\" button go through a small reload counter that retriggers the same effect.\n\nChanging the selection while times are loading still works, because the new selection starts its own request immediately.\n\nI checked with ESLint on the file (clean) and the unit tests (12 pass). The type check reports one error in `src/app/layout.tsx`, which I didn't touch. I could not run the booking flow in a browser or the integration tests, since Postgres and Redis aren't running here.",
+  "stderr": "",
+  "patch_lines": 77,
+  "touched_outside_workdir": []
+}

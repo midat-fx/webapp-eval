@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 31.7,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 10,
+  "cost_usd": 0.1788475,
+  "is_error": false,
+  "result_text": "`setBookingStatus` in `src/lib/booking.ts` now changes a booking only if it is still `confirmed`. I couldn't run the integration tests or try two clicks at once here, because Postgres and Redis aren't running. `pnpm test` passes and `tsc` reports one error, in `src/app/layout.tsx`, a file I didn't edit (`LayoutProps` not found).\n\n- **Single guarded update:** the status check is part of the one `UPDATE` statement, not a separate read. Postgres makes a competing update wait for the first one to finish, then re-check the status. The later attempt then updates no rows, and that holds across app servers.\n- **Later or competing attempts do nothing:** when no row was updated, the function returns before writing the audit entry, queuing the cancelled message or waitlist offer, or publishing the calendar update. That covers completed \u2192 cancelled, cancelled \u2192 completed, and two receptionists clicking at once.\n- **Normal use:** clicking a button on a confirmed booking behaves as before.\n\nI didn't add a test for the new behaviour.",
+  "stderr": "",
+  "patch_lines": 39,
+  "touched_outside_workdir": []
+}

@@ -136,7 +136,7 @@ per-check detail goes to `result.json`.
   `node_modules` cloned copy-on-write (APFS `clonefile`), so `pnpm test` and
   `pnpm build` work offline.
 - `--safe-mode` (no user CLAUDE.md, skills, plugins, hooks or MCP servers —
-  the owner's personal setup must not leak into the measurement),
+  my personal setup must not leak into the measurement),
   `--disallowedTools WebFetch WebSearch`, `--permission-mode bypassPermissions`.
 - The prompt is the issue plus four lines of environment facts, identical for
   every task and model.
@@ -145,7 +145,7 @@ per-check detail goes to `result.json`.
 - The diff (`git add -A && git diff --cached`) is the only thing graded.
 
 The agent runs on the host, not in the grading container, because the CLI
-needs the owner's interactive login. That means nothing but policy stops it
+needs an interactive login. That means nothing but policy stops it
 from wandering the disk, so every trace is audited: tool calls that mention
 this repository, `~/projects` or the kezek GitHub URL are listed in
 `meta.json` under `touched_outside_workdir` and counted in the README.

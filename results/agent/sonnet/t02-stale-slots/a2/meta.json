@@ -1,0 +1,28 @@
+{
+  "task": "t02-stale-slots",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 36.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 8,
+  "cost_usd": 0.164608,
+  "is_error": false,
+  "result_text": "I fixed the stale-times bug in `src/app/[slug]/wizard.tsx`. I haven't run it in a browser or tested it with throttling.\n\nThe slot fetch applied whatever response came back last, so a slow answer for the first date could overwrite the grid after the second date had already loaded. A slot response is now applied only if it comes from the newest request and still matches the current service, staff member and date. This covers the date and staff-switching cases from the report, and also a service change that clears the staff member. It also covers the refetches after a failed hold and after \"Back\", which could otherwise write old data after the selection changed. Late errors from superseded requests no longer show \"Could not load available times\" either.\n\nThe linter passes on the file. `tsc` reports one error, `LayoutProps` not found in `src/app/layout.tsx`, which I didn't touch. I didn't run `pnpm build` or `pnpm test`.",
+  "stderr": "",
+  "patch_lines": 41,
+  "touched_outside_workdir": []
+}

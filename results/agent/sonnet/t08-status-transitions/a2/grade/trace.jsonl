@@ -1,0 +1,10 @@
+{"ts":"2026-11-01T08:47:37.072Z","step":"start","status":"ok","detail":"t08-status-transitions"}
+{"ts":"2026-11-01T08:47:37.093Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T08:47:37.137Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-01T08:47:49.027Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T08:47:51.760Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T08:47:52.746Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T08:47:53.866Z","step":"server","status":"ok","detail":"2 instance(s)"}
+{"ts":"2026-11-01T08:47:59.516Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-01T08:47:59.592Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-01T08:47:59.629Z","step":"done","status":"auto","detail":"checks"}

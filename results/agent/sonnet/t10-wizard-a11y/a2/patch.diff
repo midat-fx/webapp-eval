@@ -1,0 +1,201 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..4291501 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useId, useMemo, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -23,10 +23,11 @@ function WaitlistBox({
+   const [name, setName] = useState("");
+   const [phone, setPhone] = useState("");
+   const [state, setState] = useState<"idle" | "sending" | "joined" | "error">("idle");
++  const uid = useId();
+ 
+   if (state === "joined") {
+     return (
+-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
++      <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+         You are on the waitlist for {date}. The moment a slot frees up we message you first — you get
+         15 minutes to claim it.
+       </div>
+@@ -50,19 +51,33 @@ function WaitlistBox({
+         to you.
+       </p>
+       <div className="mt-3 space-y-2">
+-        <input
+-          placeholder="Name"
+-          value={name}
+-          onChange={(e) => setName(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
+-        <input
+-          placeholder="+7701…"
+-          type="tel"
+-          value={phone}
+-          onChange={(e) => setPhone(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
++        <div>
++          <label htmlFor={`${uid}-name`} className="mb-1 block text-sm text-zinc-700">
++            Name
++          </label>
++          <input
++            id={`${uid}-name`}
++            autoComplete="name"
++            placeholder="Name"
++            value={name}
++            onChange={(e) => setName(e.target.value)}
++            className="w-full rounded-lg border border-zinc-300 px-3 py-2 placeholder:text-zinc-500"
++          />
++        </div>
++        <div>
++          <label htmlFor={`${uid}-phone`} className="mb-1 block text-sm text-zinc-700">
++            Phone
++          </label>
++          <input
++            id={`${uid}-phone`}
++            autoComplete="tel"
++            placeholder="+7701…"
++            type="tel"
++            value={phone}
++            onChange={(e) => setPhone(e.target.value)}
++            className="w-full rounded-lg border border-zinc-300 px-3 py-2 placeholder:text-zinc-500"
++          />
++        </div>
+         <button
+           onClick={submit}
+           disabled={state === "sending" || !name.trim() || !phone.trim()}
+@@ -71,7 +86,7 @@ function WaitlistBox({
+           {state === "sending" ? "Joining…" : "Join the waitlist"}
+         </button>
+         {state === "error" && (
+-          <p className="text-sm text-red-600">That did not work — check the phone number and try again</p>
++          <p role="alert" className="text-sm text-red-600">That did not work — check the phone number and try again</p>
+         )}
+       </div>
+     </div>
+@@ -91,6 +106,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [error, setError] = useState<string | null>(null);
+   const [done, setDone] = useState(false);
+   const [busy, setBusy] = useState(false);
++  const uid = useId();
+ 
+   const fmtTime = useMemo(
+     () =>
+@@ -207,12 +223,13 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       <section>
+         <h2 className="mb-2 font-semibold text-zinc-800">1 · Service</h2>
+         {!services ? (
+-          <p className="text-sm text-zinc-400">Loading…</p>
++          <p role="status" className="text-sm text-zinc-600">Loading…</p>
+         ) : (
+           <div className="grid gap-2">
+             {services.map((svc) => (
+               <button
+                 key={svc.id}
++                aria-pressed={service?.id === svc.id}
+                 onClick={() => {
+                   setService(svc);
+                   setMaster(null);
+@@ -227,7 +244,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+               >
+                 <span>
+                   {svc.name}
+-                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-400"}>
++                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-600"}>
+                     {" "}
+                     · {svc.durationMin} min
+                   </span>
+@@ -247,6 +264,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             {service.staff.map((m) => (
+               <button
+                 key={m.id}
++                aria-pressed={master?.id === m.id}
+                 onClick={() => {
+                   setMaster(m);
+                   setHold(null);
+@@ -269,7 +287,11 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       {service && master && !hold && (
+         <section>
+           <h2 className="mb-2 font-semibold text-zinc-800">3 · Date and time</h2>
++          <label htmlFor={`${uid}-date`} className="mb-1 block text-sm text-zinc-700">
++            Date
++          </label>
+           <input
++            id={`${uid}-date`}
+             type="date"
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
+@@ -280,7 +302,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             className="mb-3 rounded-lg border border-zinc-300 px-3 py-2"
+           />
+           {!slots ? (
+-            <p className="text-sm text-zinc-400">Loading…</p>
++            <p role="status" className="text-sm text-zinc-600">Loading…</p>
+           ) : slots.length === 0 ? (
+             <WaitlistBox
+               slug={slug}
+@@ -316,19 +338,33 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             </span>
+           </p>
+           <div className="mt-3 space-y-3">
+-            <input
+-              placeholder="Name"
+-              value={name}
+-              onChange={(e) => setName(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
+-            <input
+-              placeholder="+7701…"
+-              type="tel"
+-              value={phone}
+-              onChange={(e) => setPhone(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
++            <div>
++              <label htmlFor={`${uid}-name`} className="mb-1 block text-sm text-zinc-700">
++                Name
++              </label>
++              <input
++                id={`${uid}-name`}
++                autoComplete="name"
++                placeholder="Name"
++                value={name}
++                onChange={(e) => setName(e.target.value)}
++                className="w-full rounded-lg border border-zinc-300 px-3 py-2 placeholder:text-zinc-500"
++              />
++            </div>
++            <div>
++              <label htmlFor={`${uid}-phone`} className="mb-1 block text-sm text-zinc-700">
++                Phone
++              </label>
++              <input
++                id={`${uid}-phone`}
++                autoComplete="tel"
++                placeholder="+7701…"
++                type="tel"
++                value={phone}
++                onChange={(e) => setPhone(e.target.value)}
++                className="w-full rounded-lg border border-zinc-300 px-3 py-2 placeholder:text-zinc-500"
++              />
++            </div>
+             <div className="flex gap-2">
+               <button
+                 onClick={confirm}
+@@ -351,7 +387,11 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         </section>
+       )}
+ 
+-      {error && <p className="text-sm text-red-600">{error}</p>}
++      {error && (
++        <p role="alert" className="text-sm text-red-600">
++          {error}
++        </p>
++      )}
+     </div>
+   );
+ }

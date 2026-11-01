@@ -1,0 +1,28 @@
+{
+  "task": "t10-wizard-a11y",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 280.1,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 46,
+  "cost_usd": 2.6135070000000007,
+  "is_error": false,
+  "result_text": "The booking wizard now passes an axe WCAG 2 A/AA audit in every state I could reach. The only change is `src/app/[slug]/wizard.tsx`, left uncommitted.\n\n- **Labels:** the date picker, the waitlist name and phone, and the \"Your details\" name and phone now have visible `<label>`s. The placeholders are still there.\n- **Contrast:** the grey durations and \"Loading\u2026\" moved from `zinc-400` to `zinc-600`. The selected state keeps its white-on-dark styling.\n- **Errors:** the booking, hold, load, and waitlist errors render with `role=\"alert\"`. The waitlist \"joined\" message and the \"You are booked!\" panel have `role=\"status\"`.\n- **Selection:** the service and staff buttons expose `aria-pressed`, and the selected one also shows a visible \u2713 so it isn't conveyed by colour alone.\n\nI checked this by rendering the real `wizard.tsx` with stubbed API responses in headless Chrome and running axe across nine states, including the error and waitlist paths. The original code showed `label` and `color-contrast` violations; the new code shows none. Unit tests pass, `pnpm build` compiles, and the screenshot looks right.\n\nI couldn't run the real page because Postgres isn't running, so the hidden end-to-end tests haven't been exercised against it. Two things to be aware of:\n\n- The \"Name\" placeholder and the visible \"Name\" label now both show on empty fields. I kept the placeholders because you asked that nothing visible disappear; drop them if the duplication bothers you.\n- A stale \"That time was just taken\" error can persist after changing staff. That behaviour was already there and I left it alone.",
+  "stderr": "",
+  "patch_lines": 296,
+  "touched_outside_workdir": []
+}

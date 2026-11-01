@@ -1,0 +1,68 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..1676745 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,6 @@
+ "use client";
+ import { useCallback, useEffect, useMemo, useState } from "react";
++import { localDateISO } from "@/lib/slots";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -82,7 +83,8 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
++  const today = localDateISO(timezone, Date.now());
++  const [date, setDate] = useState(today);
+   const [slots, setSlots] = useState<Slot[] | null>(null);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+@@ -272,7 +274,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={today}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index e79bf01..4e4af38 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -1,5 +1,16 @@
+ import { describe, expect, it } from "vitest";
+-import { isoWeekday, localTimeToUtc, slotsForDay, tzOffsetMinutes } from "./slots";
++import { isoWeekday, localDateISO, localTimeToUtc, slotsForDay, tzOffsetMinutes } from "./slots";
++
++describe("localDateISO", () => {
++  it("is the business date, not the UTC date, just after local midnight", () => {
++    // 2026-11-01 20:00 UTC = 2026-11-02 01:00 in Almaty
++    expect(localDateISO("Asia/Almaty", Date.UTC(2026, 10, 1, 20, 0))).toBe("2026-11-02");
++  });
++  it("is the business date for a business behind UTC", () => {
++    // 2026-11-02 02:00 UTC = 2026-11-01 21:00 in New York (EST after DST ends)
++    expect(localDateISO("America/New_York", Date.UTC(2026, 10, 2, 2, 0))).toBe("2026-11-01");
++  });
++});
+ 
+ describe("tzOffsetMinutes", () => {
+   it("Almaty is UTC+5 (no DST)", () => {
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index a3d7b95..1fbe3f0 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -45,6 +45,11 @@ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string):
+   return naive - offset2 * 60000;
+ }
+ 
++/** Calendar date `YYYY-MM-DD` that `utcMs` falls on in `timeZone`. */
++export function localDateISO(timeZone: string, utcMs: number): string {
++  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(utcMs);
++}
++
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */
+ export function isoWeekday(dateISO: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);

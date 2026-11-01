@@ -1,0 +1,37 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "exactly one of six overlapping checkouts wins, every round",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "different start, different duration still collide",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "other masters and cancelled bookings don't block",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_overlapping_confirmed_bookings",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "every_winner_has_its_outbox_message",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "losers_left_no_booking_rows",
+      "pass": true
+    }
+  ],
+  "task": "t05-overlap-race",
+  "seconds": 23.0
+}

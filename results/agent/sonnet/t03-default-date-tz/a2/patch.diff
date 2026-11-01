@@ -1,0 +1,53 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..255c4d5 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,6 @@
+ "use client";
+ import { useCallback, useEffect, useMemo, useState } from "react";
++import { todayInTimeZone } from "@/lib/slots";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -82,7 +83,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
++  const [date, setDate] = useState(() => todayInTimeZone(timezone));
+   const [slots, setSlots] = useState<Slot[] | null>(null);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+@@ -272,7 +273,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={todayInTimeZone(timezone)}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index a3d7b95..7d218cc 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -32,6 +32,19 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+   return Math.round((asUtc - utcMs) / 60000);
+ }
+ 
++/** Local calendar date `YYYY-MM-DD` in `timeZone` at the given instant. */
++export function todayInTimeZone(timeZone: string, nowMs: number = Date.now()): string {
++  const parts: Record<string, string> = {};
++  const dtf = new Intl.DateTimeFormat("en-US", {
++    timeZone,
++    year: "numeric",
++    month: "2-digit",
++    day: "2-digit",
++  });
++  for (const { type, value } of dtf.formatToParts(nowMs)) parts[type] = value;
++  return `${parts.year.padStart(4, "0")}-${parts.month}-${parts.day}`;
++}
++
+ /** UTC instant of local wall time `HH:MM` on local date `YYYY-MM-DD` in `timeZone`. */
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);

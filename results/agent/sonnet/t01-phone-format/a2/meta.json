@@ -1,0 +1,28 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 36.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 7,
+  "cost_usd": 0.1650276,
+  "is_error": false,
+  "result_text": "Phone numbers with spaces, dashes, dots or parentheses are now accepted when booking and when joining the waitlist, including direct API calls. I haven't run the integration tests or the build. `pnpm test` passes, including the new unit tests. `tsc` reports one error, in `src/app/layout.tsx` (`LayoutProps` not found), a file I didn't change.\n\n- **Normalizing:** the new `src/lib/phone.ts` has `normalizePhone`, which strips whitespace, `-`, `.` and `(` `)`. It also has `phoneSchema`, which normalizes and then applies the same format check as before: an optional `+` followed by 10\u201315 digits.\n- **API routes:** the book and waitlist routes use `phoneSchema`. `+7 (701) 555-12-34` becomes `+77015551234`. `call me` and `+7 701` are still rejected with a 400.\n- **One client:** `createBooking` and `joinWaitlist` also normalize the phone before looking up or creating the client. A formatted number and `+77015551234` therefore resolve to the same client, stored as `+77015551234`, even if those functions are called directly.\n- **Tests:** `src/lib/phone.test.ts` covers the accepted and rejected formats.\n\nI didn't change the wizard UI, since the server now accepts those formats. A number typed without the leading `+` (like `77015551234`) is still accepted but stored without it, so it counts as a separate client from `+77015551234`. That was already the case before this change.",
+  "stderr": "",
+  "patch_lines": 119,
+  "touched_outside_workdir": []
+}

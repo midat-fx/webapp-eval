@@ -1,0 +1,39 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..0a2d725 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,21 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  // The guarded UPDATE is atomic: concurrent attempts block on the row lock,
++  // re-check status = 'confirmed', and the losers affect zero rows.
++  const changed = await db.transaction(async (tx) => {
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -275,7 +283,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
++  if (!changed) return;
+   await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 

@@ -1,0 +1,28 @@
+{
+  "task": "t05-overlap-race",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 52.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 10,
+  "cost_usd": 0.295075,
+  "is_error": false,
+  "result_text": "Overlapping confirmed bookings for one master are now blocked by the database, so no number of servers or simultaneous checkouts can produce them. I couldn't run any of it: Postgres isn't available here, so I haven't applied the migration or tested the race. `pnpm test` (unit) and `pnpm lint` pass, and `tsc` shows only a `LayoutProps` error in `src/app/layout.tsx`, a file I didn't touch. I didn't add an integration test.\n\n- **Migration:** `drizzle/0004_booking_no_overlap.sql` (also added to `_journal.json`) enables `btree_gist` and adds a constraint `bookings_staff_no_overlap`. It rejects two bookings for the same master whose time ranges overlap, but only while both are `confirmed`. Cancelled, completed and no-show bookings don't block time, so re-booking after a cancellation works. Back-to-back bookings (one ends 15:00, next starts 15:00) are allowed, and different masters never conflict.\n- **`createBooking` in `src/lib/booking.ts`:** when the insert hits the overlap constraint, the loser now gets `{ ok: false, error: \"slot_taken\" }`. The route already turns that into `409 {\"error\":\"slot_taken\"}`, and the waitlist accept path maps it the same way. The transaction rolls back, so no audit row or confirmation SMS is queued for the loser.\n- **Same-phone race (not in the issue):** two checkouts with the same phone number at the same moment could previously fail on the unique client record. That insert now falls back to selecting the existing client.\n\n**Deploy risk:** the migration will fail if production already has overlapping confirmed bookings, such as Dana's 14:00 and 14:15 ones. Cancel or move one of them first. You can find all such pairs with a self-join on `bookings` where `status = 'confirmed'`, the same `staff_id` and overlapping `tstzrange(start_at, end_at)`. The DB role also needs permission to create `btree_gist`, which Postgres 13+ allows for a database owner.",
+  "stderr": "",
+  "patch_lines": 161,
+  "touched_outside_workdir": []
+}

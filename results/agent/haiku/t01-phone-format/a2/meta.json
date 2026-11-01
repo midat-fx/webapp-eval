@@ -1,0 +1,28 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 84.8,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 18,
+  "cost_usd": 0.6558359999999999,
+  "is_error": false,
+  "result_text": "Phone numbers with spaces, dashes, dots or parentheses are now accepted on both the booking and waitlist endpoints, and normalized to `+77015551234` before storage and lookup. `pnpm test` (25 tests, including a new `src/lib/phone.test.ts`), `pnpm build` and `tsc --noEmit` all pass. I haven't run the integration tests or the UI since Postgres and Redis aren't available here.\n\n- **`src/lib/phone.ts` (new):** `normalizePhone` strips spaces, dashes, dots and parentheses and adds a leading `+` if missing. `phoneSchema` runs that, then requires `+` followed by 10\u201315 digits. `call me` and `+7 701` are still rejected.\n- **Both public routes** (`book` and `waitlist`) use `phoneSchema` in place of the old regex, so direct API calls get the same behavior.\n- **`createBooking` and `joinWaitlist`** also normalize the phone before the client lookup. That keeps `+7 (701) 555-12-34` and `+77015551234` as one client even when the lib functions are called directly.\n\nTwo things to be aware of:\n- A number sent without a `+` (e.g. `77015551234`) is now stored with one (`+77015551234`). Existing rows already in the database are not rewritten, so any clients created before this change keep their old format and won't merge with new bookings. A one-off migration would fix that if it matters for your data.\n- I left the wizard UI unchanged. Its placeholder and error text still say `+7701\u2026`, though the server now accepts the formatted forms.",
+  "stderr": "",
+  "patch_lines": 139,
+  "touched_outside_workdir": []
+}

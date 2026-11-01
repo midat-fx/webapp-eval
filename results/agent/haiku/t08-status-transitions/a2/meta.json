@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 56.2,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 15,
+  "cost_usd": 0.746127,
+  "is_error": false,
+  "result_text": "Only a confirmed booking can now change status, and it changes once. The fix is in `setBookingStatus` in `src/lib/booking.ts`, and the change is left uncommitted in the working tree.\n\nThe status update was filtered only by booking id and business, so any status could overwrite any booking. The update now also requires `status = 'confirmed'` in the same statement. When two requests race, Postgres serializes them on the row lock, and the loser matches no row. So it writes no audit entry, enqueues no cancellation message or waitlist offer, and publishes no calendar event. This holds across app servers because the check is in the database, not in memory.\n\nVerification: unit tests pass (12/12), and eslint is clean on `booking.ts`. The one `tsc` error is in `src/app/layout.tsx` (`LayoutProps`), which I didn't touch. I could not exercise the concurrent case because Postgres isn't available here, and the integration tests were not run. Adding a two-writer race test to `booking.integration.test.ts` would cover it once Postgres is available.",
+  "stderr": "",
+  "patch_lines": 40,
+  "touched_outside_workdir": []
+}

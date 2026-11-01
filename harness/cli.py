@@ -139,6 +139,8 @@ def cmd_regrade(a: argparse.Namespace) -> int:
         if res.exists() and json.loads(res.read_text())["verdict"] in ("pass", "fail") and not a.all:
             continue
         task = json.loads(meta.read_text())["task"]
+        if a.tasks and task not in a.tasks:
+            continue
         patch = run / "patch.diff"
         r = grading.grade(task, patch, run / "grade") if patch.read_text().strip() else None
         print(f"{run.relative_to(out_root)}: {r['verdict'] if r else 'empty patch'}", flush=True)
@@ -190,6 +192,7 @@ def main(argv: list[str] | None = None) -> int:
     fl.add_argument("-n", type=int, default=5)
     fl.set_defaults(fn=cmd_flake)
     rg = sub.add_parser("regrade", help="re-grade saved agent patches (missing or infra-error results)")
+    rg.add_argument("tasks", nargs="*")
     rg.add_argument("--all", action="store_true")
     rg.add_argument("--out", default="results/agent")
     rg.set_defaults(fn=cmd_regrade)

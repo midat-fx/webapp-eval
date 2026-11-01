@@ -1,0 +1,47 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "wizard: labelled note is saved as typed",
+      "pass": true
+    },
+    {
+      "kind": "axe",
+      "name": "step 4 has no accessibility violations",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "wizard without a note stores NULL",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "API: 500 characters is the limit, blank is no note",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "admin calendar shows the note as plain text",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "notes_within_limit",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_blank_notes",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "rejected_note_created_nothing",
+      "pass": true
+    }
+  ],
+  "task": "t09-booking-note",
+  "seconds": 29.4
+}

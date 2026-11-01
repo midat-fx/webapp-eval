@@ -1,0 +1,28 @@
+{
+  "task": "t09-booking-note",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 96.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 24,
+  "cost_usd": 1.0153415,
+  "is_error": false,
+  "result_text": "The booking flow now takes an optional client note, stores it, and shows it on the admin calendar card. Unit tests, lint and `pnpm build` pass. I couldn't run the integration tests or the dev server here, so the UI and the database path are unexercised.\n\n- **Booking page (`src/app/[slug]/wizard.tsx`)**: Step 4 has a `Note` textarea with a real `<label>`, a placeholder hint, and a `n/500` counter linked via `aria-describedby`. `maxLength={500}` stops typing at the limit. The note is sent with the confirm request.\n- **API (`src/app/api/public/[slug]/book/route.ts`)**: The note is trimmed, capped at 500 with zod, and converted to `null` when empty or whitespace-only. Over-length returns `400 bad_request` before anything is created. Line breaks are kept.\n- **Storage (`src/lib/booking.ts`)**: `createBooking` takes an optional `note` and writes it to `bookings.note`. The waitlist path and existing tests call it without a note, so they're unchanged. No migration was needed; the column already exists.\n- **Admin calendar (`src/app/admin/page.tsx`)**: The card shows the note as a React-escaped text node with `whitespace-pre-wrap`, so line breaks and spacing appear as typed.\n\nTwo judgement calls to be aware of:\n- The 500 limit counts UTF-16 units (JavaScript's `.length`), matching the textarea's `maxLength`. For emoji-heavy notes that means fewer than 500 emoji fit, and the browser and server agree on the limit.\n- I didn't run axe here. The new field follows the same contrast-safe colours as the rest of the step, but a real axe run is the check that matters.",
+  "stderr": "",
+  "patch_lines": 126,
+  "touched_outside_workdir": []
+}

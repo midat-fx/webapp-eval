@@ -1,0 +1,28 @@
+{
+  "task": "t10-wizard-a11y",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 33.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.1812518,
+  "is_error": false,
+  "result_text": "I fixed the four problems in `src/app/[slug]/wizard.tsx`. I haven't run axe or a browser, so the audit result is unconfirmed. `tsc` and `eslint` show nothing new; the one `tsc` error is `LayoutProps` in `layout.tsx`, which I didn't touch. I didn't run `pnpm test` or `pnpm build`.\n\n- **Labels:** The date picker now has a visible \"Date\" label. Name and phone, in both \"Your details\" and the waitlist box, get visible \"Name\" and \"Phone\" labels tied to their inputs. I kept the placeholders and added `autoComplete` (`name`, `tel`) to those fields.\n- **Contrast:** The service durations and \"Loading\u2026\" moved from `zinc-400` to `zinc-600`, which is readable on white. The selected service keeps its light-on-dark duration text. I also darkened the input placeholders to `zinc-500`, which axe doesn't check but were pale.\n- **Errors:** The shared error line (including \"That time was just taken\u2026\" and \"Check the name and phone\u2026\") and the waitlist error now have `role=\"alert\"`. \"Loading\u2026\" and the \"You are on the waitlist\" message use `role=\"status\"`, so they're announced politely.\n- **Selection:** Service and staff buttons now set `aria-pressed`, so assistive tech can tell which is selected. The visual styling is unchanged.\n\nThe new labels are visible text, so the layout shifts slightly. Nothing a sighted user saw before has been removed.",
+  "stderr": "",
+  "patch_lines": 201,
+  "touched_outside_workdir": []
+}

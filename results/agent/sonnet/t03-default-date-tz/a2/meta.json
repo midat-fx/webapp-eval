@@ -1,0 +1,28 @@
+{
+  "task": "t03-default-date-tz",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 35.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 11,
+  "cost_usd": 0.15954979999999996,
+  "is_error": false,
+  "result_text": "The booking page now opens on today's date in the business's timezone, and that same date is the earliest the picker allows. I haven't run it in a browser or added a test for the new function. `pnpm test` still passes, and `tsc` reports one error in `src/app/layout.tsx` (`LayoutProps` not found), which I didn't touch.\n\nThe cause was that the date picker took today's date from the visitor's browser clock converted to UTC, not from the business's timezone. I added `todayInTimeZone(timeZone, nowMs?)` to `src/lib/slots.ts`. It uses `Intl` with the business's timezone, so it works for any timezone. In `src/app/[slug]/wizard.tsx`, both the initial selected date and the picker's `min` now use it.",
+  "stderr": "",
+  "patch_lines": 53,
+  "touched_outside_workdir": []
+}

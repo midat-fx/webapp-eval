@@ -1,0 +1,28 @@
+{
+  "task": "t07-staff-permissions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 85.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 28,
+  "cost_usd": 1.036626,
+  "is_error": false,
+  "result_text": "Staff logins are now limited to Calendar and Clients, and every owner-only page and server action refuses them on the server. I haven't tested it end to end because Postgres and Redis aren't running here. The unit tests and `pnpm build` pass.\n\n- **Server guard:** `requireOwner()` in `src/lib/session.ts` redirects non-owners to `/admin`.\n- **Pages:** Services, Staff, Reports, Analytics, Notifications and Audit now call `requireOwner()`, so a staff member who opens one of those URLs lands on the calendar.\n- **Actions:** `saveService`, `toggleService`, `saveStaff`, `toggleStaff` and `toggleStaffService` call `requireOwner()`, so a replayed form submission changes nothing. `updateBookingStatus` still uses `requireSession()`, so staff can mark visits completed, no-show or cancelled.\n- **Nav:** `src/app/admin/layout.tsx` only renders the Calendar and Clients links for staff.\n\nThe `tsc --noEmit` error in `src/app/layout.tsx` (`LayoutProps` not found) is in a file I didn't touch and goes away after a build. Nothing is committed.",
+  "stderr": "",
+  "patch_lines": 207,
+  "touched_outside_workdir": []
+}

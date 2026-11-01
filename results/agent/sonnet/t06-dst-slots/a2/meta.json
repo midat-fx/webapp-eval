@@ -1,0 +1,28 @@
+{
+  "task": "t06-dst-slots",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 28.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.1425741,
+  "is_error": false,
+  "result_text": "I fixed the wrong hours on clock-change days. The unit tests pass, but I didn't run `pnpm build` or any integration tests.\n\n**Cause:** `localTimeToUtc` in `src/lib/slots.ts` looked up the timezone's UTC offset once, at UTC midnight of the date. On a clock-change day the offset changes during the day. Opening and closing times after the switch were therefore converted with the old offset, which gave 11:00 in March and 09:00 in October.\n\n**Fix:** It now works out the offset around the requested time instead of at midnight. Two edge cases are handled:\n- **Clocks go back:** a time that happens twice resolves to the earlier occurrence.\n- **Clocks go forward:** a time that doesn't exist, such as 02:30 on a spring-forward day, moves forward past the gap.\n\nThe fix applies to every timezone and year. `src/lib/booking.ts` and `src/app/admin/page.tsx` also use this function for the start of the day, and they get the corrected value too.\n\n**Tests:** I added cases in `src/lib/slots.test.ts` for Berlin on 28 March and 31 October 2027, and for New York on 14 March and 7 November 2027. One more checks that the Berlin slots on 28 March run from 10:00 to a 20:00 close, which is 08:00\u201318:00 UTC.\n\nOn a clock-change day, slots are spaced evenly in real elapsed time from the opening instant.",
+  "stderr": "",
+  "patch_lines": 55,
+  "touched_outside_workdir": []
+}

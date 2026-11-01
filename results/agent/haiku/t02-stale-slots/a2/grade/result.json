@@ -1,0 +1,37 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "late response for the previous date is ignored (2500 ms)",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "late response for the previous date is ignored (1200 ms)",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "late response for the previous staff member is ignored",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "plain selection still loads times",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_booking_on_the_abandoned_day",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "both_checks_booked",
+      "pass": true
+    }
+  ],
+  "task": "t02-stale-slots",
+  "seconds": 77.1
+}

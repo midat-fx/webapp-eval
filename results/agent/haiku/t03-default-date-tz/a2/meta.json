@@ -1,0 +1,28 @@
+{
+  "task": "t03-default-date-tz",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 58.4,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 14,
+  "cost_usd": 0.5477785000000001,
+  "is_error": false,
+  "result_text": "The booking page now opens on today's date in the business's timezone, and that same date is the earliest one the picker allows. Unit tests (14, including two new ones) and `pnpm build` pass. I haven't exercised the page in a browser, since Postgres and Redis aren't running here.\n\nThe cause was in `src/app/[slug]/wizard.tsx`: both the initial date and the picker's `min` used `new Date().toISOString()`, which is the UTC date. Between midnight and 5 a.m. in Almaty (UTC+5), that is still yesterday.\n\nChanges:\n- **`src/lib/slots.ts`**: new `localDateISO(timeZone, utcMs)` that returns the `YYYY-MM-DD` calendar date in a given timezone. It uses the same `Intl` pattern the admin page and waitlist code already use.\n- **`src/app/[slug]/wizard.tsx`**: `today` is computed from `localDateISO(timezone, Date.now())` and used for both the initial `date` state and `min`.\n- **`src/lib/slots.test.ts`**: tests for a just-after-midnight Almaty case and a New York case where the UTC date differs from the local date.\n\nThe server routes already compute days in the business timezone, so no server change was needed.",
+  "stderr": "",
+  "patch_lines": 68,
+  "touched_outside_workdir": []
+}

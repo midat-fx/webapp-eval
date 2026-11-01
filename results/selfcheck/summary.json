@@ -1,0 +1,755 @@
+{
+  "rows": [
+    {
+      "task": "t01-phone-format",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "wizard books with a formatted phone",
+        "API books with spaces in the phone",
+        "waitlist accepts dashes",
+        "one_client_per_number",
+        "both_bookings_on_that_client",
+        "waitlist_entry_on_that_client"
+      ],
+      "seconds": 89.7
+    },
+    {
+      "task": "t01-phone-format",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 54.0
+    },
+    {
+      "task": "t01-phone-format",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 34.3
+    },
+    {
+      "task": "t01-phone-format",
+      "variant": "bad-book-route-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "waitlist accepts dashes",
+        "waitlist_entry_on_that_client"
+      ],
+      "seconds": 34.1
+    },
+    {
+      "task": "t01-phone-format",
+      "variant": "bad-no-canonical-form",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "one_client_per_number",
+        "stored_in_canonical_form",
+        "both_bookings_on_that_client",
+        "waitlist_entry_on_that_client"
+      ],
+      "seconds": 58.3
+    },
+    {
+      "task": "t01-phone-format",
+      "variant": "bad-ui-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "API books with spaces in the phone",
+        "waitlist accepts dashes",
+        "both_bookings_on_that_client",
+        "waitlist_entry_on_that_client"
+      ],
+      "seconds": 105.2
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "late response for the previous date is ignored (2500 ms)",
+        "late response for the previous date is ignored (1200 ms)",
+        "late response for the previous staff member is ignored",
+        "both_checks_booked"
+      ],
+      "seconds": 52.1
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 43.5
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 62.3
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "bad-debounce-date",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "late response for the previous date is ignored (2500 ms)",
+        "late response for the previous date is ignored (1200 ms)",
+        "late response for the previous staff member is ignored",
+        "both_checks_booked"
+      ],
+      "seconds": 47.6
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "bad-drop-slow-responses",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "late response for the previous date is ignored (1200 ms)",
+        "both_checks_booked"
+      ],
+      "seconds": 46.0
+    },
+    {
+      "task": "t02-stale-slots",
+      "variant": "bad-lock-inputs-while-loading",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "late response for the previous date is ignored (2500 ms)",
+        "late response for the previous date is ignored (1200 ms)",
+        "late response for the previous staff member is ignored",
+        "both_checks_booked"
+      ],
+      "seconds": 76.2
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT+12"
+      ],
+      "seconds": 90.4
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 87.0
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 37.7
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "bad-browser-local-date",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT+12"
+      ],
+      "seconds": 44.7
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "bad-default-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT+12"
+      ],
+      "seconds": 49.9
+    },
+    {
+      "task": "t03-default-date-tz",
+      "variant": "bad-hardcoded-utc-plus-5",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT+12"
+      ],
+      "seconds": 50.0
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "closed tabs release their Redis subscriber and connection"
+      ],
+      "seconds": 59.7
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 110.0
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 77.8
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "bad-close-on-pagehide",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "closed tabs release their Redis subscriber and connection"
+      ],
+      "seconds": 65.4
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "bad-recycle-after-60s",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "closed tabs release their Redis subscriber and connection"
+      ],
+      "seconds": 70.3
+    },
+    {
+      "task": "t04-sse-subscriber-leak",
+      "variant": "bad-unsubscribe-without-quit",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "closed tabs release their Redis subscriber and connection"
+      ],
+      "seconds": 70.2
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "different start, different duration still collide",
+        "no_overlapping_confirmed_bookings"
+      ],
+      "seconds": 37.6
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 34.4
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 38.5
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-check-then-insert",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "no_overlapping_confirmed_bookings"
+      ],
+      "seconds": 40.9
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-constraint-without-409",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "different start, different duration still collide"
+      ],
+      "seconds": 40.7
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-in-process-lock",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "no_overlapping_confirmed_bookings"
+      ],
+      "seconds": 117.7
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-unique-start-time",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "different start, different duration still collide",
+        "no_overlapping_confirmed_bookings"
+      ],
+      "seconds": 151.1
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "slots follow opening hours in Europe/Berlin on 2027-03-28",
+        "slots follow opening hours in Europe/Berlin on 2027-10-31",
+        "slots follow opening hours in Europe/Berlin on 2028-03-26",
+        "slots follow opening hours in Europe/Berlin on 2028-10-29",
+        "slots follow opening hours in America/New_York on 2027-03-14",
+        "slots follow opening hours in America/New_York on 2027-11-07",
+        "slots follow opening hours in America/New_York on 2028-03-12",
+        "slots follow opening hours in America/New_York on 2028-11-05",
+        "wizard shows the Berlin opening time on the spring-forward day"
+      ],
+      "seconds": 69.1
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 43.1
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 37.3
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "bad-hardcoded-dst-dates",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "slots follow opening hours in Europe/Berlin on 2028-03-26",
+        "slots follow opening hours in Europe/Berlin on 2028-10-29",
+        "slots follow opening hours in America/New_York on 2028-03-12",
+        "slots follow opening hours in America/New_York on 2028-11-05"
+      ],
+      "seconds": 32.3
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "bad-platform-local-time",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "slots follow opening hours in Europe/Berlin on 2027-03-28",
+        "slots follow opening hours in Europe/Berlin on 2027-10-31",
+        "slots follow opening hours in Europe/Berlin on 2028-03-26",
+        "slots follow opening hours in Europe/Berlin on 2028-10-29",
+        "slots follow opening hours in America/New_York on 2027-03-14",
+        "slots follow opening hours in America/New_York on 2027-11-07",
+        "slots follow opening hours in America/New_York on 2028-03-12",
+        "slots follow opening hours in America/New_York on 2028-11-05",
+        "slots follow opening hours in Europe/Berlin on 2027-07-04",
+        "wizard shows the Berlin opening time on the spring-forward day"
+      ],
+      "seconds": 69.8
+    },
+    {
+      "task": "t06-dst-slots",
+      "variant": "bad-ui-filter",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "slots follow opening hours in Europe/Berlin on 2027-03-28",
+        "slots follow opening hours in Europe/Berlin on 2027-10-31",
+        "slots follow opening hours in Europe/Berlin on 2028-03-26",
+        "slots follow opening hours in Europe/Berlin on 2028-10-29",
+        "slots follow opening hours in America/New_York on 2027-03-14",
+        "slots follow opening hours in America/New_York on 2027-11-07",
+        "slots follow opening hours in America/New_York on 2028-03-12",
+        "slots follow opening hours in America/New_York on 2028-11-05",
+        "wizard shows the Berlin opening time on the spring-forward day"
+      ],
+      "seconds": 93.0
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "staff cannot open owner-only pages",
+        "staff navigation only links to what staff can use",
+        "replayed owner forms are refused for staff",
+        "staff_did_not_change_prices",
+        "staff_did_not_hide_anything",
+        "no_staff_rows_created_by_staff",
+        "no_owner_audit_entries_by_staff"
+      ],
+      "seconds": 102.1
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 90.9
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 168.8
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "bad-owner-only-everything",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "staff can still run the day"
+      ],
+      "seconds": 122.9
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "bad-pages-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "staff_did_not_change_prices",
+        "staff_did_not_hide_anything",
+        "no_staff_rows_created_by_staff",
+        "no_owner_audit_entries_by_staff"
+      ],
+      "seconds": 93.6
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "bad-services-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "staff_did_not_hide_anything",
+        "no_staff_rows_created_by_staff",
+        "no_owner_audit_entries_by_staff"
+      ],
+      "seconds": 145.1
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "a cancelled booking stays cancelled",
+        "a completed booking can't be cancelled or turned into a no-show",
+        "simultaneous clicks on two servers: exactly one change wins",
+        "at_most_one_status_change_per_booking",
+        "audit_matches_final_status",
+        "waitlist_offers_only_for_cancelled",
+        "cancellation_messages_only_for_cancelled"
+      ],
+      "seconds": 353.8
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 279.5
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 41.3
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "bad-disable-button-while-pending",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "a cancelled booking stays cancelled",
+        "a completed booking can't be cancelled or turned into a no-show",
+        "simultaneous clicks on two servers: exactly one change wins",
+        "at_most_one_status_change_per_booking",
+        "audit_matches_final_status",
+        "waitlist_offers_only_for_cancelled",
+        "cancellation_messages_only_for_cancelled"
+      ],
+      "seconds": 54.7
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "bad-only-cancelled-is-final",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "a completed booking can't be cancelled or turned into a no-show",
+        "simultaneous clicks on two servers: exactly one change wins",
+        "at_most_one_status_change_per_booking",
+        "audit_matches_final_status"
+      ],
+      "seconds": 45.5
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "bad-read-then-update",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "simultaneous clicks on two servers: exactly one change wins",
+        "at_most_one_status_change_per_booking",
+        "audit_matches_final_status",
+        "waitlist_offers_only_for_cancelled",
+        "cancellation_messages_only_for_cancelled"
+      ],
+      "seconds": 34.9
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "step 4 has no accessibility violations",
+        "API: 500 characters is the limit, blank is no note",
+        "admin calendar shows the note as plain text",
+        "rejected_note_created_nothing"
+      ],
+      "seconds": 103.4
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 72.1
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 44.2
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "bad-html-line-breaks",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 47.5
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "bad-no-length-limit",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "API: 500 characters is the limit, blank is no note",
+        "admin calendar shows the note as plain text",
+        "notes_within_limit",
+        "rejected_note_created_nothing"
+      ],
+      "seconds": 89.5
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "bad-placeholder-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "step 4 has no accessibility violations",
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 135.2
+    },
+    {
+      "task": "t09-booking-note",
+      "variant": "bad-ui-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "API: 500 characters is the limit, blank is no note",
+        "admin calendar shows the note as plain text",
+        "rejected_note_created_nothing"
+      ],
+      "seconds": 109.2
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "every wizard state passes axe",
+        "fields have real labels and nothing visible was dropped",
+        "selection is exposed to assistive tech",
+        "errors are announced"
+      ],
+      "seconds": 85.4
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 78.2
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 56.8
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "bad-axe-clean-only",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "every wizard state passes axe",
+        "fields have real labels and nothing visible was dropped",
+        "selection is exposed to assistive tech",
+        "errors are announced"
+      ],
+      "seconds": 101.9
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "bad-drop-low-contrast-text",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "fields have real labels and nothing visible was dropped"
+      ],
+      "seconds": 47.3
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "bad-errors-not-announced",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "errors are announced"
+      ],
+      "seconds": 31.4
+    }
+  ],
+  "total": 62,
+  "agree": 62
+}

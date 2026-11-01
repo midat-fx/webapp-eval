@@ -1,0 +1,28 @@
+{
+  "task": "t05-overlap-race",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 82.8,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 22,
+  "cost_usd": 0.9444284999999999,
+  "is_error": false,
+  "result_text": "Overlapping bookings for the same master are now blocked at the database, so the race can't produce two confirmed bookings across app servers. I couldn't run the integration tests here because Postgres and Redis aren't running, so the new test is unverified.\n\nThe change is in `createBooking` in `src/lib/booking.ts`. Inside its transaction, it now locks the master's `staff` row (`SELECT ... FOR UPDATE`), then checks for a confirmed booking that overlaps the requested time. If it finds one, it returns `slot_taken`, which the existing route already maps to a `409`. Checkouts for the same master are serialised by that row lock, and checkouts for different masters don't block each other. Cancelled, completed and no-show bookings are ignored by the overlap check. The waitlist accept path goes through the same function, so it's covered too. Admin status changes can't set a booking back to `confirmed`, so this is the only path that creates confirmed bookings.\n\nI also added an integration test in `src/lib/booking.integration.test.ts`. It races 20 checkouts with overlapping start times for one master and expects exactly one success.\n\n`pnpm test` passes, `pnpm build` succeeds, and ESLint is clean on the changed files. `tsc --noEmit` reports one error in `src/app/layout.tsx`, which I didn't touch. Changes are uncommitted in the working tree.",
+  "stderr": "",
+  "patch_lines": 72,
+  "touched_outside_workdir": []
+}

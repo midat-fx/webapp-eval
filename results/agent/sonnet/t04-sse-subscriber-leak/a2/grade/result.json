@@ -1,0 +1,17 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "closed tabs release their Redis subscriber and connection",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "open calendar still updates live, also after other tabs closed",
+      "pass": true
+    }
+  ],
+  "task": "t04-sse-subscriber-leak",
+  "seconds": 80.3
+}

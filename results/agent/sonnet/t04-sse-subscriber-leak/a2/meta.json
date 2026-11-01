@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 25.0,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.11822869999999999,
+  "is_error": false,
+  "result_text": "I fixed the leak in `src/app/api/admin/events/route.ts`. I haven't run it against Redis, because none is available here, so the teardown is untested. `tsc` shows one error, `LayoutProps` not found in `src/app/layout.tsx`. That file is outside this change, and I didn't check whether it's already there on a clean checkout.\n\nThe cause was that each calendar stream opened its own Redis connection with `redis().duplicate()` and never closed it. The 25-second ping timer was never cleared either. So every tab, and every navigation back to the calendar, left a subscriber behind.\n\nEach stream now cleans up when the client disconnects or the stream is cancelled, and again if the client is already gone before subscribing finishes. Cleanup stops the ping timer, drops the message listener, unsubscribes from `calendar:<business id>` and quits the connection, so the connection should go away within a moment of the tab closing.\n\nEach open tab still gets its own subscriber, so bookings should still appear live in the tabs that remain. A failed subscribe returns a 503 instead of leaving a connection open.\n\nThe client in `src/app/admin/live.tsx` already closes its `EventSource` on unmount, so I left it alone.",
+  "stderr": "",
+  "patch_lines": 74,
+  "touched_outside_workdir": []
+}

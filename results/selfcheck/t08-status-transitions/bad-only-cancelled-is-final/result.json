@@ -1,0 +1,51 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "a cancelled booking stays cancelled",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "a completed booking can't be cancelled or turned into a no-show",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"c\u001b[7momplet\u001b[27med\"\u001b[39m\nReceived: \u001b[31m\"c\u001b[7mancell\u001b[27med\"\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "simultaneous clicks on two servers: exactly one change wins",
+      "pass": false,
+      "detail": "Error: audit trail of 3dbb3ff5-e327-4f29-bf2a-604c5b2ab35d\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 0\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[2m    \"booking.cancelled\",\u001b[22m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "playwright",
+      "name": "normal use still works",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "at_most_one_status_change_per_booking",
+      "pass": false,
+      "detail": "[{\"entity_id\":\"25f3e443-53ff-43e1-bfb7-002a6a4145ff\",\"array_agg\":[\"booking.cancelled\",\"booking.completed\",\"booking.no_show\"]},{\"entity_id\":\"3dbb3ff5-e327-4f29-bf2a-604c5b2ab35d\",\"array_agg\":[\"booking.completed\",\"booking.cancelled\"]}]"
+    },
+    {
+      "kind": "sql",
+      "name": "audit_matches_final_status",
+      "pass": false,
+      "detail": "[{\"id\":\"25f3e443-53ff-43e1-bfb7-002a6a4145ff\",\"status\":\"cancelled\",\"action\":\"booking.no_show\"},{\"id\":\"25f3e443-53ff-43e1-bfb7-002a6a4145ff\",\"status\":\"cancelled\",\"action\":\"booking.completed\"},{\"id\":\"3dbb3ff5-e327-4f29-bf2a-604c5b2ab35d\",\"status\":\"cancelled\",\"action\":\"booking.completed\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_offers_only_for_cancelled",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "cancellation_messages_only_for_cancelled",
+      "pass": true
+    }
+  ],
+  "task": "t08-status-transitions",
+  "seconds": 45.5
+}
