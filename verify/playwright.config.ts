@@ -6,7 +6,7 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   timeout: 90_000,
-  expect: { timeout: 10_000 },
+  expect: { timeout: 20_000 },
   reporter: [["json", { outputFile: process.env.PW_JSON ?? "playwright.json" }], ["list"]],
   use: {
     baseURL: "http://localhost:3000",

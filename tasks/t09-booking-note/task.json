@@ -1,0 +1,7 @@
+{
+  "id": "t09-booking-note",
+  "title": "Let clients leave a note with their booking",
+  "category": "feature",
+  "origin": "new feature (the bookings.note column exists but is unused)",
+  "instances": 1
+}
