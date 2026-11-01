@@ -1,0 +1,10 @@
+{"ts":"2026-11-01T08:05:47.778Z","step":"start","status":"ok","detail":"t07-staff-permissions"}
+{"ts":"2026-11-01T08:05:47.803Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T08:05:47.871Z","step":"apply","status":"ok","detail":"8 files touched"}
+{"ts":"2026-11-01T08:06:38.879Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T08:06:44.507Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T08:06:49.985Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T08:06:51.394Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T08:07:19.698Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-01T08:07:19.929Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-01T08:07:20.039Z","step":"done","status":"auto","detail":"checks"}

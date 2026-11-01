@@ -1,0 +1,58 @@
+diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
+index 1a0aabc..7b7145b 100644
+--- a/src/app/api/admin/events/route.ts
++++ b/src/app/api/admin/events/route.ts
+@@ -6,25 +6,44 @@ export const dynamic = "force-dynamic";
+ 
+ // SSE stream of calendar changes for the admin UI.
+ // Each connection gets its own Redis subscriber (a subscribing connection
+-// can't run other commands).
+-export async function GET() {
++// can't run other commands). It must be torn down when the client leaves,
++// otherwise every tab leaks a connection.
++export async function GET(request: Request) {
+   const session = await getSession();
+   if (!session) return new Response("unauthorized", { status: 401 });
+ 
+   const sub = redis().duplicate();
+-  await sub.subscribe(calendarChannel(session.businessId));
+   const encoder = new TextEncoder();
++  let ping: ReturnType<typeof setInterval> | undefined;
++  let closed = false;
++
++  const close = () => {
++    if (closed) return;
++    closed = true;
++    clearInterval(ping);
++    sub.removeAllListeners("message");
++    sub.disconnect();
++  };
++  request.signal.addEventListener("abort", close);
+ 
+   const stream = new ReadableStream({
+-    start(controller) {
+-      controller.enqueue(encoder.encode(`event: hello\ndata: {}\n\n`));
+-      sub.on("message", (_channel, message) => {
+-        controller.enqueue(encoder.encode(`data: ${message}\n\n`));
+-      });
+-      setInterval(() => {
++    async start(controller) {
++      try {
++        controller.enqueue(encoder.encode(`event: hello\ndata: {}\n\n`));
++        sub.on("message", (_channel, message) => {
++          controller.enqueue(encoder.encode(`data: ${message}\n\n`));
++        });
++        await sub.subscribe(calendarChannel(session.businessId));
++      } catch (err) {
++        close();
++        throw err;
++      }
++      if (closed) return;
++      ping = setInterval(() => {
+         controller.enqueue(encoder.encode(`: ping\n\n`));
+       }, 25_000);
+     },
++    cancel: close,
+   });
+ 
+   return new Response(stream, {

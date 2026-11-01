@@ -1,0 +1,1491 @@
+diff --git a/drizzle/0004_booking_no_overlap.sql b/drizzle/0004_booking_no_overlap.sql
+new file mode 100644
+index 0000000..623ec87
+--- /dev/null
++++ b/drizzle/0004_booking_no_overlap.sql
+@@ -0,0 +1,3 @@
++CREATE EXTENSION IF NOT EXISTS btree_gist;
++--> statement-breakpoint
++ALTER TABLE "bookings" ADD CONSTRAINT "bookings_no_overlap_confirmed" EXCLUDE USING gist ("staff_id" WITH =, tstzrange("start_at", "end_at") WITH &&) WHERE ("status" = 'confirmed');
+diff --git a/drizzle/meta/0004_snapshot.json b/drizzle/meta/0004_snapshot.json
+new file mode 100644
+index 0000000..03b96e7
+--- /dev/null
++++ b/drizzle/meta/0004_snapshot.json
+@@ -0,0 +1,1291 @@
++{
++  "id": "60e529e4-4b70-4bec-8130-503991bcd0ab",
++  "prevId": "085d5079-f5ef-4c1d-9c82-87c388f3cc4d",
++  "version": "7",
++  "dialect": "postgresql",
++  "tables": {
++    "public.audit_log": {
++      "name": "audit_log",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "actor_user_id": {
++          "name": "actor_user_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "action": {
++          "name": "action",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "entity": {
++          "name": "entity",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "entity_id": {
++          "name": "entity_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "meta": {
++          "name": "meta",
++          "type": "jsonb",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "audit_log_business_id_businesses_id_fk": {
++          "name": "audit_log_business_id_businesses_id_fk",
++          "tableFrom": "audit_log",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "audit_log_actor_user_id_users_id_fk": {
++          "name": "audit_log_actor_user_id_users_id_fk",
++          "tableFrom": "audit_log",
++          "tableTo": "users",
++          "columnsFrom": [
++            "actor_user_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.bookings": {
++      "name": "bookings",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "staff_id": {
++          "name": "staff_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "service_id": {
++          "name": "service_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "client_id": {
++          "name": "client_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "start_at": {
++          "name": "start_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "end_at": {
++          "name": "end_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'confirmed'"
++        },
++        "price_kzt": {
++          "name": "price_kzt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "note": {
++          "name": "note",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "bookings_business_id_businesses_id_fk": {
++          "name": "bookings_business_id_businesses_id_fk",
++          "tableFrom": "bookings",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "bookings_staff_id_staff_id_fk": {
++          "name": "bookings_staff_id_staff_id_fk",
++          "tableFrom": "bookings",
++          "tableTo": "staff",
++          "columnsFrom": [
++            "staff_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        },
++        "bookings_service_id_services_id_fk": {
++          "name": "bookings_service_id_services_id_fk",
++          "tableFrom": "bookings",
++          "tableTo": "services",
++          "columnsFrom": [
++            "service_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        },
++        "bookings_client_id_clients_id_fk": {
++          "name": "bookings_client_id_clients_id_fk",
++          "tableFrom": "bookings",
++          "tableTo": "clients",
++          "columnsFrom": [
++            "client_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.business_hours": {
++      "name": "business_hours",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "weekday": {
++          "name": "weekday",
++          "type": "smallint",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "open_time": {
++          "name": "open_time",
++          "type": "time",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "close_time": {
++          "name": "close_time",
++          "type": "time",
++          "primaryKey": false,
++          "notNull": true
++        }
++      },
++      "indexes": {
++        "business_hours_unique": {
++          "name": "business_hours_unique",
++          "columns": [
++            {
++              "expression": "business_id",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "weekday",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": true,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        }
++      },
++      "foreignKeys": {
++        "business_hours_business_id_businesses_id_fk": {
++          "name": "business_hours_business_id_businesses_id_fk",
++          "tableFrom": "business_hours",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.businesses": {
++      "name": "businesses",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "slug": {
++          "name": "slug",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "timezone": {
++          "name": "timezone",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'Asia/Almaty'"
++        },
++        "currency": {
++          "name": "currency",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'KZT'"
++        },
++        "hold_ttl_sec": {
++          "name": "hold_ttl_sec",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "default": 300
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {
++        "businesses_slug_unique": {
++          "name": "businesses_slug_unique",
++          "nullsNotDistinct": false,
++          "columns": [
++            "slug"
++          ]
++        }
++      },
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.clients": {
++      "name": "clients",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "phone": {
++          "name": "phone",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {
++        "clients_business_phone_unique": {
++          "name": "clients_business_phone_unique",
++          "columns": [
++            {
++              "expression": "business_id",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "phone",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": true,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        }
++      },
++      "foreignKeys": {
++        "clients_business_id_businesses_id_fk": {
++          "name": "clients_business_id_businesses_id_fk",
++          "tableFrom": "clients",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.message_log": {
++      "name": "message_log",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "outbox_id": {
++          "name": "outbox_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "channel": {
++          "name": "channel",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "recipient": {
++          "name": "recipient",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "subject": {
++          "name": "subject",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "message_log_business_id_businesses_id_fk": {
++          "name": "message_log_business_id_businesses_id_fk",
++          "tableFrom": "message_log",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "message_log_outbox_id_outbox_id_fk": {
++          "name": "message_log_outbox_id_outbox_id_fk",
++          "tableFrom": "message_log",
++          "tableTo": "outbox",
++          "columnsFrom": [
++            "outbox_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "set null",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.outbox": {
++      "name": "outbox",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "topic": {
++          "name": "topic",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "payload": {
++          "name": "payload",
++          "type": "jsonb",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "dedupe_key": {
++          "name": "dedupe_key",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "available_at": {
++          "name": "available_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'pending'"
++        },
++        "attempts": {
++          "name": "attempts",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "default": 0
++        },
++        "max_attempts": {
++          "name": "max_attempts",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "default": 5
++        },
++        "last_error": {
++          "name": "last_error",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {
++        "outbox_dedupe_key_unique": {
++          "name": "outbox_dedupe_key_unique",
++          "columns": [
++            {
++              "expression": "dedupe_key",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": true,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        },
++        "outbox_claim_idx": {
++          "name": "outbox_claim_idx",
++          "columns": [
++            {
++              "expression": "status",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "available_at",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": false,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        }
++      },
++      "foreignKeys": {
++        "outbox_business_id_businesses_id_fk": {
++          "name": "outbox_business_id_businesses_id_fk",
++          "tableFrom": "outbox",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.services": {
++      "name": "services",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "duration_min": {
++          "name": "duration_min",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "price_kzt": {
++          "name": "price_kzt",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "is_active": {
++          "name": "is_active",
++          "type": "boolean",
++          "primaryKey": false,
++          "notNull": true,
++          "default": true
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "services_business_id_businesses_id_fk": {
++          "name": "services_business_id_businesses_id_fk",
++          "tableFrom": "services",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.staff": {
++      "name": "staff",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "user_id": {
++          "name": "user_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "is_active": {
++          "name": "is_active",
++          "type": "boolean",
++          "primaryKey": false,
++          "notNull": true,
++          "default": true
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "staff_business_id_businesses_id_fk": {
++          "name": "staff_business_id_businesses_id_fk",
++          "tableFrom": "staff",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "staff_user_id_users_id_fk": {
++          "name": "staff_user_id_users_id_fk",
++          "tableFrom": "staff",
++          "tableTo": "users",
++          "columnsFrom": [
++            "user_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.staff_hours": {
++      "name": "staff_hours",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "staff_id": {
++          "name": "staff_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "weekday": {
++          "name": "weekday",
++          "type": "smallint",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "start_time": {
++          "name": "start_time",
++          "type": "time",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "end_time": {
++          "name": "end_time",
++          "type": "time",
++          "primaryKey": false,
++          "notNull": true
++        }
++      },
++      "indexes": {
++        "staff_hours_unique": {
++          "name": "staff_hours_unique",
++          "columns": [
++            {
++              "expression": "staff_id",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "weekday",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": true,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        }
++      },
++      "foreignKeys": {
++        "staff_hours_staff_id_staff_id_fk": {
++          "name": "staff_hours_staff_id_staff_id_fk",
++          "tableFrom": "staff_hours",
++          "tableTo": "staff",
++          "columnsFrom": [
++            "staff_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.staff_services": {
++      "name": "staff_services",
++      "schema": "",
++      "columns": {
++        "staff_id": {
++          "name": "staff_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "service_id": {
++          "name": "service_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "staff_services_staff_id_staff_id_fk": {
++          "name": "staff_services_staff_id_staff_id_fk",
++          "tableFrom": "staff_services",
++          "tableTo": "staff",
++          "columnsFrom": [
++            "staff_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "staff_services_service_id_services_id_fk": {
++          "name": "staff_services_service_id_services_id_fk",
++          "tableFrom": "staff_services",
++          "tableTo": "services",
++          "columnsFrom": [
++            "service_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {
++        "staff_services_staff_id_service_id_pk": {
++          "name": "staff_services_staff_id_service_id_pk",
++          "columns": [
++            "staff_id",
++            "service_id"
++          ]
++        }
++      },
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.users": {
++      "name": "users",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "password_hash": {
++          "name": "password_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "name": {
++          "name": "name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "role": {
++          "name": "role",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'staff'"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {
++        "users_business_id_businesses_id_fk": {
++          "name": "users_business_id_businesses_id_fk",
++          "tableFrom": "users",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "no action",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {
++        "users_email_unique": {
++          "name": "users_email_unique",
++          "nullsNotDistinct": false,
++          "columns": [
++            "email"
++          ]
++        }
++      },
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    },
++    "public.waitlist_entries": {
++      "name": "waitlist_entries",
++      "schema": "",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "uuid",
++          "primaryKey": true,
++          "notNull": true,
++          "default": "gen_random_uuid()"
++        },
++        "business_id": {
++          "name": "business_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "service_id": {
++          "name": "service_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "staff_id": {
++          "name": "staff_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "client_id": {
++          "name": "client_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "date_iso": {
++          "name": "date_iso",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "'waiting'"
++        },
++        "offer_token": {
++          "name": "offer_token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "offer_hold_token": {
++          "name": "offer_hold_token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "offer_slot_start_at": {
++          "name": "offer_slot_start_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "offer_slot_end_at": {
++          "name": "offer_slot_end_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "offer_expires_at": {
++          "name": "offer_expires_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "offer_staff_id": {
++          "name": "offer_staff_id",
++          "type": "uuid",
++          "primaryKey": false,
++          "notNull": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "timestamp with time zone",
++          "primaryKey": false,
++          "notNull": true,
++          "default": "now()"
++        }
++      },
++      "indexes": {
++        "waitlist_offer_token_unique": {
++          "name": "waitlist_offer_token_unique",
++          "columns": [
++            {
++              "expression": "offer_token",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": true,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        },
++        "waitlist_queue_idx": {
++          "name": "waitlist_queue_idx",
++          "columns": [
++            {
++              "expression": "business_id",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "date_iso",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "status",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            },
++            {
++              "expression": "created_at",
++              "isExpression": false,
++              "asc": true,
++              "nulls": "last"
++            }
++          ],
++          "isUnique": false,
++          "concurrently": false,
++          "method": "btree",
++          "with": {}
++        }
++      },
++      "foreignKeys": {
++        "waitlist_entries_business_id_businesses_id_fk": {
++          "name": "waitlist_entries_business_id_businesses_id_fk",
++          "tableFrom": "waitlist_entries",
++          "tableTo": "businesses",
++          "columnsFrom": [
++            "business_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "waitlist_entries_service_id_services_id_fk": {
++          "name": "waitlist_entries_service_id_services_id_fk",
++          "tableFrom": "waitlist_entries",
++          "tableTo": "services",
++          "columnsFrom": [
++            "service_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "waitlist_entries_staff_id_staff_id_fk": {
++          "name": "waitlist_entries_staff_id_staff_id_fk",
++          "tableFrom": "waitlist_entries",
++          "tableTo": "staff",
++          "columnsFrom": [
++            "staff_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "waitlist_entries_client_id_clients_id_fk": {
++          "name": "waitlist_entries_client_id_clients_id_fk",
++          "tableFrom": "waitlist_entries",
++          "tableTo": "clients",
++          "columnsFrom": [
++            "client_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "cascade",
++          "onUpdate": "no action"
++        },
++        "waitlist_entries_offer_staff_id_staff_id_fk": {
++          "name": "waitlist_entries_offer_staff_id_staff_id_fk",
++          "tableFrom": "waitlist_entries",
++          "tableTo": "staff",
++          "columnsFrom": [
++            "offer_staff_id"
++          ],
++          "columnsTo": [
++            "id"
++          ],
++          "onDelete": "set null",
++          "onUpdate": "no action"
++        }
++      },
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "policies": {},
++      "checkConstraints": {},
++      "isRLSEnabled": false
++    }
++  },
++  "enums": {},
++  "schemas": {},
++  "sequences": {},
++  "roles": {},
++  "policies": {},
++  "views": {},
++  "_meta": {
++    "columns": {},
++    "schemas": {},
++    "tables": {}
++  }
++}
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index ecdda1a..d621c70 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1786183773099,
+       "tag": "0003_waitlist",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "7",
++      "when": 1793491200000,
++      "tag": "0004_booking_no_overlap",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/src/lib/booking.integration.test.ts b/src/lib/booking.integration.test.ts
+index ad73ba6..725039e 100644
+--- a/src/lib/booking.integration.test.ts
++++ b/src/lib/booking.integration.test.ts
+@@ -178,6 +178,38 @@ describe("concurrency", () => {
+     expect(await db.select().from(s.bookings)).toHaveLength(1);
+   });
+ 
++  // Holds are keyed by start time, so these two both get a hold, yet they overlap.
++  it("rejects an overlapping booking that starts at a different time", async () => {
++    const start = atLocal(date, "14:00", f.business.timezone);
++    const a = { startMs: start, endMs: start + 3600_000 };
++    const b = { startMs: start + 15 * 60_000, endMs: start + 4500_000 };
++    const tokenA = (await createHold(f.master.id, a, 300))!;
++    const tokenB = (await createHold(f.master.id, b, 300))!;
++
++    const results = await Promise.all([
++      createBooking({
++        businessId: f.business.id,
++        staffId: f.master.id,
++        serviceId: f.service.id,
++        slot: a,
++        holdToken: tokenA,
++        client: { name: "Women", phone: "+77010000020" },
++      }),
++      createBooking({
++        businessId: f.business.id,
++        staffId: f.master.id,
++        serviceId: f.service.id,
++        slot: b,
++        holdToken: tokenB,
++        client: { name: "Men", phone: "+77010000021" },
++      }),
++    ]);
++
++    expect(results.filter((r) => r.ok)).toHaveLength(1);
++    expect(results).toContainEqual({ ok: false, error: "slot_taken" });
++    expect(await db.select().from(s.bookings)).toHaveLength(1);
++  });
++
+   it("allows overlapping bookings for different masters", async () => {
+     const [second] = await db
+       .insert(s.staff)
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..9e3f456 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, DrizzleQueryError, eq, gte, inArray, lt } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -161,57 +161,72 @@ export async function createBooking(opts: {
+ 
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
+-  const bookingId = await db.transaction(async (tx) => {
+-    const [booking] = await tx
+-      .insert(s.bookings)
+-      .values({
+-        businessId,
+-        staffId,
+-        serviceId,
+-        clientId: clientRow.id,
+-        startAt: new Date(slot.startMs),
+-        endAt: new Date(slot.endMs),
+-        status: "confirmed",
+-        priceKzt: service.priceKzt,
+-      })
+-      .returning();
+-
+-    await tx.insert(s.auditLog).values({
+-      businessId,
+-      action: "booking.create",
+-      entity: "booking",
+-      entityId: booking.id,
+-      meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
+-    });
++  // Holds only cover identical start times, so overlaps are rejected by the
++  // database (exclusion constraint, migration 0004) and reported as a lost race.
++  let bookingId: string;
++  try {
++    bookingId = await db.transaction(async (tx) => {
++      const [booking] = await tx
++        .insert(s.bookings)
++        .values({
++          businessId,
++          staffId,
++          serviceId,
++          clientId: clientRow.id,
++          startAt: new Date(slot.startMs),
++          endAt: new Date(slot.endMs),
++          status: "confirmed",
++          priceKzt: service.priceKzt,
++        })
++        .returning();
+ 
+-    await enqueue(tx, {
+-      businessId,
+-      topic: "booking.confirmed",
+-      payload: { bookingId: booking.id },
+-      dedupeKey: `booking.confirmed:${booking.id}`,
+-    });
++      await tx.insert(s.auditLog).values({
++        businessId,
++        action: "booking.create",
++        entity: "booking",
++        entityId: booking.id,
++        meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
++      });
+ 
+-    // Reminder the day before; retired automatically if the booking is
+-    // cancelled before the worker gets to it.
+-    const remindAt = new Date(slot.startMs - 24 * 3600_000);
+-    if (remindAt.getTime() > Date.now()) {
+       await enqueue(tx, {
+         businessId,
+-        topic: "booking.reminder",
++        topic: "booking.confirmed",
+         payload: { bookingId: booking.id },
+-        dedupeKey: `booking.reminder:${booking.id}`,
+-        availableAt: remindAt,
++        dedupeKey: `booking.confirmed:${booking.id}`,
+       });
+-    }
+ 
+-    return booking.id;
+-  });
++      // Reminder the day before; retired automatically if the booking is
++      // cancelled before the worker gets to it.
++      const remindAt = new Date(slot.startMs - 24 * 3600_000);
++      if (remindAt.getTime() > Date.now()) {
++        await enqueue(tx, {
++          businessId,
++          topic: "booking.reminder",
++          payload: { bookingId: booking.id },
++          dedupeKey: `booking.reminder:${booking.id}`,
++          availableAt: remindAt,
++        });
++      }
++
++      return booking.id;
++    });
++  } catch (err) {
++    if (isOverlapViolation(err)) return { ok: false, error: "slot_taken" };
++    throw err;
++  }
+ 
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });
+   return { ok: true, bookingId };
+ }
+ 
++const OVERLAP_CONSTRAINT = "bookings_no_overlap_confirmed";
++
++function isOverlapViolation(err: unknown): boolean {
++  const pgErr = err instanceof DrizzleQueryError ? err.cause : err;
++  return (pgErr as { constraint?: string } | undefined)?.constraint === OVERLAP_CONSTRAINT;
++}
++
+ export async function setBookingStatus(opts: {
+   businessId: string;
+   bookingId: string;

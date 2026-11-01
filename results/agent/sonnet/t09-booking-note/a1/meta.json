@@ -1,0 +1,28 @@
+{
+  "task": "t09-booking-note",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 39.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 7,
+  "cost_usd": 0.2505498,
+  "is_error": false,
+  "result_text": "Clients can now add an optional note at step 4, and it shows on the admin calendar card. Unit tests pass and the files I edited lint clean. I couldn't run the integration tests, the dev server or axe here, so none of this has been exercised against a real booking. `tsc --noEmit` reports one error, in `src/app/layout.tsx` (`LayoutProps` not found). I didn't touch that file and didn't check it against the original code.\n\n- **Booking form** (`src/app/[slug]/wizard.tsx`): there's a new \"Note (optional)\" textarea with a real `<label>`, limited to 500 characters. The Name and Phone inputs only had placeholders, so I gave them proper labels too, otherwise the step would still fail axe. The \"bad request\" message now also mentions the note limit.\n- **Public API** (`src/app/api/public/[slug]/book/route.ts`): the note is trimmed, and an empty or whitespace-only note becomes `NULL`. A note over 500 characters is rejected with `400 bad_request` before anything is created. Line breaks inside the note are kept.\n- **Saving** (`src/lib/booking.ts`): `createBooking` takes the note and writes it to the existing `bookings.note` column. It trims again there, so callers other than the API get the same behaviour.\n- **Admin calendar** (`src/app/admin/page.tsx`): the booking card shows the note as plain text (React escapes it), with line breaks preserved and long words wrapped.\n\nThe 500-character limit counts UTF-16 code units, like the browser's `maxLength`. A note made of emoji would hit the limit at about 250 characters.",
+  "stderr": "",
+  "patch_lines": 167,
+  "touched_outside_workdir": []
+}

@@ -1,0 +1,73 @@
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index ff1de20..5dec246 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -20,6 +20,48 @@ describe("localTimeToUtc", () => {
+   });
+ });
+ 
++describe("localTimeToUtc across DST transitions", () => {
++  it("Berlin summer-time start day: 10:00 is CEST (UTC+2)", () => {
++    expect(localTimeToUtc("2027-03-28", "10:00", "Europe/Berlin")).toBe(Date.UTC(2027, 2, 28, 8, 0));
++    expect(localTimeToUtc("2027-03-28", "20:00", "Europe/Berlin")).toBe(Date.UTC(2027, 2, 28, 18, 0));
++  });
++  it("Berlin winter-time start day: 10:00 is CET (UTC+1)", () => {
++    expect(localTimeToUtc("2027-10-31", "10:00", "Europe/Berlin")).toBe(Date.UTC(2027, 9, 31, 9, 0));
++    expect(localTimeToUtc("2027-10-31", "20:00", "Europe/Berlin")).toBe(Date.UTC(2027, 9, 31, 19, 0));
++  });
++  it("New York clock-change days", () => {
++    expect(localTimeToUtc("2027-03-14", "10:00", "America/New_York")).toBe(Date.UTC(2027, 2, 14, 14, 0));
++    expect(localTimeToUtc("2027-11-07", "10:00", "America/New_York")).toBe(Date.UTC(2027, 10, 7, 15, 0));
++  });
++});
++
++describe("slotsForDay on a DST transition day", () => {
++  it("Berlin Sunday 28 Mar 2027 opens at 10:00 local and closes at 20:00 local", () => {
++    const slots = slotsForDay({
++      dateISO: "2027-03-28",
++      timeZone: "Europe/Berlin",
++      window: { open: "10:00", close: "20:00" },
++      durationMin: 60,
++      stepMin: 60,
++    });
++    expect(slots[0].startMs).toBe(Date.UTC(2027, 2, 28, 8, 0));
++    expect(slots[slots.length - 1].endMs).toBe(Date.UTC(2027, 2, 28, 18, 0));
++    expect(slots).toHaveLength(10);
++  });
++  it("Berlin Sunday 31 Oct 2027 does not offer 09:00", () => {
++    const slots = slotsForDay({
++      dateISO: "2027-10-31",
++      timeZone: "Europe/Berlin",
++      window: { open: "10:00", close: "20:00" },
++      durationMin: 60,
++      stepMin: 60,
++    });
++    expect(slots[0].startMs).toBe(Date.UTC(2027, 9, 31, 9, 0));
++    expect(slots[slots.length - 1].endMs).toBe(Date.UTC(2027, 9, 31, 19, 0));
++    expect(slots).toHaveLength(10);
++  });
++});
++
+ describe("isoWeekday", () => {
+   it("Monday=1, Sunday=7", () => {
+     expect(isoWeekday("2026-08-10")).toBe(1); // Monday
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index 0ae9530..f60651c 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -36,10 +36,11 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+-  // The zone's offset is taken once, at the start of the date: building an
+-  // Intl formatter is the expensive part, and a day has a single offset.
+-  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
+-  return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
++  const wallAsUtc = Date.UTC(y, m - 1, d, hh, mm);
++  // Offsets differ before and after a DST transition within the same day, so
++  // resolve the offset at the candidate instant and refine once.
++  const firstGuess = wallAsUtc - tzOffsetMinutes(timeZone, wallAsUtc) * 60000;
++  return wallAsUtc - tzOffsetMinutes(timeZone, firstGuess) * 60000;
+ }
+ 
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */

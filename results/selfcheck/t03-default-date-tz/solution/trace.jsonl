@@ -1,0 +1,9 @@
+{"ts":"2026-11-01T07:32:15.364Z","step":"start","status":"ok","detail":"t03-default-date-tz"}
+{"ts":"2026-11-01T07:32:15.397Z","step":"setup","status":"ok"}
+{"ts":"2026-11-01T07:32:15.490Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-01T07:33:27.459Z","step":"build","status":"ok"}
+{"ts":"2026-11-01T07:33:31.194Z","step":"services","status":"ok"}
+{"ts":"2026-11-01T07:33:34.477Z","step":"seed","status":"ok"}
+{"ts":"2026-11-01T07:33:35.636Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-01T07:33:40.929Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-01T07:33:41.034Z","step":"done","status":"auto","detail":"checks"}

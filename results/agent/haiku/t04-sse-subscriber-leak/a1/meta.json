@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 54.0,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 12,
+  "cost_usd": 0.42020899999999994,
+  "is_error": false,
+  "result_text": "The leak is fixed in `src/app/api/admin/events/route.ts`. Each admin calendar connection now releases its Redis subscriber and stops its keep-alive timer as soon as the browser disconnects, and live updates for open tabs are unchanged.\n\n**Cause:** every GET created a dedicated Redis connection and subscribed it, but nothing ever cleaned it up. The 25-second ping timer also kept running after the tab closed.\n\n**Change:** cleanup now runs from either the request's abort signal or the stream's `cancel` callback. Both call one idempotent `close()` that clears the timer, removes the message listener, and disconnects the subscriber. If the initial subscribe fails, the connection is also closed so a failed attempt can't leak one.\n\n**Verification:** `tsc` shows no new errors (the one reported in `src/app/layout.tsx` predates this change), eslint is clean on the file, and the unit tests pass. I couldn't run it against a live Redis here, so the \"connection disappears within seconds\" behaviour is untested. Checking `CLIENT LIST` after closing a tab would confirm it.",
+  "stderr": "",
+  "patch_lines": 58,
+  "touched_outside_workdir": []
+}

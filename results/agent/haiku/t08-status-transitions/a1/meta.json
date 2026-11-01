@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 73.2,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 14,
+  "cost_usd": 0.7232890000000001,
+  "is_error": false,
+  "result_text": "Only confirmed bookings can change status now, and each booking changes at most once, even when attempts race across app servers. The change is in `setBookingStatus` in `src/lib/booking.ts`, and the UPDATE now requires `status = 'confirmed'`.\n\n- **Stale or repeated attempts:** a cancel on a completed booking matches no row, so there's no audit entry, no `booking.cancelled` message, no waitlist offer, and no calendar event.\n- **Simultaneous clicks:** the second writer waits on the row lock, then re-checks the condition against the committed row and updates nothing. This relies on Postgres's default READ COMMITTED behavior, so it holds across servers without a Redis lock.\n\nI also added two integration tests to `src/lib/booking.integration.test.ts`. They cover cancel-after-complete and three racing attempts, and they expect exactly one audit entry. I could not run them because Postgres isn't available here. `pnpm test` and `pnpm build` pass. The changes are uncommitted in the working tree.",
+  "stderr": "",
+  "patch_lines": 105,
+  "touched_outside_workdir": []
+}

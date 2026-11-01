@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   SLUG, apiHoldAndBook, biz, almaty, openWizard, pickDate, pickMaster, pickService, pickSlot,
   resetRateLimits, serviceId, staffId, upcoming,
+  nameField, phoneField,
 } from "../lib/kz";
 
 test("wizard books with a formatted phone", async ({ page }) => {
@@ -11,8 +12,8 @@ test("wizard books with a formatted phone", async ({ page }) => {
   await pickMaster(page, "Dana");
   await pickDate(page, upcoming(b.timezone, 3));
   await pickSlot(page, "11:00");
-  await page.getByPlaceholder("Name").fill("Phone Format");
-  await page.getByPlaceholder("+7701…").fill("+7 (701) 555-12-34");
+  await nameField(page).fill("Phone Format");
+  await phoneField(page).fill("+7 (701) 555-12-34");
   await page.getByRole("button", { name: "Confirm booking" }).click();
   await expect(page.getByText("You are booked!")).toBeVisible();
 });

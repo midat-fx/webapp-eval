@@ -1,0 +1,105 @@
+diff --git a/src/lib/booking.integration.test.ts b/src/lib/booking.integration.test.ts
+index 20f94cf..877dd61 100644
+--- a/src/lib/booking.integration.test.ts
++++ b/src/lib/booking.integration.test.ts
+@@ -1,7 +1,13 @@
+ import { eq } from "drizzle-orm";
+ import { afterAll, beforeEach, describe, expect, it } from "vitest";
+ import { db, schema as s } from "@/db";
+-import { createBooking, createHold, getAvailability, listHolds } from "@/lib/booking";
++import {
++  createBooking,
++  createHold,
++  getAvailability,
++  listHolds,
++  setBookingStatus,
++} from "@/lib/booking";
+ import { redis } from "@/lib/redis";
+ import { atLocal, futureDateISO, resetAll, seedBusiness, type Fixture } from "@/test/fixtures";
+ 
+@@ -249,3 +255,45 @@ describe("concurrency", () => {
+     expect(again.ok).toBe(true);
+   });
+ });
++
++describe("setBookingStatus", () => {
++  const change = (bookingId: string, status: "completed" | "cancelled" | "no_show") =>
++    setBookingStatus({
++      businessId: f.business.id,
++      bookingId,
++      status,
++      actorUserId: f.owner.id,
++    });
++
++  async function confirmedBooking() {
++    const start = atLocal(date, "13:00", f.business.timezone);
++    const result = await book(start, start + 3600_000);
++    if (!result.ok) throw new Error("setup booking failed");
++    return result.bookingId;
++  }
++
++  it("does not cancel a booking that is already completed", async () => {
++    const id = await confirmedBooking();
++    await change(id, "completed");
++    await change(id, "cancelled");
++
++    const [row] = await db.select().from(s.bookings).where(eq(s.bookings.id, id));
++    expect(row.status).toBe("completed");
++    const topics = (await db.select().from(s.outbox)).map((m) => m.topic);
++    expect(topics).not.toContain("booking.cancelled");
++    expect(topics).not.toContain("waitlist.slot_freed");
++  });
++
++  it("records exactly one status change when attempts race", async () => {
++    const id = await confirmedBooking();
++    await Promise.all([change(id, "completed"), change(id, "no_show"), change(id, "cancelled")]);
++
++    const [row] = await db.select().from(s.bookings).where(eq(s.bookings.id, id));
++    const statusChanges = (await db.select().from(s.auditLog)).filter(
++      (a) => a.action !== "booking.create",
++    );
++    expect(statusChanges).toHaveLength(1);
++    expect(statusChanges[0].action).toBe(`booking.${row.status}`);
++    expect(["completed", "no_show", "cancelled"]).toContain(row.status);
++  });
++});
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..326bbf0 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,21 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  const changed = await db.transaction(async (tx) => {
++    // The status guard lives in the UPDATE: a concurrent writer waits on the row
++    // lock, then re-checks it against the committed row and matches nothing.
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -275,8 +283,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
+-  await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  if (changed) await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 
+ export async function staffForService(businessId: string, serviceId: string) {

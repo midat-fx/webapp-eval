@@ -27,10 +27,12 @@ const announced = (page: Page, text: string | RegExp) =>
     return false;
   });
 
-const serviceButton = (page: Page, name: string) =>
-  page.locator("button, [role=radio], [role=option], label").filter({ hasText: new RegExp(`^${name}`) }).first();
-const staffButton = (page: Page, name: string) =>
-  page.locator("button, [role=radio], [role=option], label").filter({ hasText: new RegExp(`^${name}$`) }).first();
+// Found by role and accessible name (decorative aria-hidden icons don't count),
+// whether the fix kept toggle buttons or switched to radios / options.
+const choice = (page: Page, name: RegExp) =>
+  page.getByRole("button", { name }).or(page.getByRole("radio", { name })).or(page.getByRole("option", { name })).first();
+const serviceButton = (page: Page, name: string) => choice(page, new RegExp(`(^|\\W)${name}`));
+const staffButton = (page: Page, name: string) => choice(page, new RegExp(`^\\W*${name}\\W*$`));
 
 /** Click a staff member and let the times it triggers land (see pickMaster in lib/kz). */
 async function chooseStaff(page: Page, name: string) {

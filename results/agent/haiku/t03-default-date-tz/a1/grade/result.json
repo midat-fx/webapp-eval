@@ -1,0 +1,32 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Etc/GMT+12",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Etc/GMT-14",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Asia/Almaty",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in America/Los_Angeles",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Pacific/Kiritimati",
+      "pass": true
+    }
+  ],
+  "task": "t03-default-date-tz",
+  "seconds": 30.2
+}

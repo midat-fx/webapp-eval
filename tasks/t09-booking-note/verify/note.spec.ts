@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import {
   OWNER, almaty, apiHold, apiBook, biz, login, openWizard, pickDate, pickMaster, pickService, pickSlot, q,
   resetRateLimits, serviceId, staffId, upcoming,
+  nameField, phoneField,
 } from "../lib/kz";
 
 const NOTE = "Allergic to ammonia dye.\nPlease use the gentle one.";
@@ -23,8 +24,8 @@ async function toStep4(page: import("@playwright/test").Page, weekday: number, h
 
 test("wizard: labelled note is saved as typed", async ({ page }) => {
   await toStep4(page, 3, "12:00");
-  await page.getByPlaceholder("Name").fill("Note Writer");
-  await page.getByPlaceholder("+7701…").fill("+77013330001");
+  await nameField(page).fill("Note Writer");
+  await phoneField(page).fill("+77013330001");
   await page.getByLabel(/note/i).fill(`  ${NOTE}  `);
   await page.getByRole("button", { name: "Confirm booking" }).click();
   await expect(page.getByText("You are booked!")).toBeVisible();
@@ -43,8 +44,8 @@ test("step 4 has no accessibility violations", { tag: "@axe" }, async ({ page })
 
 test("wizard without a note stores NULL", async ({ page }) => {
   await toStep4(page, 4, "12:00");
-  await page.getByPlaceholder("Name").fill("No Note");
-  await page.getByPlaceholder("+7701…").fill("+77013330002");
+  await nameField(page).fill("No Note");
+  await phoneField(page).fill("+77013330002");
   await page.getByRole("button", { name: "Confirm booking" }).click();
   await expect(page.getByText("You are booked!")).toBeVisible();
   expect(await noteOf("+77013330002")).toEqual([null]);

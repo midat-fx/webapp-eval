@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 37.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 11,
+  "cost_usd": 0.1892706,
+  "is_error": false,
+  "result_text": "Only a confirmed booking can now change status, and it changes exactly once. I haven't run this against Postgres, since it isn't available here. `pnpm test` passes (12 unit tests), and `tsc` reports only a `LayoutProps` error in `src/app/layout.tsx`, a file I didn't touch.\n\nThe fix is in `setBookingStatus` in `src/lib/booking.ts`. The update now only matches a row whose status is still `confirmed`:\n\n- **Stale tab or resubmitted form:** a booking that is already completed, cancelled or no-show no longer matches. Nothing is written: no second audit entry, no cancellation message, no waitlist offer, no calendar event.\n- **Two clicks at the same moment:** Postgres makes the second update wait for the first to commit, and then it no longer matches. This holds across app servers, because the row lock is in the database.\n- **Passing `confirmed` as the new status:** this now does nothing.\n\nI didn't add a test for the concurrent case, since the integration tests need a running database.",
+  "stderr": "",
+  "patch_lines": 53,
+  "touched_outside_workdir": []
+}

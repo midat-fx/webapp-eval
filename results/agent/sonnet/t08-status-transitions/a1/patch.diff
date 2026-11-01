@@ -1,0 +1,53 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..2a421d2 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,25 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
++  if (status === "confirmed") return;
++  let changed = false;
+   await db.transaction(async (tx) => {
++    // Compare-and-set on status: only a confirmed booking transitions, and
++    // concurrent attempts (even across app servers) serialize on the row lock,
++    // so exactly one wins.
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+     if (!updated) return;
++    changed = true;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -248,10 +260,8 @@ export async function setBookingStatus(opts: {
+       entityId: bookingId,
+     });
+ 
+-    if (status !== "confirmed") {
+-      // Nobody wants a reminder for an appointment that is no longer happening.
+-      await cancelByDedupeKey(tx, `booking.reminder:${bookingId}`);
+-    }
++    // Nobody wants a reminder for an appointment that is no longer happening.
++    await cancelByDedupeKey(tx, `booking.reminder:${bookingId}`);
+     if (status === "cancelled") {
+       await enqueue(tx, {
+         businessId,
+@@ -276,7 +286,7 @@ export async function setBookingStatus(opts: {
+       });
+     }
+   });
+-  await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  if (changed) await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 
+ export async function staffForService(businessId: string, serviceId: string) {

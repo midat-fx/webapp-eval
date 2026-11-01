@@ -133,6 +133,14 @@ export async function pickSlot(page: Page, hhmm: string): Promise<void> {
   await page.getByRole("button", { name: hhmm, exact: true }).click();
 }
 
+/**
+ * The contact fields of "Your details". Found by label first, placeholder as
+ * a fallback: an agent that gives the inputs real labels (and drops the
+ * placeholders) must not fail an unrelated check.
+ */
+export const nameField = (page: Page) => page.getByLabel(/name/i).or(page.getByPlaceholder("Name")).first();
+export const phoneField = (page: Page) => page.getByLabel(/phone/i).or(page.getByPlaceholder("+7701…")).first();
+
 // ---------- public HTTP API ----------
 
 export type Slot = { startMs: number; endMs: number };

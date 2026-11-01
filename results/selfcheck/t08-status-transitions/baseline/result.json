@@ -1,0 +1,54 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "a cancelled booking stays cancelled",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 0\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"booking.cancelled\",\u001b[22m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "playwright",
+      "name": "a completed booking can't be cancelled or turned into a no-show",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 0\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"booking.completed\",\u001b[22m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "playwright",
+      "name": "simultaneous clicks on two servers: exactly one change wins",
+      "pass": false,
+      "detail": "Error: audit trail of 3d4409fb-4ced-49ff-92be-fd9235306766\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 0\u001b[39m\n\u001b[31m+ Received  + 8\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    \"booking.no_show\",\u001b[22m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "playwright",
+      "name": "normal use still works",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "at_most_one_status_change_per_booking",
+      "pass": false,
+      "detail": "[{\"entity_id\":\"3d4409fb-4ced-49ff-92be-fd9235306766\",\"array_agg\":[\"booking.completed\",\"booking.cancelled\",\"booking.completed\",\"booking.cancelled\",\"booking.no_show\",\"booking.no_show\",\"booking.completed\",\"booking.cancelled\",\"booking.no_show\"]},{\"entity_id\":\"546f9593-53f3-470e-9782-4992256c52ad\",\"array_agg\":[\"booking.cancelled\",\"booking.completed\",\"booking.no_show\",\"booking.cancelled\"]},{\"entity_id\":\"b0ea6d2b-185c-4c29-a536-1f3736360469\",\"array_agg\":[\"booking.completed\",\"booking.cancelled\",\"booking.no_show\",\"booking.completed\"]}]"
+    },
+    {
+      "kind": "sql",
+      "name": "audit_matches_final_status",
+      "pass": false,
+      "detail": "[{\"id\":\"546f9593-53f3-470e-9782-4992256c52ad\",\"status\":\"cancelled\",\"action\":\"booking.no_show\"},{\"id\":\"546f9593-53f3-470e-9782-4992256c52ad\",\"status\":\"cancelled\",\"action\":\"booking.completed\"},{\"id\":\"b0ea6d2b-185c-4c29-a536-1f3736360469\",\"status\":\"completed\",\"action\":\"booking.cancelled\"},{\"id\":\"b0ea6d2b-185c-4c29-a536-1f3736360469\",\"status\":\"completed\",\"action\":\"booking.no_show\"},{\"id\":\"3d4409fb-4ced-49ff-92be-fd9235306766\",\"status\":\"no_show\",\"action\":\"booking.completed\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_offers_only_for_cancelled",
+      "pass": false,
+      "detail": "[{\"id\":\"b0ea6d2b-185c-4c29-a536-1f3736360469\",\"status\":\"completed\"},{\"id\":\"3d4409fb-4ced-49ff-92be-fd9235306766\",\"status\":\"no_show\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "cancellation_messages_only_for_cancelled",
+      "pass": false,
+      "detail": "[{\"id\":\"b0ea6d2b-185c-4c29-a536-1f3736360469\",\"status\":\"completed\"},{\"id\":\"3d4409fb-4ced-49ff-92be-fd9235306766\",\"status\":\"no_show\"}]"
+    }
+  ],
+  "task": "t08-status-transitions",
+  "seconds": 353.8
+}

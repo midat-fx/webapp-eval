@@ -1,0 +1,28 @@
+{
+  "task": "t10-wizard-a11y",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 46.4,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 7,
+  "cost_usd": 0.1990468,
+  "is_error": false,
+  "result_text": "I fixed all four problems in `src/app/[slug]/wizard.tsx`. I haven't run axe or loaded the page in a browser; Postgres and Redis aren't running here, so the dev server wouldn't start. Unit tests pass and eslint is clean on the wizard. `tsc` reports one error, `LayoutProps` not found in `src/app/layout.tsx`, a file I didn't touch. I didn't run `pnpm build` or check whether that error is new.\n\n- **Labels:** The date picker now has a \"Date\" label. Name and phone, in both \"Your details\" and the waitlist box, now have visible \"Name\" and \"Phone\" labels, and the placeholders are still there. I also added `autocomplete` hints for name and phone.\n- **Contrast:** \"Loading\u2026\" and the unselected service durations went from `zinc-400` to `zinc-600`. The selected-state duration colour was already readable, so I left it.\n- **Errors:** The shared error line and the waitlist error now have `role=\"alert\"`. The waitlist \"You are on the waitlist\" message and \"Loading\u2026\" have `role=\"status\"`.\n- **Selection:** Service and staff buttons now carry `aria-pressed`, so assistive tech can tell which one is selected. The colour styling is unchanged.\n\nThe visible labels add a small line above each field, so the layout shifts slightly. Nothing a sighted user sees today was removed.",
+  "stderr": "",
+  "patch_lines": 210,
+  "touched_outside_workdir": []
+}

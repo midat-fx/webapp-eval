@@ -1,0 +1,28 @@
+{
+  "task": "t06-dst-slots",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 33.8,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 8,
+  "cost_usd": 0.1544148,
+  "is_error": false,
+  "result_text": "I fixed the slot calculation. On the clock-change days the first slot is now at opening time and the last slot ends at closing time.\n\n**Cause:** `localTimeToUtc` in `src/lib/slots.ts` worked out the timezone offset once, at 00:00 UTC of the date. On a clock-change day, the offset at that moment differs from the offset at opening time. Opening and closing times were therefore off by an hour.\n\n**Fix:** `localTimeToUtc` now works out which offset actually applies at the requested local time. For a local time that happens twice when the clocks go back, it picks the earlier instant. For one that is skipped when the clocks go forward, it moves to just after the gap.\n\n**Admin day view:** `src/app/admin/page.tsx` assumed every day is 24 hours long. It now ends the day at the next local midnight, so the 23-hour and 25-hour days are covered.\n\n**Checks:** A temporary test, which I then deleted, ran 10:00\u201320:00 hours on these dates. Every case gave a first slot at 10:00, a last slot ending at 20:00, and 37 one-hour slots on the 15-minute grid:\n- Berlin on 2027-03-28 and 2027-10-31\n- New York on 2027-03-14 and 2027-11-07\n- Sydney on 2027-10-03 and 2027-04-04\n- Almaty on 2027-03-28\n\n`pnpm test` passes, but I did not add a permanent regression test for the clock-change days. `tsc` reports one error, `Cannot find name 'LayoutProps'` in `src/app/layout.tsx`, which is in a file I didn't touch. I didn't run the integration tests or the dev server.",
+  "stderr": "",
+  "patch_lines": 41,
+  "touched_outside_workdir": []
+}

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   almaty, biz, insertBooking, openWizard, pickDate, pickMaster, pickService, q, shownSlots, staffId, upcoming,
+  nameField, phoneField,
 } from "../lib/kz";
 
 /** Delay /slots responses that match `when` by `ms`. */
@@ -37,8 +38,8 @@ for (const [delay, dayA, dayB] of [[2500, 2, 3], [1200, 7, 6]]) {
 
     // Booking from that grid lands on the day that is selected.
     await page.getByRole("button", { name: "14:00", exact: true }).click();
-    await page.getByPlaceholder("Name").fill("Stale Check");
-    await page.getByPlaceholder("+7701…").fill(`${tag}2`);
+    await nameField(page).fill("Stale Check");
+    await phoneField(page).fill(`${tag}2`);
     await page.getByRole("button", { name: "Confirm booking" }).click();
     await expect(page.getByText("You are booked!")).toBeVisible();
     const rows = await q<{ start_at: Date }>(

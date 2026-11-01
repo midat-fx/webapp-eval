@@ -1,0 +1,28 @@
+{
+  "task": "t10-wizard-a11y",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 234.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 31,
+  "cost_usd": 1.528738,
+  "is_error": false,
+  "result_text": "The booking wizard now passes an axe WCAG 2 A/AA run with zero violations in every state I could reach, and `pnpm build` succeeds. The only change is in `src/app/[slug]/wizard.tsx`, left uncommitted.\n\n- **Labels:** The date picker, name, and phone fields now have visible `<label>`s, with IDs from `useId`. The placeholders stay.\n- **Contrast:** The grey durations and \"Loading\u2026\" moved from `zinc-400` to `zinc-600`, which passes contrast on white.\n- **Errors:** The \"That time was just taken\", \"Check the name and phone\u2026\", and waitlist error messages now have `role=\"alert\"`. The waitlist \"joined\" confirmation has `role=\"status\"`.\n- **Selection:** Service and staff buttons expose `aria-pressed`, and the selected one also gets a visible \u2713. The \u2713 is additive, so nothing sighted users see today is removed.\n\nI checked this with a temporary harness page under `next dev`, with the API mocked in the browser and axe-core run at each state. The original wizard had 1\u20132 violations in almost every state; the updated one has none. I then deleted the harness.\n\nThe audit doesn't cover focus. After picking a time, the button that had focus is removed, so keyboard and screen reader users land on `<body>`. Moving focus to the \"Your details\" heading would fix that; I left it out to keep this change to the four items in the issue.",
+  "stderr": "",
+  "patch_lines": 244,
+  "touched_outside_workdir": []
+}

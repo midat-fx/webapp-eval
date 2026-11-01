@@ -1,0 +1,18 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "closed tabs release their Redis subscriber and connection",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m4\u001b[39m\nReceived:    \u001b[31m8\u001b[39m\n\nCall Log:\n- Timeout 6000ms exceeded while waiting on the predicate"
+    },
+    {
+      "kind": "playwright",
+      "name": "open calendar still updates live, also after other tabs closed",
+      "pass": true
+    }
+  ],
+  "task": "t04-sse-subscriber-leak",
+  "seconds": 70.2
+}

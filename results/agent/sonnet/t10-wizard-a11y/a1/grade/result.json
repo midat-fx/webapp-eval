@@ -1,0 +1,27 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "axe",
+      "name": "every wizard state passes axe",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "fields have real labels and nothing visible was dropped",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "selection is exposed to assistive tech",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "errors are announced",
+      "pass": true
+    }
+  ],
+  "task": "t10-wizard-a11y",
+  "seconds": 143.7
+}

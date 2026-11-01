@@ -1,0 +1,63 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..0aa3e21 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,6 @@
+ "use client";
+ import { useCallback, useEffect, useMemo, useState } from "react";
++import { todayInTimezone } from "@/lib/slots";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -82,7 +83,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
++  const [date, setDate] = useState(() => todayInTimezone(timezone));
+   const [slots, setSlots] = useState<Slot[] | null>(null);
+   const [hold, setHold] = useState<Hold | null>(null);
+   const [holdLeft, setHoldLeft] = useState(0);
+@@ -272,7 +273,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={todayInTimezone(timezone)}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index e79bf01..a5c48c6 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -80,3 +80,13 @@ describe("slotsForDay", () => {
+     expect(slots.map((s) => s.startMs)).toEqual([at(11)]);
+   });
+ });
++
++describe("todayInTimezone", () => {
++  const t = Date.UTC(2026, 10, 1, 20, 0); // 2026-11-01 20:00 UTC
++  it("uses the business timezone, not UTC", async () => {
++    const { todayInTimezone } = await import("./slots");
++    expect(todayInTimezone("Asia/Almaty", t)).toBe("2026-11-02");
++    expect(todayInTimezone("America/Los_Angeles", t)).toBe("2026-11-01");
++    expect(todayInTimezone("Pacific/Kiritimati", t)).toBe("2026-11-02");
++  });
++});
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index a3d7b95..2f2ea2b 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -81,3 +81,11 @@ export function slotsForDay(input: SlotsInput): Range[] {
+   }
+   return out;
+ }
++
++/** Current local date `YYYY-MM-DD` in `timeZone`. */
++export function todayInTimezone(timeZone: string, nowMs: number = Date.now()): string {
++  const parts: Record<string, string> = {};
++  const dtf = new Intl.DateTimeFormat("en-US", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" });
++  for (const { type, value } of dtf.formatToParts(nowMs)) parts[type] = value;
++  return `${parts.year.padStart(4, "0")}-${parts.month}-${parts.day}`;
++}

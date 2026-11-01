@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 29.0,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.11311430000000001,
+  "is_error": false,
+  "result_text": "I fixed the leak in `src/app/api/admin/events/route.ts`. I haven't run it against Redis, and the type check only shows an unrelated error in `src/app/layout.tsx` (`LayoutProps` not found).\n\n**Cause:** each connection to the calendar's event stream created its own Redis subscriber, and nothing ever shut it down. The route ignored both the client disconnecting and the stream being cancelled. The 25-second ping timer also kept running, so every closed tab left a live subscriber behind.\n\n**Fix:** a cleanup step now runs when the client goes away. It stops the ping timer, removes the message listener, unsubscribes from `calendar:<id>`, and closes the connection. If Redis doesn't answer the close, the connection is forced shut after 2 seconds. Cleanup is triggered by the request abort, the stream cancel, or a failed write. It also covers a client that disconnects while the subscribe call is still in flight.\n\nOpen tabs still get live updates, because each one keeps its own subscriber and message forwarding is unchanged. The browser side (`src/app/admin/live.tsx`) already closes its `EventSource` on unmount, so I left it alone.",
+  "stderr": "",
+  "patch_lines": 74,
+  "touched_outside_workdir": []
+}

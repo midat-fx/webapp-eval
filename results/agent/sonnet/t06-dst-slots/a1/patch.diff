@@ -1,0 +1,41 @@
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index 68dc9d7..a013b43 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -31,7 +31,9 @@ export default async function CalendarPage(ctx: {
+     new Intl.DateTimeFormat("en-CA", { timeZone: biz.timezone }).format(new Date()); // YYYY-MM-DD today, business-local
+ 
+   const dayStart = new Date(localTimeToUtc(dateISO, "00:00", biz.timezone));
+-  const dayEnd = new Date(dayStart.getTime() + 24 * 3600_000);
++  const [ny, nm, nd] = dateISO.split("-").map(Number);
++  const nextDateISO = new Date(Date.UTC(ny, nm - 1, nd + 1)).toISOString().slice(0, 10);
++  const dayEnd = new Date(localTimeToUtc(nextDateISO, "00:00", biz.timezone));
+ 
+   const rows = await db
+     .select({
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index 0ae9530..dfa60a3 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -36,10 +36,17 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+-  // The zone's offset is taken once, at the start of the date: building an
+-  // Intl formatter is the expensive part, and a day has a single offset.
+-  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
+-  return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
++  const wallMs = Date.UTC(y, m - 1, d, hh, mm);
++  // Offsets in effect shortly before and after this wall time bracket any transition.
++  const before = tzOffsetMinutes(timeZone, wallMs - 24 * 3600_000);
++  const after = tzOffsetMinutes(timeZone, wallMs + 24 * 3600_000);
++  const candidates = [before, after]
++    .map((o) => wallMs - o * 60000)
++    .filter((t, i, arr) => arr.indexOf(t) === i)
++    .filter((t) => wallMs - tzOffsetMinutes(timeZone, t) * 60000 === t)
++    .sort((x, y2) => x - y2);
++  // Ambiguous (clocks go back): earliest instant. Nonexistent (clocks go forward): shift forward.
++  return candidates.length > 0 ? candidates[0] : wallMs - before * 60000;
+ }
+ 
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */

@@ -1,0 +1,33 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Etc/GMT+12",
+      "pass": false,
+      "detail": "Error: pre-selected date\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"2026-11-01\"\u001b[39m\nReceived array: \u001b[31m[\"2026-10-31\", \"2026-10-31\"]\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Etc/GMT-14",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Asia/Almaty",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in America/Los_Angeles",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "opens on the business's today in Pacific/Kiritimati",
+      "pass": true
+    }
+  ],
+  "task": "t03-default-date-tz",
+  "seconds": 50.0
+}

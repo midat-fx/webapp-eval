@@ -1,0 +1,28 @@
+{
+  "task": "t03-default-date-tz",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 37.7,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 11,
+  "cost_usd": 0.1815959,
+  "is_error": false,
+  "result_text": "The booking page now opens on today's date in the business's configured timezone, and that same date is the earliest the picker allows.\n\n- **Cause:** `src/app/[slug]/wizard.tsx` took both the default date and the picker's `min` from `new Date().toISOString()`, which is the UTC date. In Almaty (UTC+5) that is still yesterday between midnight and 5 a.m. The same mismatch hit the European traveller in the evening.\n- **Fix:** I added `todayInTimezone(timeZone, nowMs?)` to `src/lib/slots.ts`. It returns today's `YYYY-MM-DD` in any IANA timezone using `Intl`, so it isn't tied to Almaty. The wizard uses it for both values, with the `timezone` prop it already received.\n- **Tests:** I added a unit test for `todayInTimezone` (Almaty, Los Angeles and Kiritimati against one UTC instant). `pnpm test` passes, 13 of 13.\n- **Not checked:** I couldn't run the dev server here, so I haven't looked at the page in a browser.\n- **Type check:** `tsc --noEmit` reports one error, `LayoutProps` in `src/app/layout.tsx`, in a file I didn't touch.",
+  "stderr": "",
+  "patch_lines": 63,
+  "touched_outside_workdir": []
+}

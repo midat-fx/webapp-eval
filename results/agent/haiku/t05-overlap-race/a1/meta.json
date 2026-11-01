@@ -1,0 +1,28 @@
+{
+  "task": "t05-overlap-race",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 189.9,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 29,
+  "cost_usd": 1.7196150000000003,
+  "is_error": false,
+  "result_text": "Overlapping confirmed bookings for the same master are now rejected by Postgres itself, so the race can't happen regardless of which app server handles the checkout. The losing client gets `409 {\"error\": \"slot_taken\"}`. Nothing is committed.\n\n**What changed**\n- **`drizzle/0004_booking_no_overlap.sql`** (new, registered in the journal with a chained snapshot): enables `btree_gist` and adds an exclusion constraint `bookings_no_overlap_confirmed` on `(staff_id, tstzrange(start_at, end_at))`, restricted to `status = 'confirmed'`. Cancelled, completed, and no-show rows don't block time, and different masters don't conflict.\n- **`src/lib/booking.ts`**: the booking transaction is wrapped in a try/catch. If the constraint fires, `createBooking` returns `{ ok: false, error: \"slot_taken\" }`, which the existing route already maps to 409. The Redis hold check is unchanged.\n- **`src/lib/booking.integration.test.ts`**: new test where two overlapping bookings with different start times race, and exactly one wins.\n\n**Verification**\n- Unit tests pass, and eslint is clean on the changed files.\n- I started throwaway Postgres 16 and Redis 7 containers, ran `pnpm test:integration`, and removed them afterwards. The migration applied cleanly, and the booking, waitlist, and notify suites pass, including the new race test.\n- One analytics test (`cohorts > groups clients by first visit\u2026`) fails. It builds its dates from the wall clock, and today is the 1st of the month, so it looks date-dependent rather than related to this change. I didn't run it against the original code to confirm.\n\n**Before deploying**\n- The migration will fail on any database that already has overlapping confirmed bookings, such as the two Saturday bookings in the report. Those need to be resolved by hand first, since choosing which one to cancel is a business decision.\n- Deploys need a role that can run `CREATE EXTENSION btree_gist`. Neon and the stock Postgres images support it.",
+  "stderr": "",
+  "patch_lines": 1491,
+  "touched_outside_workdir": []
+}
