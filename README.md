@@ -15,9 +15,9 @@ scenario, and run axe-core on the UI it touches.
 Every number here is computed by `python3 -m harness.report` from files in
 [`results/`](results/) ([`results/summary.json`](results/summary.json)).
 
-**Verifiers: 63/63 self-check variants graded as expected**
+**Verifiers: 65/65 self-check variants graded as expected**
 ([`results/selfcheck/`](results/selfcheck/summary.json)). All ten start states
-fail, all ten reference and ten alternative fixes pass, and 33/33 known-bad
+fail, all ten reference and ten alternative fixes pass, and 35/35 known-bad
 patches are rejected.
 
 **Agents: 59/59 graded runs pass** (Claude Code headless, `claude -p`,
@@ -70,18 +70,55 @@ more times, and so were the two reference fixes they compete with:
 Five runs is enough to show the checks aren't coin flips, not enough to
 put a number on a rare miss.
 
+**Verifiers vs. mutants** ([`results/mutants/`](results/mutants/)). A mutant is
+a reference fix with one hunk dropped, so it is a partial fix nobody had to
+think of. There are 56 hunks; one only touches a test file, which leaves 55
+mutants to grade:
+
+| Task | Hunks | Rejected by a verifier | Didn't build | Survived |
+|---|---|---|---|---|
+| t01-phone-format | 6 | 2 | 4 | 0 |
+| t02-stale-slots | 2 | 1 | 1 | 0 |
+| t03-default-date-tz | 3 | 2 | 1 | 0 |
+| t04-sse-subscriber-leak | 3 | 1 | 1 | 1 |
+| t05-overlap-race | 3 | 2 | 1 | 0 |
+| t06-dst-slots | 2 | 1 | 0 | 0 |
+| t07-staff-permissions | 16 | 11 | 4 | 1 |
+| t08-status-transitions | 2 | 0 | 1 | 1 |
+| t09-booking-note | 10 | 5 | 5 | 0 |
+| t10-wizard-a11y | 9 | 9 | 0 | 0 |
+| **total** | **56** | **34** | **18** | **3** |
+
+Of the 37 mutants that built, the verifiers reject 34. The 18 that didn't
+build say nothing about the verifiers, so they aren't counted as kills (one of
+them is a migration failure, the rest are compile errors). The three survivors
+change nothing a user can see: two drop only a comment, and one sends a
+calendar refresh after a no-op, as my alternative fix does too
+([`classification.json`](results/mutants/classification.json)).
+
+The first pass had five survivors, and two were real holes in my verifiers,
+both on requirements the issue states outright. The t07 replay never submitted
+the Hide button of a service, so a fix leaving `toggleService` open to staff
+passed. The t10 axe scan never ran while times were loading, so a fix leaving
+that "Loading…" low-contrast passed. Both checks exist now, both mutants are
+known-bad patches, and all 11 agent patches for those tasks still pass, so no
+agent had benefited from either hole. The first verdicts are in
+[`results/mutants/superseded/`](results/mutants/superseded/).
+
 **LLM judge vs. verifiers** (Sonnet 5.5, issue + diff only, no tools,
 [`results/judge/sonnet/`](results/judge/sonnet/summary.json)):
 
 | Patches | n | agreement | false accepts | false rejects |
 |---|---|---|---|---|
 | reference + alternative fixes | 20 | 19/20 | – | 1 |
-| known-bad patches | 33 | 33/33 | 0 | – |
+| known-bad patches | 35 | 34/35 | 1 | – |
 | agent patches | 59 | 57/59 | – | 2 |
-| **all** | **112** | **97.3 %, κ = 0.94** | **0** | **3** |
+| **all** | **114** | **96.5 %, κ = 0.92** | **1** | **3** |
 
-The judge never accepted a wrong patch, but it couldn't be tested against an
-agent's wrong patch, because there weren't any. Its three false rejects all
+The judge's one false accept is a mutant: the t10 patch that darkens one
+"Loading…" and misses the other. The judge read that as "darkens the Loading
+text" and passed it. It also couldn't be tested against an agent's wrong patch,
+because there weren't any. Its three false rejects all
 come from missing context: it assumed `redisSub` didn't exist because the
 diff didn't define it, and twice it guessed that the browser blocks formatted
 phone numbers before the API sees them, which the wizard test shows it
@@ -152,6 +189,7 @@ without `credsStore`.
 python3 -m harness.cli grade t05-overlap-race my.patch     # grade one patch
 python3 -m harness.cli agent t01-phone-format --models haiku --attempts 1
 python3 -m harness.cli judge --model sonnet
+python3 -m harness.cli mutants t07-staff-permissions -j 2  # reference fix minus one hunk at a time
 python3 -m harness.report                                  # tables below, from results/
 ```
 
@@ -165,6 +203,6 @@ base/            pinned kezek SHA + offline patch (no Google Fonts at build time
 tasks/<id>/      issue.md, setup.patch, solution.patch, alt.patch, bad/*.patch, verify/
 verify/          verifier toolchain: Playwright config, shared helpers, axe, SQL runner
 docker/          grading image and the in-container grading script
-harness/         grade, selfcheck, flake, agent, judge, report (stdlib Python)
+harness/         grade, selfcheck, flake, mutants, agent, judge, report (stdlib Python)
 results/         every number in this README, with per-run traces
 ```

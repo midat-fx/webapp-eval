@@ -103,6 +103,43 @@ was caught 5/5 times, and the reference fixes for t05 and t08 passed 5/5.
 Six racers over eight rounds make a miss need every round to serialise by
 luck. Five runs per variant rules out a coin flip, not a rare miss.
 
+### Mutants attack the verifiers without my imagination in the loop
+
+Known-bad patches only test the wrong fixes I thought of. `harness.cli mutants`
+takes each reference fix and drops one hunk at a time (`harness/mutants.py`,
+stdlib only), so each mutant is a partial fix picked by the diff, not by me.
+
+- **Hunks, not lines or AST operators.** A reference fix is already a list of
+  separate requirements, and a hunk is close to one of them. Dropping one is
+  a mistake an agent really makes: it forgot a place. Operator mutation would
+  need a TypeScript parser and thousands of gradings at about 20 s each.
+- **Only `src/` and `drizzle/`.** A test file can't change what the app does,
+  so grading its hunks would only add easy survivors. That skips one hunk.
+- **Line numbers are fixed up.** Dropping a hunk moves everything after it in
+  that file, and `git apply` starts its search at the new-side line number. In
+  repetitive code a stale number could land a hunk in the wrong place, so later
+  hunks are renumbered.
+- **A build failure isn't a kill.** It's reported as "didn't build" and left
+  out of the kill rate, since `tsc` caught it and no verifier ran. Counting
+  those would turn 34/37 into 52/55, a better number that says less. A mutant
+  that doesn't apply is reported as invalid, not as a kill; none did.
+- **Survivors are classified by hand**, in
+  `results/mutants/classification.json`: redundant or gap. Whether a hunk matters
+  is a judgement about the issue, and writing it down makes it reviewable.
+
+The first pass found two gaps, t07's `toggleService` replay and t10's loading
+state. Neither was in my known-bad list, and neither had let a wrong agent patch
+through. The t08 survivor is the case I left alone on purpose: without the hunk,
+a no-op still publishes a calendar refresh. Rejecting that would be overfitting
+to the reference, because the issue doesn't forbid it, nothing changes for a
+user, and my alternative fix behaves the same way.
+
+The limits are what you'd expect. A mutant only removes code, so this says
+nothing about a fix that's present but wrong; the known-bad patches still cover
+that. Only the reference fix is mutated, and race mutants are graded once, so
+for those a single rejection is the whole measurement. Dropping two hunks
+together isn't tried.
+
 ### Time-dependent checks are made time-independent
 
 t03 ("the wizard opens on the business's today") depends on the wall clock.
@@ -184,10 +221,17 @@ and the judge's verdicts on them are kept in `results/judge/superseded/`.
 That's the argument for running a cheap judge next to deterministic
 verifiers: its disagreements are a list of places to look.
 
+It works in the other direction too. The judge's only false accept is a
+mutant: the wizard shows "Loading…" in two places, and the patch darkens just
+one of them. It passed that patch, and my t10 verifier had passed it as well
+until the mutant run. A skim of a diff doesn't see what the diff left out.
+
 ## Known limitations
 
 - Ten tasks from one app: good for depth, says nothing about other stacks.
 - Agent sandboxing on the host is audited, not enforced.
+- Mutants only drop one hunk of the reference fix at a time: a survivor-free
+  task can still miss a wrong fix that adds code.
 - Race verifiers are probabilistic: 5/5 catches per known-bad patch is the
   whole measurement.
 - t04 can't trigger the abort-then-cancel race described above
