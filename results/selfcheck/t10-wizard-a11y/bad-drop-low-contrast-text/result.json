@@ -20,10 +20,9 @@
     {
       "kind": "playwright",
       "name": "errors are announced",
-      "pass": false,
-      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/fully booked/)\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/fully booked/) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/fully booked/)\u001b[22m\n"
+      "pass": true
     }
   ],
   "task": "t10-wizard-a11y",
-  "seconds": 85.0
+  "seconds": 40.3
 }

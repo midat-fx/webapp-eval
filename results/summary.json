@@ -1,9 +1,9 @@
 {
   "selfcheck": {
-    "agree": 63,
-    "total": 63,
-    "known_bad": 33,
-    "known_bad_caught": 33,
+    "agree": 65,
+    "total": 65,
+    "known_bad": 35,
+    "known_bad_caught": 35,
     "by_task": {
       "t01-phone-format": {
         "accepted": [
@@ -93,7 +93,8 @@
           "baseline",
           "bad-owner-only-everything",
           "bad-pages-only",
-          "bad-services-only"
+          "bad-services-only",
+          "bad-toggle-service-unguarded"
         ],
         "wrong": []
       },
@@ -134,7 +135,8 @@
           "baseline",
           "bad-axe-clean-only",
           "bad-drop-low-contrast-text",
-          "bad-errors-not-announced"
+          "bad-errors-not-announced",
+          "bad-loading-text-still-light"
         ],
         "wrong": []
       }
@@ -281,14 +283,14 @@
     "sonnet": {
       "model": "claude-sonnet-5-5",
       "overall": {
-        "n": 112,
+        "n": 114,
         "tp": 76,
-        "tn": 33,
-        "fp": 0,
+        "tn": 34,
+        "fp": 1,
         "fn": 3,
-        "accuracy": 0.973,
-        "kappa": 0.937,
-        "false_accept_rate": 0.0,
+        "accuracy": 0.965,
+        "kappa": 0.919,
+        "false_accept_rate": 0.029,
         "false_reject_rate": 0.038
       },
       "unparsed": 0,
@@ -305,14 +307,14 @@
           "false_reject_rate": 0.034
         },
         "known-bad": {
-          "n": 33,
+          "n": 35,
           "tp": 0,
-          "tn": 33,
-          "fp": 0,
+          "tn": 34,
+          "fp": 1,
           "fn": 0,
-          "accuracy": 1.0,
-          "kappa": 1.0,
-          "false_accept_rate": 0.0,
+          "accuracy": 0.971,
+          "kappa": 0.0,
+          "false_accept_rate": 0.029,
           "false_reject_rate": null
         },
         "reference": {
@@ -404,10 +406,10 @@
   "mutants": {
     "hunks": 56,
     "graded": 55,
-    "killed": 32,
+    "killed": 34,
     "broken": 18,
-    "survived": 5,
-    "verifier_kill_rate": 0.865,
+    "survived": 3,
+    "verifier_kill_rate": 0.919,
     "by_task": {
       "t01-phone-format": {
         "hunks": 6,
@@ -461,9 +463,9 @@
         "hunks": 16,
         "not_source": 0,
         "graded": 16,
-        "killed": 10,
+        "killed": 11,
         "broken": 4,
-        "survived": 2
+        "survived": 1
       },
       "t08-status-transitions": {
         "hunks": 2,
@@ -485,9 +487,9 @@
         "hunks": 9,
         "not_source": 0,
         "graded": 9,
-        "killed": 8,
+        "killed": 9,
         "broken": 0,
-        "survived": 1
+        "survived": 0
       }
     },
     "survivors": [
@@ -496,12 +498,6 @@
         "file": "src/app/api/admin/events/route.ts",
         "class": "redundant",
         "why": "Comment only."
-      },
-      {
-        "mutant": "t07-staff-permissions/h02",
-        "file": "src/app/admin/actions.ts",
-        "class": "gap",
-        "why": "toggleService stays open to staff. The issue names hiding services, and the replay test never submitted that button."
       },
       {
         "mutant": "t07-staff-permissions/h08",
@@ -514,13 +510,11 @@
         "file": "src/lib/booking.ts",
         "class": "redundant",
         "why": "Publishes a calendar refresh after a no-op. Nothing changes for a user and the issue doesn't forbid it; the alternative fix publishes unconditionally too."
-      },
-      {
-        "mutant": "t10-wizard-a11y/h06",
-        "file": "src/app/[slug]/wizard.tsx",
-        "class": "gap",
-        "why": "The Loading text under the date keeps its low contrast. The issue names it, but axe never ran while the times were loading."
       }
+    ],
+    "gaps_found": [
+      "t07-staff-permissions/h02",
+      "t10-wizard-a11y/h06"
     ]
   }
 }

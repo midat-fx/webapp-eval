@@ -79,7 +79,8 @@ def mutants() -> dict:
     built = total("killed") + total("survived")
     return {"hunks": total("hunks"), "graded": total("graded"), "killed": total("killed"), "broken": total("broken"),
             "survived": total("survived"), "verifier_kill_rate": round(total("killed") / built, 3) if built else None,
-            "by_task": by_task, "survivors": survivors}
+            "by_task": by_task, "survivors": survivors,
+            "gaps_found": [k for k, v in notes.items() if v["class"] == "gap"]}
 
 
 def main() -> None:
@@ -107,6 +108,7 @@ def main() -> None:
     print("| Task | Hunks | Killed | Didn't build | Survived |\n|---|---|---|---|---|")
     for t, m in mu["by_task"].items():
         print(f"| {t} | {m['hunks']} | {m['killed']} | {m['broken']} | {m['survived']} |")
+    print(f"verifier gaps found and closed: {mu['gaps_found']}")
     for x in mu["survivors"]:
         print(f"  {x['mutant']} {x['file']}: {x['class']}")
 

@@ -42,13 +42,13 @@
       "kind": "sql",
       "name": "staff_did_not_hide_anything",
       "pass": false,
-      "detail": "[{\"kind\":\"staff\",\"name\":\"Madina\"}]"
+      "detail": "[{\"kind\":\"service\",\"name\":\"Women's haircut\"},{\"kind\":\"staff\",\"name\":\"Madina\"}]"
     },
     {
       "kind": "sql",
       "name": "no_staff_rows_created_by_staff",
       "pass": false,
-      "detail": "[{\"id\":\"d6198f67-fe81-4f22-83cc-aa6e891e35a0\",\"name\":\"Intruder\"}]"
+      "detail": "[{\"id\":\"9b9aca20-2ffa-46a5-bedc-db21eee0f96a\",\"name\":\"Intruder\"}]"
     },
     {
       "kind": "sql",
@@ -63,5 +63,5 @@
     }
   ],
   "task": "t07-staff-permissions",
-  "seconds": 93.6
+  "seconds": 16.9
 }

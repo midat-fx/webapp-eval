@@ -46,7 +46,7 @@
       "kind": "sql",
       "name": "no_staff_rows_created_by_staff",
       "pass": false,
-      "detail": "[{\"id\":\"410c8252-01f3-42a5-8a9e-90ae2771597b\",\"name\":\"Intruder\"}]"
+      "detail": "[{\"id\":\"85ebe17f-c007-4748-8435-c5ce58270d60\",\"name\":\"Intruder\"}]"
     },
     {
       "kind": "sql",
@@ -61,5 +61,5 @@
     }
   ],
   "task": "t07-staff-permissions",
-  "seconds": 19.6
+  "seconds": 18.0
 }

@@ -455,7 +455,7 @@
         "no_staff_rows_created_by_staff",
         "no_owner_audit_entries_by_staff"
       ],
-      "seconds": 102.1
+      "seconds": 38.7
     },
     {
       "task": "t07-staff-permissions",
@@ -464,7 +464,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 90.9
+      "seconds": 17.5
     },
     {
       "task": "t07-staff-permissions",
@@ -473,7 +473,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 168.8
+      "seconds": 16.5
     },
     {
       "task": "t07-staff-permissions",
@@ -484,7 +484,7 @@
       "failed_checks": [
         "staff can still run the day"
       ],
-      "seconds": 122.9
+      "seconds": 37.3
     },
     {
       "task": "t07-staff-permissions",
@@ -499,7 +499,7 @@
         "no_staff_rows_created_by_staff",
         "no_owner_audit_entries_by_staff"
       ],
-      "seconds": 93.6
+      "seconds": 16.9
     },
     {
       "task": "t07-staff-permissions",
@@ -513,7 +513,19 @@
         "no_staff_rows_created_by_staff",
         "no_owner_audit_entries_by_staff"
       ],
-      "seconds": 145.1
+      "seconds": 16.7
+    },
+    {
+      "task": "t07-staff-permissions",
+      "variant": "bad-toggle-service-unguarded",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "staff_did_not_hide_anything"
+      ],
+      "seconds": 18.0
     },
     {
       "task": "t08-status-transitions",
@@ -704,7 +716,7 @@
         "selection is exposed to assistive tech",
         "errors are announced"
       ],
-      "seconds": 106.4
+      "seconds": 57.4
     },
     {
       "task": "t10-wizard-a11y",
@@ -713,7 +725,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 45.4
+      "seconds": 19.3
     },
     {
       "task": "t10-wizard-a11y",
@@ -722,7 +734,7 @@
       "verdict": "pass",
       "ok": true,
       "failed_checks": [],
-      "seconds": 47.2
+      "seconds": 19.4
     },
     {
       "task": "t10-wizard-a11y",
@@ -736,7 +748,7 @@
         "selection is exposed to assistive tech",
         "errors are announced"
       ],
-      "seconds": 100.7
+      "seconds": 80.4
     },
     {
       "task": "t10-wizard-a11y",
@@ -745,10 +757,9 @@
       "verdict": "fail",
       "ok": true,
       "failed_checks": [
-        "fields have real labels and nothing visible was dropped",
-        "errors are announced"
+        "fields have real labels and nothing visible was dropped"
       ],
-      "seconds": 85.0
+      "seconds": 40.3
     },
     {
       "task": "t10-wizard-a11y",
@@ -759,9 +770,20 @@
       "failed_checks": [
         "errors are announced"
       ],
-      "seconds": 36.6
+      "seconds": 24.1
+    },
+    {
+      "task": "t10-wizard-a11y",
+      "variant": "bad-loading-text-still-light",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "every wizard state passes axe"
+      ],
+      "seconds": 23.7
     }
   ],
-  "total": 63,
-  "agree": 63
+  "total": 65,
+  "agree": 65
 }

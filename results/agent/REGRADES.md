@@ -31,3 +31,16 @@ and the re-run that produced the published result.
 `.cache/grade-*` to free disk and deleted its scratch directory with it, so
 the grading crashed without a result. The saved patch was re-graded with
 `harness.cli regrade` (pass). The agent was not re-run.
+
+## 2026-11-02: two verifier gaps found by mutants
+
+Two hunk-drop mutants passed verifiers they should have failed
+(`results/mutants/superseded/`): t07 never replayed a service's Hide button, and
+t10 never ran axe while times were loading. Both specs now check it, and the
+mutants became `bad/toggle-service-unguarded.patch` and
+`bad/loading-text-still-light.patch`.
+
+All 11 agent patches for t07 and t10 were re-graded with the stricter specs:
+all passed before and after, so no verdict changed. The self-check is 65/65,
+and two new judge calls cover the two new known-bad patches. No agent was
+re-run.

@@ -1,5 +1,5 @@
 {
-  "verdict": "pass",
+  "verdict": "fail",
   "checks": [
     {
       "kind": "playwright",
@@ -14,7 +14,8 @@
     {
       "kind": "playwright",
       "name": "replayed owner forms are refused for staff",
-      "pass": true
+      "pass": false,
+      "detail": "Error: service hidden by staff\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
     },
     {
       "kind": "playwright",
@@ -39,7 +40,8 @@
     {
       "kind": "sql",
       "name": "staff_did_not_hide_anything",
-      "pass": true
+      "pass": false,
+      "detail": "[{\"kind\":\"service\",\"name\":\"Women's haircut\"}]"
     },
     {
       "kind": "sql",
@@ -58,5 +60,5 @@
     }
   ],
   "task": "t07-staff-permissions",
-  "seconds": 19.4
+  "seconds": 18.1
 }

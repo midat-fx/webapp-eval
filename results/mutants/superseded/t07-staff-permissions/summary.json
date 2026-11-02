@@ -1,0 +1,182 @@
+{
+  "task": "t07-staff-permissions",
+  "hunks": 16,
+  "not_source": 0,
+  "graded": 16,
+  "killed": 10,
+  "broken": 4,
+  "survived": 2,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/admin/actions.ts",
+      "title": "import { and, eq } from \"drizzle-orm\";",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 10.4
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/admin/actions.ts",
+      "title": "export async function updateBookingStatus(formData: FormData): Promise<void> {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "staff_did_not_change_prices",
+        "no_owner_audit_entries_by_staff"
+      ],
+      "seconds": 19.2
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/admin/actions.ts",
+      "title": "export async function saveService(formData: FormData): Promise<void> {",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 19.4
+    },
+    {
+      "hunk": 3,
+      "file": "src/app/admin/actions.ts",
+      "title": "export async function toggleService(formData: FormData): Promise<void> {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "no_staff_rows_created_by_staff",
+        "no_owner_audit_entries_by_staff"
+      ],
+      "seconds": 19.6
+    },
+    {
+      "hunk": 4,
+      "file": "src/app/admin/actions.ts",
+      "title": "export async function saveStaff(formData: FormData): Promise<void> {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "replayed owner forms are refused for staff",
+        "staff_did_not_hide_anything"
+      ],
+      "seconds": 19.3
+    },
+    {
+      "hunk": 5,
+      "file": "src/app/admin/actions.ts",
+      "title": "export async function toggleStaff(formData: FormData): Promise<void> {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "replayed owner forms are refused for staff"
+      ],
+      "seconds": 19.5
+    },
+    {
+      "hunk": 6,
+      "file": "src/app/admin/analytics/page.tsx",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff cannot open owner-only pages"
+      ],
+      "seconds": 18.9
+    },
+    {
+      "hunk": 7,
+      "file": "src/app/admin/audit/page.tsx",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff cannot open owner-only pages"
+      ],
+      "seconds": 19.1
+    },
+    {
+      "hunk": 8,
+      "file": "src/app/admin/layout.tsx",
+      "title": "import Link from \"next/link\";",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 18.3
+    },
+    {
+      "hunk": 9,
+      "file": "src/app/admin/layout.tsx",
+      "title": "export default async function AdminLayout({ children }: { children: React.ReactN",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff navigation only links to what staff can use"
+      ],
+      "seconds": 39.1
+    },
+    {
+      "hunk": 10,
+      "file": "src/app/admin/notifications/page.tsx",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.3
+    },
+    {
+      "hunk": 11,
+      "file": "src/app/admin/notifications/page.tsx",
+      "title": "const statusStyle: Record<string, string> = {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 8.7
+    },
+    {
+      "hunk": 12,
+      "file": "src/app/admin/reports/page.tsx",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff cannot open owner-only pages"
+      ],
+      "seconds": 17.6
+    },
+    {
+      "hunk": 13,
+      "file": "src/app/admin/services/page.tsx",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff cannot open owner-only pages"
+      ],
+      "seconds": 17.5
+    },
+    {
+      "hunk": 14,
+      "file": "src/app/admin/staff/page.tsx",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "staff cannot open owner-only pages"
+      ],
+      "seconds": 18.4
+    },
+    {
+      "hunk": 15,
+      "file": "src/lib/session.ts",
+      "title": "export async function requireSession(): Promise<Session> {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 6.8
+    }
+  ]
+}

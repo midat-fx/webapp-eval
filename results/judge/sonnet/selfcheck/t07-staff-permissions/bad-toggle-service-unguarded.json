@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t07-staff-permissions/bad-toggle-service-unguarded",
+  "task": "t07-staff-permissions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"`toggleService` in src/app/admin/actions.ts still uses `requireSession()`; the patch changes only `saveService` and the staff actions. A staff login can therefore replay a toggle-service form post and hide or show services, which the issue says must be refused on the server.\"}",
+  "cost_usd": 0.047863699999999995,
+  "is_error": false
+}

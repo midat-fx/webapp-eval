@@ -48,7 +48,20 @@ test("every wizard state passes axe", { tag: "@axe" }, async ({ page }) => {
   await audit(page, "service list");
   await serviceButton(page, "Women's haircut").click();
   await audit(page, "staff list");
-  await chooseStaff(page, "Dana");
+  // Hold the times back so "Loading…" stays up for as long as axe needs.
+  let release = () => {};
+  const held = new Promise<void>((r) => (release = r));
+  await page.route("**/slots?*", async (route) => {
+    await held;
+    await route.continue();
+  });
+  const loaded = page.waitForResponse((r) => r.url().includes("/slots?"), { timeout: 15_000 });
+  await staffButton(page, "Dana").click();
+  await expect(page.getByText(/Loading/).first()).toBeVisible();
+  await audit(page, "loading times");
+  release();
+  await loaded;
+  await page.unroute("**/slots?*");
   await pickDate(page, upcoming(b.timezone, 1)); // Monday: closed
   await expect(page.getByText(/fully booked/)).toBeVisible();
   await audit(page, "waitlist box");

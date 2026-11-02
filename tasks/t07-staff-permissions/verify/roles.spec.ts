@@ -11,6 +11,20 @@ async function as(browser: Browser, who: { email: string; password: string }): P
   return page;
 }
 
+/** What the row's Hide/Restore button submits: the button's own action, not the form's Save. */
+const toggleFields = (page: Page, formSelector: string) =>
+  page.locator(formSelector).first().getByRole("button", { name: /^(Hide|Restore)$/ }).evaluate((btn) => {
+    const b = btn as HTMLButtonElement;
+    const out: Record<string, string> = {};
+    const own = b.name.startsWith("$ACTION_ID_");
+    for (const el of Array.from(b.form!.elements) as HTMLInputElement[]) {
+      if (!el.name || el === (b as unknown) || (own && el.name.startsWith("$ACTION_ID_"))) continue;
+      out[el.name] = el.value;
+    }
+    if (own) out[b.name] = b.value;
+    return out;
+  });
+
 test.beforeAll(async () => {
   const b = await biz();
   await createUser({ ...STAFF, name: "Aliya", role: "staff", businessId: b.id });
@@ -39,6 +53,7 @@ test("replayed owner forms are refused for staff", async ({ browser }) => {
   const owner = await as(browser, OWNER);
   await owner.goto("/admin/services");
   const price = await formFields(owner, `form:has(input[name="name"][value="Women's haircut"])`);
+  const hideService = await toggleFields(owner, `form:has(input[name="name"][value="Women's haircut"])`);
   await owner.goto("/admin/staff");
   const madina = await staffId("Madina");
   const dana = await staffId("Dana");
@@ -49,12 +64,15 @@ test("replayed owner forms are refused for staff", async ({ browser }) => {
 
   const staff = await as(browser, STAFF);
   await postAction(staff.request, "/admin/services", { ...price, priceKzt: "1" });
+  await postAction(staff.request, "/admin/services", hideService);
   await postAction(staff.request, "/admin/staff", hideMadina);
   await postAction(staff.request, "/admin/staff", link);
   await postAction(staff.request, "/admin/staff", { ...addStaff, name: "Intruder" });
 
   const [svc] = await q<{ price_kzt: number }>("SELECT price_kzt FROM services WHERE name = 'Women''s haircut'");
   expect(svc.price_kzt, "price changed by staff").toBe(8000);
+  const [hidden] = await q<{ is_active: boolean }>("SELECT is_active FROM services WHERE name = 'Women''s haircut'");
+  expect(hidden.is_active, "service hidden by staff").toBe(true);
   const [m] = await q<{ is_active: boolean }>("SELECT is_active FROM staff WHERE name = 'Madina'");
   expect(m.is_active, "colleague hidden by staff").toBe(true);
   expect(await q("SELECT 1 FROM staff_services WHERE staff_id = $1 AND service_id = $2", [dana, coloring])).toHaveLength(0);
@@ -69,6 +87,14 @@ test("the same replay still works for the owner", async ({ browser }) => {
   await postAction(owner.request, "/admin/services", { ...f, priceKzt: "26000" });
   const [svc] = await q<{ price_kzt: number }>("SELECT price_kzt FROM services WHERE name = 'Hair coloring'");
   expect(svc.price_kzt).toBe(26000);
+
+  const coloring = `form:has(input[name="name"][value="Hair coloring"])`;
+  const active = async () => (await q<{ is_active: boolean }>("SELECT is_active FROM services WHERE name = 'Hair coloring'"))[0].is_active;
+  await postAction(owner.request, "/admin/services", await toggleFields(owner, coloring));
+  expect(await active(), "owner's hide replay").toBe(false);
+  await owner.goto("/admin/services");
+  await postAction(owner.request, "/admin/services", await toggleFields(owner, coloring));
+  expect(await active(), "owner's restore replay").toBe(true);
 });
 
 test("staff can still run the day", async ({ browser }) => {

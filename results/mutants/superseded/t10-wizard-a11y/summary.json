@@ -1,0 +1,113 @@
+{
+  "task": "t10-wizard-a11y",
+  "hunks": 9,
+  "not_source": 0,
+  "graded": 9,
+  "killed": 8,
+  "broken": 0,
+  "survived": 1,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "function WaitlistBox({",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "errors are announced"
+      ],
+      "seconds": 40.1
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "function WaitlistBox({",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "errors are announced"
+      ],
+      "seconds": 20.0
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "selection is exposed to assistive tech"
+      ],
+      "seconds": 20.7
+    },
+    {
+      "hunk": 3,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "every wizard state passes axe"
+      ],
+      "seconds": 17.5
+    },
+    {
+      "hunk": 4,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "selection is exposed to assistive tech"
+      ],
+      "seconds": 20.5
+    },
+    {
+      "hunk": 5,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "every wizard state passes axe",
+        "fields have real labels and nothing visible was dropped"
+      ],
+      "seconds": 39.0
+    },
+    {
+      "hunk": 6,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 20.0
+    },
+    {
+      "hunk": 7,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "every wizard state passes axe",
+        "fields have real labels and nothing visible was dropped",
+        "errors are announced"
+      ],
+      "seconds": 80.4
+    },
+    {
+      "hunk": 8,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "errors are announced"
+      ],
+      "seconds": 20.0
+    }
+  ]
+}

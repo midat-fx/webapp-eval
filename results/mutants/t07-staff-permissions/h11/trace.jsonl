@@ -1,5 +1,5 @@
-{"ts":"2026-11-02T18:37:47.262Z","step":"start","status":"ok","detail":"t07-staff-permissions"}
-{"ts":"2026-11-02T18:37:47.276Z","step":"setup","status":"ok"}
-{"ts":"2026-11-02T18:37:47.305Z","step":"apply","status":"ok","detail":"9 files touched"}
-{"ts":"2026-11-02T18:37:55.777Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 10ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 5.1s\n  Running TypeScript ...\nsrc/app/admin/notifications/page.tsx(14,25): error TS2304: Cannot find name 'requireSession'.\nFailed to type check."}
-{"ts":"2026-11-02T18:37:55.804Z","step":"done","status":"fail","detail":"build_failed"}
+{"ts":"2026-11-02T18:51:09.090Z","step":"start","status":"ok","detail":"t07-staff-permissions"}
+{"ts":"2026-11-02T18:51:09.103Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:51:09.128Z","step":"apply","status":"ok","detail":"9 files touched"}
+{"ts":"2026-11-02T18:51:17.054Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 10ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 4.8s\n  Running TypeScript ...\nsrc/app/admin/notifications/page.tsx(14,25): error TS2304: Cannot find name 'requireSession'.\nFailed to type check."}
+{"ts":"2026-11-02T18:51:17.081Z","step":"done","status":"fail","detail":"build_failed"}

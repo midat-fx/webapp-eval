@@ -1,10 +1,10 @@
-{"ts":"2026-11-02T18:36:22.018Z","step":"start","status":"ok","detail":"t07-staff-permissions"}
-{"ts":"2026-11-02T18:36:22.033Z","step":"setup","status":"ok"}
-{"ts":"2026-11-02T18:36:22.072Z","step":"apply","status":"ok","detail":"9 files touched"}
-{"ts":"2026-11-02T18:36:33.068Z","step":"build","status":"ok"}
-{"ts":"2026-11-02T18:36:35.651Z","step":"services","status":"ok"}
-{"ts":"2026-11-02T18:36:36.528Z","step":"seed","status":"ok"}
-{"ts":"2026-11-02T18:36:37.587Z","step":"server","status":"ok","detail":"1 instance(s)"}
-{"ts":"2026-11-02T18:36:41.106Z","step":"playwright","status":"exit:0"}
-{"ts":"2026-11-02T18:36:41.173Z","step":"invariants","status":"exit:0"}
-{"ts":"2026-11-02T18:36:41.205Z","step":"done","status":"auto","detail":"checks"}
+{"ts":"2026-11-02T18:49:49.536Z","step":"start","status":"ok","detail":"t07-staff-permissions"}
+{"ts":"2026-11-02T18:49:49.554Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:49:49.597Z","step":"apply","status":"ok","detail":"9 files touched"}
+{"ts":"2026-11-02T18:49:58.750Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T18:50:01.206Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T18:50:01.943Z","step":"seed","status":"ok"}
+{"ts":"2026-11-02T18:50:02.997Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-02T18:50:07.323Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-02T18:50:07.380Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-02T18:50:07.412Z","step":"done","status":"auto","detail":"checks"}

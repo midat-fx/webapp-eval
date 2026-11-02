@@ -11,7 +11,7 @@
       "kind": "playwright",
       "name": "staff navigation only links to what staff can use",
       "pass": false,
-      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('header a[href=\"/admin/services\"]')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('header a[href=\"/admin/services\"]') with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('header a[href=\"/admin/services\"]')\u001b[22m\n\u001b[2m    42 \u00d7 locator resolved to 1 element\u001b[22m\n\u001b[2m       - unexpected value \"1\"\u001b[22m\n"
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('header a[href=\"/admin/services\"]')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('header a[href=\"/admin/services\"]') with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('header a[href=\"/admin/services\"]')\u001b[22m\n\u001b[2m    44 \u00d7 locator resolved to 1 element\u001b[22m\n\u001b[2m       - unexpected value \"1\"\u001b[22m\n"
     },
     {
       "kind": "playwright",
@@ -44,13 +44,13 @@
       "kind": "sql",
       "name": "staff_did_not_hide_anything",
       "pass": false,
-      "detail": "[{\"kind\":\"staff\",\"name\":\"Madina\"}]"
+      "detail": "[{\"kind\":\"service\",\"name\":\"Women's haircut\"},{\"kind\":\"staff\",\"name\":\"Madina\"}]"
     },
     {
       "kind": "sql",
       "name": "no_staff_rows_created_by_staff",
       "pass": false,
-      "detail": "[{\"id\":\"e196ad79-1755-49ae-bf29-eda9e073292b\",\"name\":\"Intruder\"}]"
+      "detail": "[{\"id\":\"11c4bb16-d6ff-44cc-a76a-cc38c4d3ce92\",\"name\":\"Intruder\"}]"
     },
     {
       "kind": "sql",
@@ -65,5 +65,5 @@
     }
   ],
   "task": "t07-staff-permissions",
-  "seconds": 102.1
+  "seconds": 38.7
 }

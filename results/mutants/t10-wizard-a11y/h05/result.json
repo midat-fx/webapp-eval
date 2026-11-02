@@ -5,7 +5,7 @@
       "kind": "axe",
       "name": "every wizard state passes axe",
       "pass": false,
-      "detail": "Error: waitlist box\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label (critical): .mb-3\",\u001b[39m\n\u001b[31m+ ]\u001b[39m"
+      "detail": "Error: loading times\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label (critical): input\",\u001b[39m\n\u001b[31m+ ]\u001b[39m"
     },
     {
       "kind": "playwright",
@@ -25,5 +25,5 @@
     }
   ],
   "task": "t10-wizard-a11y",
-  "seconds": 39.0
+  "seconds": 38.7
 }

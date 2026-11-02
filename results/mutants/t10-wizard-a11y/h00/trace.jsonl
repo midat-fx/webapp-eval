@@ -1,9 +1,9 @@
-{"ts":"2026-11-02T18:41:02.781Z","step":"start","status":"ok","detail":"t10-wizard-a11y"}
-{"ts":"2026-11-02T18:41:02.796Z","step":"setup","status":"ok"}
-{"ts":"2026-11-02T18:41:02.822Z","step":"apply","status":"ok","detail":"1 files touched"}
-{"ts":"2026-11-02T18:41:12.316Z","step":"build","status":"ok"}
-{"ts":"2026-11-02T18:41:14.767Z","step":"services","status":"ok"}
-{"ts":"2026-11-02T18:41:15.469Z","step":"seed","status":"ok"}
-{"ts":"2026-11-02T18:41:16.528Z","step":"server","status":"ok","detail":"1 instance(s)"}
-{"ts":"2026-11-02T18:41:42.675Z","step":"playwright","status":"exit:1"}
-{"ts":"2026-11-02T18:41:42.709Z","step":"done","status":"auto","detail":"checks"}
+{"ts":"2026-11-02T18:51:51.325Z","step":"start","status":"ok","detail":"t10-wizard-a11y"}
+{"ts":"2026-11-02T18:51:51.340Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:51:51.364Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-02T18:52:00.834Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T18:52:03.276Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T18:52:03.947Z","step":"seed","status":"ok"}
+{"ts":"2026-11-02T18:52:05.000Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-02T18:52:31.254Z","step":"playwright","status":"exit:1"}
+{"ts":"2026-11-02T18:52:31.282Z","step":"done","status":"auto","detail":"checks"}

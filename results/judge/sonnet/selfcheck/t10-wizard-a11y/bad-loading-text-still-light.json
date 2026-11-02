@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/bad-loading-text-still-light",
+  "task": "t10-wizard-a11y",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds visible labels to the date, name and phone fields (keeping the placeholders), darkens the duration and \\\"Loading\u2026\\\" text to zinc-500 and the errors to red-700, adds `aria-pressed` to the service and staff buttons, and announces errors through `role=\\\"alert\\\"` (the main one always in the DOM). This covers all four requirements without removing anything a sighted user sees. I could not see the rest of the file, so any other grey text there is unchecked.\"}",
+  "cost_usd": 0.0485437,
+  "is_error": false
+}
