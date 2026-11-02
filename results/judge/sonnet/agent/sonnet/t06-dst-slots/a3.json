@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t06-dst-slots/a3",
+  "task": "t06-dst-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"localTimeToUtc now resolves the offset at the actual wall-clock instant by validating candidate offsets from either side of a transition. I traced Berlin 2027-03-28 and 2027-10-31 at 10:00 and got the correct UTC instants (08:00Z and 09:00Z). Ambiguous and nonexistent local times are also handled sensibly, and the admin day-end bound is fixed too. I could not see slotsForDay itself, so I assumed it derives its slots from localTimeToUtc.\"}",
+  "cost_usd": 0.0408417,
+  "is_error": false
+}

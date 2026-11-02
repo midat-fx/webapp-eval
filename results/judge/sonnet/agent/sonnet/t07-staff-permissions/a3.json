@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t07-staff-permissions/a3",
+  "task": "t07-staff-permissions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Every owner-only server action in the diff (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService) and every owner-only page (services, staff, reports, analytics, notifications, audit) now calls a new requireOwner() that redirects staff to /admin. updateBookingStatus still uses requireSession, so staff can still mark bookings. The layout shows only Calendar and Clients to staff, and owners are unaffected. I could only judge from the diff, so any other owner-only endpoints outside it are unverified.\"}",
+  "cost_usd": 0.043933700000000006,
+  "is_error": false
+}

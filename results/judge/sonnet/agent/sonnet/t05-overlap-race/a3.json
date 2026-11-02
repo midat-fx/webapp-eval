@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t05-overlap-race/a3",
+  "task": "t05-overlap-race",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"createBooking locks the staff row, re-checks overlap among confirmed bookings, and inserts in one transaction, with a partial EXCLUDE constraint (confirmed only, half-open range) as a cross-server backstop. A constraint violation (23P01) maps to the 409 slot_taken response, and different masters, cancelled bookings and back-to-back slots are unaffected. One risk I could not verify from the diff: the migration would fail on a database that still holds overlapping confirmed bookings like Dana's.\"}",
+  "cost_usd": 0.049439699999999996,
+  "is_error": false
+}

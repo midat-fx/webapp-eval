@@ -1,0 +1,284 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..dbdcac4 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useId, useMemo, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -20,13 +20,17 @@ function WaitlistBox({
+   staffId: string;
+   date: string;
+ }) {
++  const id = useId();
+   const [name, setName] = useState("");
+   const [phone, setPhone] = useState("");
+   const [state, setState] = useState<"idle" | "sending" | "joined" | "error">("idle");
+ 
+   if (state === "joined") {
+     return (
+-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
++      <div
++        role="status"
++        className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
++      >
+         You are on the waitlist for {date}. The moment a slot frees up we message you first — you get
+         15 minutes to claim it.
+       </div>
+@@ -50,19 +54,31 @@ function WaitlistBox({
+         to you.
+       </p>
+       <div className="mt-3 space-y-2">
+-        <input
+-          placeholder="Name"
+-          value={name}
+-          onChange={(e) => setName(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
+-        <input
+-          placeholder="+7701…"
+-          type="tel"
+-          value={phone}
+-          onChange={(e) => setPhone(e.target.value)}
+-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-        />
++        <div>
++          <label htmlFor={`${id}-name`} className="mb-1 block text-sm font-medium text-zinc-700">
++            Name
++          </label>
++          <input
++            id={`${id}-name`}
++            placeholder="Name"
++            value={name}
++            onChange={(e) => setName(e.target.value)}
++            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
++          />
++        </div>
++        <div>
++          <label htmlFor={`${id}-phone`} className="mb-1 block text-sm font-medium text-zinc-700">
++            Phone
++          </label>
++          <input
++            id={`${id}-phone`}
++            placeholder="+7701…"
++            type="tel"
++            value={phone}
++            onChange={(e) => setPhone(e.target.value)}
++            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
++          />
++        </div>
+         <button
+           onClick={submit}
+           disabled={state === "sending" || !name.trim() || !phone.trim()}
+@@ -71,7 +87,9 @@ function WaitlistBox({
+           {state === "sending" ? "Joining…" : "Join the waitlist"}
+         </button>
+         {state === "error" && (
+-          <p className="text-sm text-red-600">That did not work — check the phone number and try again</p>
++          <p role="alert" className="text-sm text-red-600">
++            That did not work — check the phone number and try again
++          </p>
+         )}
+       </div>
+     </div>
+@@ -79,6 +97,7 @@ function WaitlistBox({
+ }
+ 
+ export function BookingWizard({ slug, timezone }: { slug: string; timezone: string }) {
++  const id = useId();
+   const [services, setServices] = useState<Service[] | null>(null);
+   const [service, setService] = useState<Service | null>(null);
+   const [master, setMaster] = useState<Master | null>(null);
+@@ -207,34 +226,39 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       <section>
+         <h2 className="mb-2 font-semibold text-zinc-800">1 · Service</h2>
+         {!services ? (
+-          <p className="text-sm text-zinc-400">Loading…</p>
++          <p className="text-sm text-zinc-600">Loading…</p>
+         ) : (
+           <div className="grid gap-2">
+-            {services.map((svc) => (
+-              <button
+-                key={svc.id}
+-                onClick={() => {
+-                  setService(svc);
+-                  setMaster(null);
+-                  setHold(null);
+-                  setSlots(null);
+-                }}
+-                className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition ${
+-                  service?.id === svc.id
+-                    ? "border-zinc-900 bg-zinc-900 text-white"
+-                    : "border-zinc-200 bg-white hover:border-zinc-400"
+-                }`}
+-              >
+-                <span>
+-                  {svc.name}
+-                  <span className={service?.id === svc.id ? "text-zinc-300" : "text-zinc-400"}>
+-                    {" "}
+-                    · {svc.durationMin} min
++            {services.map((svc) => {
++              const selected = service?.id === svc.id;
++              return (
++                <button
++                  key={svc.id}
++                  aria-pressed={selected}
++                  onClick={() => {
++                    setService(svc);
++                    setMaster(null);
++                    setHold(null);
++                    setSlots(null);
++                  }}
++                  className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition ${
++                    selected
++                      ? "border-zinc-900 bg-zinc-900 text-white"
++                      : "border-zinc-200 bg-white hover:border-zinc-400"
++                  }`}
++                >
++                  <span>
++                    {selected && <span aria-hidden="true">✓ </span>}
++                    {svc.name}
++                    <span className={selected ? "text-zinc-300" : "text-zinc-600"}>
++                      {" "}
++                      · {svc.durationMin} min
++                    </span>
+                   </span>
+-                </span>
+-                <span className="shrink-0 font-medium">{fmtPrice(svc.priceKzt)}</span>
+-              </button>
+-            ))}
++                  <span className="shrink-0 font-medium">{fmtPrice(svc.priceKzt)}</span>
++                </button>
++              );
++            })}
+           </div>
+         )}
+       </section>
+@@ -244,23 +268,28 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         <section>
+           <h2 className="mb-2 font-semibold text-zinc-800">2 · Staff member</h2>
+           <div className="flex flex-wrap gap-2">
+-            {service.staff.map((m) => (
+-              <button
+-                key={m.id}
+-                onClick={() => {
+-                  setMaster(m);
+-                  setHold(null);
+-                  setSlots(null);
+-                }}
+-                className={`rounded-full border px-4 py-2 transition ${
+-                  master?.id === m.id
+-                    ? "border-zinc-900 bg-zinc-900 text-white"
+-                    : "border-zinc-200 bg-white hover:border-zinc-400"
+-                }`}
+-              >
+-                {m.name}
+-              </button>
+-            ))}
++            {service.staff.map((m) => {
++              const selected = master?.id === m.id;
++              return (
++                <button
++                  key={m.id}
++                  aria-pressed={selected}
++                  onClick={() => {
++                    setMaster(m);
++                    setHold(null);
++                    setSlots(null);
++                  }}
++                  className={`rounded-full border px-4 py-2 transition ${
++                    selected
++                      ? "border-zinc-900 bg-zinc-900 text-white"
++                      : "border-zinc-200 bg-white hover:border-zinc-400"
++                  }`}
++                >
++                  {selected && <span aria-hidden="true">✓ </span>}
++                  {m.name}
++                </button>
++              );
++            })}
+           </div>
+         </section>
+       )}
+@@ -269,7 +298,11 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       {service && master && !hold && (
+         <section>
+           <h2 className="mb-2 font-semibold text-zinc-800">3 · Date and time</h2>
++          <label htmlFor={`${id}-date`} className="mb-1 block text-sm font-medium text-zinc-700">
++            Date
++          </label>
+           <input
++            id={`${id}-date`}
+             type="date"
+             value={date}
+             min={new Date().toISOString().slice(0, 10)}
+@@ -280,7 +313,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             className="mb-3 rounded-lg border border-zinc-300 px-3 py-2"
+           />
+           {!slots ? (
+-            <p className="text-sm text-zinc-400">Loading…</p>
++            <p className="text-sm text-zinc-600">Loading…</p>
+           ) : slots.length === 0 ? (
+             <WaitlistBox
+               slug={slug}
+@@ -316,19 +349,31 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+             </span>
+           </p>
+           <div className="mt-3 space-y-3">
+-            <input
+-              placeholder="Name"
+-              value={name}
+-              onChange={(e) => setName(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
+-            <input
+-              placeholder="+7701…"
+-              type="tel"
+-              value={phone}
+-              onChange={(e) => setPhone(e.target.value)}
+-              className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+-            />
++            <div>
++              <label htmlFor={`${id}-name`} className="mb-1 block text-sm font-medium text-zinc-700">
++                Name
++              </label>
++              <input
++                id={`${id}-name`}
++                placeholder="Name"
++                value={name}
++                onChange={(e) => setName(e.target.value)}
++                className="w-full rounded-lg border border-zinc-300 px-3 py-2"
++              />
++            </div>
++            <div>
++              <label htmlFor={`${id}-phone`} className="mb-1 block text-sm font-medium text-zinc-700">
++                Phone
++              </label>
++              <input
++                id={`${id}-phone`}
++                placeholder="+7701…"
++                type="tel"
++                value={phone}
++                onChange={(e) => setPhone(e.target.value)}
++                className="w-full rounded-lg border border-zinc-300 px-3 py-2"
++              />
++            </div>
+             <div className="flex gap-2">
+               <button
+                 onClick={confirm}
+@@ -351,7 +396,11 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         </section>
+       )}
+ 
+-      {error && <p className="text-sm text-red-600">{error}</p>}
++      {error && (
++        <p role="alert" className="text-sm text-red-600">
++          {error}
++        </p>
++      )}
+     </div>
+   );
+ }

@@ -1,0 +1,28 @@
+{
+  "task": "t07-staff-permissions",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 41.4,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.22399409999999997,
+  "is_error": false,
+  "result_text": "Staff logins are now limited to the Calendar and Clients. I haven't tested it with a real staff login, since the dev server, Postgres and Redis aren't running here. `pnpm build` and `pnpm test` pass.\n\n- **Server check:** I added `requireOwner()` in `src/lib/session.ts`. It redirects any non-owner session to `/admin`, the calendar.\n- **Owner-only pages:** The Services, Staff, Reports, Analytics, Notifications and Audit pages now call `requireOwner()`. A staff member who opens one of those URLs is redirected to the calendar before any data is queried.\n- **Server actions:** `saveService`, `toggleService`, `saveStaff`, `toggleStaff` and `toggleStaffService` in `src/app/admin/actions.ts` now call `requireOwner()`. A replayed form submission from a staff session is refused, whatever page it comes from.\n- **Staff actions kept:** `updateBookingStatus` still uses the plain session check, so staff can mark bookings completed, no-show or cancelled.\n- **Navigation:** `src/app/admin/layout.tsx` shows only Calendar and Clients to staff. The owner sees all eight links, as before.\n\nThe checks are on each page and action rather than in the layout. Layouts don't re-run on client navigation or on form posts, so a layout check wouldn't have stopped replayed submissions.\n\nThe role is read from the session saved in Redis at login. A role change for an existing user only takes effect on their next login.",
+  "stderr": "",
+  "patch_lines": 210,
+  "touched_outside_workdir": []
+}

@@ -1,0 +1,9 @@
+{"ts":"2026-11-02T08:05:43.480Z","step":"start","status":"ok","detail":"t06-dst-slots"}
+{"ts":"2026-11-02T08:05:43.497Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T08:05:43.519Z","step":"apply","status":"ok","detail":"4 files touched"}
+{"ts":"2026-11-02T08:05:52.194Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T08:05:54.637Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T08:05:55.358Z","step":"seed","status":"ok"}
+{"ts":"2026-11-02T08:05:56.420Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-02T08:05:57.740Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-02T08:05:57.770Z","step":"done","status":"auto","detail":"checks"}

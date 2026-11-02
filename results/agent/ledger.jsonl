@@ -48,3 +48,13 @@
 {"task": "t07-staff-permissions", "model": "haiku", "attempt": 3}
 {"task": "t08-status-transitions", "model": "haiku", "attempt": 3}
 {"task": "t09-booking-note", "model": "haiku", "attempt": 3}
+{"task": "t10-wizard-a11y", "model": "haiku", "attempt": 3}
+{"task": "t01-phone-format", "model": "sonnet", "attempt": 3}
+{"task": "t02-stale-slots", "model": "sonnet", "attempt": 3}
+{"task": "t03-default-date-tz", "model": "sonnet", "attempt": 3}
+{"task": "t04-sse-subscriber-leak", "model": "sonnet", "attempt": 3}
+{"task": "t05-overlap-race", "model": "sonnet", "attempt": 3}
+{"task": "t06-dst-slots", "model": "sonnet", "attempt": 3}
+{"task": "t07-staff-permissions", "model": "sonnet", "attempt": 3}
+{"task": "t08-status-transitions", "model": "sonnet", "attempt": 3}
+{"task": "t09-booking-note", "model": "sonnet", "attempt": 3}

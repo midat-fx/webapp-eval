@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t04-sse-subscriber-leak/a3",
+  "task": "t04-sse-subscriber-leak",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch tears down the subscriber (clears the ping timer, removes the listener, unsubscribes, then quits or disconnects) from both the request abort signal and the stream's cancel, and guards against double cleanup and abort-before-subscribe races. Live message forwarding to open tabs is unchanged.\"}",
+  "cost_usd": 0.029623700000000003,
+  "is_error": false
+}

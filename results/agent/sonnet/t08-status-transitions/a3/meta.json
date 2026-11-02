@@ -1,0 +1,28 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 55.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 8,
+  "cost_usd": 0.1669911,
+  "is_error": false,
+  "result_text": "`setBookingStatus` in `src/lib/booking.ts` now only changes a booking that is still `confirmed`. I haven't run the change against Postgres or Redis. `pnpm test` passes (12 tests). `tsc` reports one error, in `src/app/layout.tsx` (`LayoutProps` not found), which I didn't touch.\n\n- **Single update:** the status update now includes `status = 'confirmed'` in its `WHERE` clause.\n  - **Concurrent clicks:** Postgres makes the second update wait for the first, then re-check the status. The loser matches no row, so there is no second audit entry, cancellation message or waitlist offer. This holds across app servers because the database does the check, not app code.\n  - **Cancelled or finished bookings:** the same check blocks completing a cancelled booking and cancelling a finished one, so no slot is announced as free again.\n- **No-op calls:** when nothing changes, the function now skips the \"booking updated\" calendar event too. A call asking for status `confirmed` also returns immediately.\n- **Cleanup:** I removed the `status !== \"confirmed\"` guard around the reminder cancellation, since `confirmed` can no longer reach that point.",
+  "stderr": "",
+  "patch_lines": 53,
+  "touched_outside_workdir": []
+}

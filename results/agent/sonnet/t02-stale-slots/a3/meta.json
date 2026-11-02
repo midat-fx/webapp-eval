@@ -1,0 +1,28 @@
+{
+  "task": "t02-stale-slots",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 29.1,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.1530358,
+  "is_error": false,
+  "result_text": "I fixed the stale-response bug in `src/app/[slug]/wizard.tsx`. I haven't run it in a browser, since the dev server needs Postgres and Redis.\n\nThe wizard now builds a key from the selected service, staff member and date. Each slots request remembers the key it was made for. When a response arrives, it is applied only if that key still matches the current selection. Otherwise it is dropped, so a slow first-date response can no longer overwrite the second date's times. The same check covers switching staff or service, and it skips the \"Could not load available times\" error for superseded requests.\n\nChanging the selection while times are loading still works, because the new selection simply starts its own request. The \"just taken\" and hold-expired reloads go through the same check, so a stale callback can't overwrite the grid either.\n\nESLint is clean on the file. `tsc --noEmit` reports one error, `LayoutProps` not found in `src/app/layout.tsx`. That file isn't one I changed, and I haven't investigated it. I didn't run `pnpm test` or `pnpm build`.",
+  "stderr": "",
+  "patch_lines": 41,
+  "touched_outside_workdir": []
+}

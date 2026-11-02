@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t03-default-date-tz/a3",
+  "task": "t03-default-date-tz",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds `todayInTimeZone`, which uses `Intl.DateTimeFormat` with the business timezone, and uses it for both the date picker's initial value and its `min`. This gives the business-local date for any IANA timezone, independent of the visitor's timezone or UTC.\"}",
+  "cost_usd": 0.0207897,
+  "is_error": false
+}

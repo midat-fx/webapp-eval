@@ -1,0 +1,41 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..72c5fa7 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -1,5 +1,5 @@
+ "use client";
+-import { useCallback, useEffect, useMemo, useState } from "react";
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ 
+ type Master = { id: string; name: string };
+ type Service = { id: string; name: string; durationMin: number; priceKzt: number; staff: Master[] };
+@@ -105,14 +105,25 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+       .catch(() => setError("Could not load services"));
+   }, [slug]);
+ 
+-  // Data lands asynchronously; loading state is `slots === null`,
+-  // reset in the event handlers that change service/master/date.
++  // Loading state is `slots === null`, reset in the handlers that change service/master/date.
++  // A response is applied only if it still matches the current selection, whatever the arrival order.
++  const selectionKey = service && master ? `${service.id}|${master.id}|${date}` : null;
++  const selectionKeyRef = useRef(selectionKey);
++  useEffect(() => {
++    selectionKeyRef.current = selectionKey;
++  }, [selectionKey]);
++
+   const loadSlots = useCallback(() => {
+     if (!service || !master) return;
++    const key = `${service.id}|${master.id}|${date}`;
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
+-      .catch(() => setError("Could not load available times"));
++      .then((d) => {
++        if (selectionKeyRef.current === key) setSlots(d.slots ?? []);
++      })
++      .catch(() => {
++        if (selectionKeyRef.current === key) setError("Could not load available times");
++      });
+   }, [slug, service, master, date]);
+ 
+   useEffect(loadSlots, [loadSlots]);

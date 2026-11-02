@@ -1,0 +1,28 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 43.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 6,
+  "cost_usd": 0.1168965,
+  "is_error": false,
+  "result_text": "I fixed the leak in `src/app/api/admin/events/route.ts`. I haven't run it against Redis, because Redis and Postgres aren't available here.\n\n**Cause:** each connection to `/api/admin/events` created its own Redis subscriber with `redis().duplicate()`, but nothing cleaned it up. The 25-second ping `setInterval` was never cleared, and the subscriber was never unsubscribed or closed. Every tab open or back-navigation left a Redis connection stuck in `subscribe`.\n\n**Fix:** the route now tears down the subscriber when the client goes away. It does this when the request aborts (tab closed or navigated away) and when the stream is cancelled. Teardown clears the ping timer, removes the message listener, unsubscribes from `calendar:<id>`, and quits the connection. It runs only once and is safe to call again. It also covers a client that disconnects while the subscribe is still in progress, and an enqueue that fails because the stream has already closed.\n\nThe client in `src/app/admin/live.tsx` already closes its `EventSource` on unmount, so I left it alone. Open tabs still get live updates, since each keeps its own subscriber.\n\n`tsc` reports one error, `LayoutProps` not found in `src/app/layout.tsx`. I didn't touch that file, and I haven't confirmed whether it also fails in `pnpm build`.",
+  "stderr": "",
+  "patch_lines": 73,
+  "touched_outside_workdir": []
+}

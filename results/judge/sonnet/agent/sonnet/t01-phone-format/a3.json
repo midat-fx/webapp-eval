@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t01-phone-format/a3",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"A shared `normalizePhone` strips spaces, dashes, dots and parentheses, then applies the original validation, so `call me` and `+7 701` are still rejected. Both public routes use it via `phoneSchema`, and `createBooking` and `joinWaitlist` normalize again before the client lookup and insert, so all formats resolve to one client stored as `+77015551234`. The diff does not show whether the wizard has its own client-side phone check, which would not be covered.\"}",
+  "cost_usd": 0.0476267,
+  "is_error": false
+}

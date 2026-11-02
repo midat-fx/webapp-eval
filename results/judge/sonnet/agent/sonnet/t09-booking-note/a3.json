@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t09-booking-note/a3",
+  "task": "t09-booking-note",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds a properly labelled optional Note textarea (maxLength 500) and labels the Name and Phone inputs too. The API schema trims the note and rejects anything over 500 characters before `createBooking` runs; the server stores an empty note as NULL and keeps inner line breaks. The admin card renders the note as escaped plain text with `whitespace-pre-wrap`, so line breaks show.\"}",
+  "cost_usd": 0.04229970000000001,
+  "is_error": false
+}

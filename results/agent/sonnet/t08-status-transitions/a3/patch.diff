@@ -1,0 +1,53 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..cb1b77f 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,22 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  if (status === "confirmed") return;
++  const changed = await db.transaction(async (tx) => {
++    // Compare-and-set: the row lock makes competing writers queue up, and the
++    // loser re-checks status = 'confirmed' against the winner's committed value.
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -248,10 +257,8 @@ export async function setBookingStatus(opts: {
+       entityId: bookingId,
+     });
+ 
+-    if (status !== "confirmed") {
+-      // Nobody wants a reminder for an appointment that is no longer happening.
+-      await cancelByDedupeKey(tx, `booking.reminder:${bookingId}`);
+-    }
++    // Nobody wants a reminder for an appointment that is no longer happening.
++    await cancelByDedupeKey(tx, `booking.reminder:${bookingId}`);
+     if (status === "cancelled") {
+       await enqueue(tx, {
+         businessId,
+@@ -275,7 +282,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
++  if (!changed) return;
+   await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 

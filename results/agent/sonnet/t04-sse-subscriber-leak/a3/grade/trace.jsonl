@@ -1,0 +1,9 @@
+{"ts":"2026-11-02T08:02:50.910Z","step":"start","status":"ok","detail":"t04-sse-subscriber-leak"}
+{"ts":"2026-11-02T08:02:50.931Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T08:02:50.951Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-02T08:02:59.805Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T08:03:02.292Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T08:03:03.087Z","step":"seed","status":"ok"}
+{"ts":"2026-11-02T08:03:04.138Z","step":"server","status":"ok","detail":"1 instance(s)"}
+{"ts":"2026-11-02T08:03:12.290Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-02T08:03:12.318Z","step":"done","status":"auto","detail":"checks"}

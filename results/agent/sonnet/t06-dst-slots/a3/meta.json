@@ -1,0 +1,28 @@
+{
+  "task": "t06-dst-slots",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 50.9,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 10,
+  "cost_usd": 0.2044851,
+  "is_error": false,
+  "result_text": "I fixed the wrong slots on clock-change days. On 28 March 2027 in Berlin, the first slot is now 10:00 local (08:00Z) and the last one ends at 20:00. Winter time start (31 October) opens at 10:00 too. `pnpm test` passes. I did not run `pnpm build`, and the integration tests and dev server can't run here, so nothing was checked against a real booking page.\n\n**Cause:** `localTimeToUtc` in `src/lib/slots.ts` read the timezone offset once, at 00:00 UTC of the date. On a clock-change day the offset changes during the day, so every opening and closing time came out an hour off.\n\n**Fix:**\n- **`src/lib/slots.ts`:** `localTimeToUtc` now works out the offset that applies at the requested wall time. For a wall time that happens twice when clocks go back, it takes the earlier one. For a wall time that doesn't exist when clocks go forward, such as 02:30 in Berlin on 28 March, it shifts forward to 03:30.\n- **`src/app/admin/page.tsx`:** the calendar's day range was start of day plus a fixed 24 hours, which cuts bookings off on 23- and 25-hour days. It now ends at the next local midnight.\n- **`src/lib/slots.test.ts`:** I added tests for the Berlin spring and autumn days and the New York spring day.\n\nI also spot-checked 2027 dates in Asia/Kolkata and Australia/Lord_Howe. Both gave the right times.",
+  "stderr": "",
+  "patch_lines": 69,
+  "touched_outside_workdir": []
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t02-stale-slots/a3",
+  "task": "t02-stale-slots",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Each slots response is tagged with a service|staff|date key and applied only if it still matches the current selection, tracked in a ref that is updated before the load effect runs. Late responses for a previous date or staff member are dropped, while changing the selection during loading still triggers a fresh fetch, and a stale error cannot overwrite the current view either.\"}",
+  "cost_usd": 0.0256037,
+  "is_error": false
+}

@@ -1,0 +1,10 @@
+{
+  "id": "agent/haiku/t10-wizard-a11y/a3",
+  "task": "t10-wizard-a11y",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The patch adds real labels to the date, name and phone fields, darkens the low-contrast grey text, adds role=alert to the booking and waitlist errors, and marks the chosen service and staff with aria-pressed plus a visible check. Placeholders are kept, so nothing a sighted user sees today disappears.\"}",
+  "cost_usd": 0.0557677,
+  "is_error": false
+}

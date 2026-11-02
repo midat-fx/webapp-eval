@@ -1,0 +1,196 @@
+diff --git a/drizzle/0004_no_overlapping_bookings.sql b/drizzle/0004_no_overlapping_bookings.sql
+new file mode 100644
+index 0000000..9b9e305
+--- /dev/null
++++ b/drizzle/0004_no_overlapping_bookings.sql
+@@ -0,0 +1,3 @@
++CREATE EXTENSION IF NOT EXISTS btree_gist;
++--> statement-breakpoint
++ALTER TABLE "bookings" ADD CONSTRAINT "bookings_no_overlap" EXCLUDE USING gist ("staff_id" WITH =, tstzrange("start_at", "end_at", '[)') WITH &&) WHERE ("status" = 'confirmed');
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index ecdda1a..b961271 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1786183773099,
+       "tag": "0003_waitlist",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "7",
++      "when": 1786187373099,
++      "tag": "0004_no_overlapping_bookings",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index 3b13bba..12de6ad 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, eq, gte, inArray, lt } from "drizzle-orm";
++import { and, eq, gt, gte, inArray, lt } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+@@ -125,6 +125,13 @@ export type BookResult =
+   | { ok: true; bookingId: string }
+   | { ok: false; error: "hold_expired" | "slot_taken" };
+ 
++function pgErrorCode(err: unknown): string | undefined {
++  for (let e = err as { code?: string; cause?: unknown } | undefined; e; e = e.cause as typeof e) {
++    if (typeof e.code === "string") return e.code;
++  }
++  return undefined;
++}
++
+ export async function createBooking(opts: {
+   businessId: string;
+   staffId: string;
+@@ -147,65 +154,96 @@ export async function createBooking(opts: {
+     .where(and(eq(s.services.id, serviceId), eq(s.services.businessId, businessId)));
+   if (!service) return { ok: false, error: "slot_taken" };
+ 
+-  // Upsert client by (business, phone)
+-  const [existing] = await db
++  if (!(slot.endMs > slot.startMs)) return { ok: false, error: "slot_taken" };
++
++  // Upsert client by (business, phone); concurrent checkouts may race here.
++  await db
++    .insert(s.clients)
++    .values({ businessId, name: client.name, phone: client.phone })
++    .onConflictDoNothing({ target: [s.clients.businessId, s.clients.phone] });
++  const [clientRow] = await db
+     .select()
+     .from(s.clients)
+     .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, client.phone)));
+-  const clientRow =
+-    existing ??
+-    (await db
+-      .insert(s.clients)
+-      .values({ businessId, name: client.name, phone: client.phone })
+-      .returning())[0];
+ 
+   // Booking, audit trail and outbound messages commit together: a client can
+   // never end up with a confirmation for a booking that was rolled back.
+-  const bookingId = await db.transaction(async (tx) => {
+-    const [booking] = await tx
+-      .insert(s.bookings)
+-      .values({
+-        businessId,
+-        staffId,
+-        serviceId,
+-        clientId: clientRow.id,
+-        startAt: new Date(slot.startMs),
+-        endAt: new Date(slot.endMs),
+-        status: "confirmed",
+-        priceKzt: service.priceKzt,
+-      })
+-      .returning();
++  let bookingId: string | null;
++  try {
++    bookingId = await db.transaction(async (tx) => {
++      // Serialise all bookings for this master (across app servers) on the
++      // staff row, then check for overlap. The bookings_no_overlap exclusion
++      // constraint is the backstop if anything ever bypasses this path.
++      const [lockedStaff] = await tx
++        .select({ id: s.staff.id })
++        .from(s.staff)
++        .where(and(eq(s.staff.id, staffId), eq(s.staff.businessId, businessId)))
++        .for("update");
++      if (!lockedStaff) return null;
+ 
+-    await tx.insert(s.auditLog).values({
+-      businessId,
+-      action: "booking.create",
+-      entity: "booking",
+-      entityId: booking.id,
+-      meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
+-    });
++      const [clash] = await tx
++        .select({ id: s.bookings.id })
++        .from(s.bookings)
++        .where(
++          and(
++            eq(s.bookings.staffId, staffId),
++            eq(s.bookings.status, "confirmed"),
++            lt(s.bookings.startAt, new Date(slot.endMs)),
++            gt(s.bookings.endAt, new Date(slot.startMs)),
++          ),
++        )
++        .limit(1);
++      if (clash) return null;
+ 
+-    await enqueue(tx, {
+-      businessId,
+-      topic: "booking.confirmed",
+-      payload: { bookingId: booking.id },
+-      dedupeKey: `booking.confirmed:${booking.id}`,
+-    });
++      const [booking] = await tx
++        .insert(s.bookings)
++        .values({
++          businessId,
++          staffId,
++          serviceId,
++          clientId: clientRow.id,
++          startAt: new Date(slot.startMs),
++          endAt: new Date(slot.endMs),
++          status: "confirmed",
++          priceKzt: service.priceKzt,
++        })
++        .returning();
++
++      await tx.insert(s.auditLog).values({
++        businessId,
++        action: "booking.create",
++        entity: "booking",
++        entityId: booking.id,
++        meta: { staffId, serviceId, startAt: new Date(slot.startMs).toISOString() },
++      });
+ 
+-    // Reminder the day before; retired automatically if the booking is
+-    // cancelled before the worker gets to it.
+-    const remindAt = new Date(slot.startMs - 24 * 3600_000);
+-    if (remindAt.getTime() > Date.now()) {
+       await enqueue(tx, {
+         businessId,
+-        topic: "booking.reminder",
++        topic: "booking.confirmed",
+         payload: { bookingId: booking.id },
+-        dedupeKey: `booking.reminder:${booking.id}`,
+-        availableAt: remindAt,
++        dedupeKey: `booking.confirmed:${booking.id}`,
+       });
+-    }
+ 
+-    return booking.id;
+-  });
++      // Reminder the day before; retired automatically if the booking is
++      // cancelled before the worker gets to it.
++      const remindAt = new Date(slot.startMs - 24 * 3600_000);
++      if (remindAt.getTime() > Date.now()) {
++        await enqueue(tx, {
++          businessId,
++          topic: "booking.reminder",
++          payload: { bookingId: booking.id },
++          dedupeKey: `booking.reminder:${booking.id}`,
++          availableAt: remindAt,
++        });
++      }
++
++      return booking.id;
++    });
++  } catch (err) {
++    if (pgErrorCode(err) === "23P01") return { ok: false, error: "slot_taken" };
++    throw err;
++  }
++  if (!bookingId) return { ok: false, error: "slot_taken" };
+ 
+   await redis().del(holdKey(staffId, slot.startMs));
+   await publishCalendar(businessId, { type: "booking.created", bookingId });

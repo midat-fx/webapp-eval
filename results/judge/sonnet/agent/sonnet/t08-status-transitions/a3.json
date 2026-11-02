@@ -1,0 +1,10 @@
+{
+  "id": "agent/sonnet/t08-status-transitions/a3",
+  "task": "t08-status-transitions",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The UPDATE now has `status = 'confirmed'` in its WHERE clause, so under Postgres row locking a competing writer re-checks the committed status and updates nothing. The audit entry, reminder cancellation, cancellation message, waitlist offer and calendar publish all depend on that update succeeding, so stale, repeated and concurrent attempts are no-ops across app servers.\"}",
+  "cost_usd": 0.0221047,
+  "is_error": false
+}

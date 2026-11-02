@@ -1,0 +1,28 @@
+{
+  "task": "t03-default-date-tz",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "seconds": 45.0,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 8,
+  "cost_usd": 0.134349,
+  "is_error": false,
+  "result_text": "The booking page now opens on today's date in the business's timezone. That same date is also the earliest date the picker allows.\n\nThe bug was in `src/app/[slug]/wizard.tsx`, which built both the default date and the `min` from `new Date().toISOString()`, i.e. the UTC date. I added a `todayInTimeZone(timeZone)` helper to `src/lib/slots.ts` and used it for both. It takes any IANA timezone, so it isn't specific to Almaty. The visitor's own timezone no longer matters.\n\nI didn't add a test for the helper or try the page in a browser. `pnpm test` passes, and `pnpm build` wasn't run. `tsc --noEmit` reports one error, in `src/app/layout.tsx` (`LayoutProps` not found). I didn't touch that file.",
+  "stderr": "",
+  "patch_lines": 52,
+  "touched_outside_workdir": []
+}

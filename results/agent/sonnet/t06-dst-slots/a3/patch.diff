@@ -1,0 +1,69 @@
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index 68dc9d7..a013b43 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -31,7 +31,9 @@ export default async function CalendarPage(ctx: {
+     new Intl.DateTimeFormat("en-CA", { timeZone: biz.timezone }).format(new Date()); // YYYY-MM-DD today, business-local
+ 
+   const dayStart = new Date(localTimeToUtc(dateISO, "00:00", biz.timezone));
+-  const dayEnd = new Date(dayStart.getTime() + 24 * 3600_000);
++  const [ny, nm, nd] = dateISO.split("-").map(Number);
++  const nextDateISO = new Date(Date.UTC(ny, nm - 1, nd + 1)).toISOString().slice(0, 10);
++  const dayEnd = new Date(localTimeToUtc(nextDateISO, "00:00", biz.timezone));
+ 
+   const rows = await db
+     .select({
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index ff1de20..2ecf744 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -74,3 +74,23 @@ describe("slotsForDay", () => {
+     expect(slots.map((s) => s.startMs)).toEqual([at(11)]);
+   });
+ });
++
++describe("DST transition days", () => {
++  it("Berlin spring-forward day opens at 10:00 local and closes at 20:00", () => {
++    expect(new Date(localTimeToUtc("2027-03-28", "10:00", "Europe/Berlin")).toISOString()).toBe("2027-03-28T08:00:00.000Z");
++    const slots = slotsForDay({
++      dateISO: "2027-03-28",
++      timeZone: "Europe/Berlin",
++      window: { open: "10:00", close: "20:00" },
++      durationMin: 60,
++    });
++    expect(new Date(slots[0].startMs).toISOString()).toBe("2027-03-28T08:00:00.000Z");
++    expect(new Date(slots.at(-1)!.endMs).toISOString()).toBe("2027-03-28T18:00:00.000Z");
++  });
++  it("Berlin fall-back day opens at 10:00 local", () => {
++    expect(new Date(localTimeToUtc("2027-10-31", "10:00", "Europe/Berlin")).toISOString()).toBe("2027-10-31T09:00:00.000Z");
++  });
++  it("New York spring-forward day", () => {
++    expect(new Date(localTimeToUtc("2027-03-14", "09:00", "America/New_York")).toISOString()).toBe("2027-03-14T13:00:00.000Z");
++  });
++});
+diff --git a/src/lib/slots.ts b/src/lib/slots.ts
+index 0ae9530..7c55a2a 100644
+--- a/src/lib/slots.ts
++++ b/src/lib/slots.ts
+@@ -36,10 +36,17 @@ export function tzOffsetMinutes(timeZone: string, utcMs: number): number {
+ export function localTimeToUtc(dateISO: string, hhmm: string, timeZone: string): number {
+   const [y, m, d] = dateISO.split("-").map(Number);
+   const [hh, mm] = hhmm.split(":").map(Number);
+-  // The zone's offset is taken once, at the start of the date: building an
+-  // Intl formatter is the expensive part, and a day has a single offset.
+-  const offset = tzOffsetMinutes(timeZone, Date.UTC(y, m - 1, d));
+-  return Date.UTC(y, m - 1, d, hh, mm) - offset * 60000;
++  const wallMs = Date.UTC(y, m - 1, d, hh, mm);
++  // Offsets on either side of any transition within a day of the wall time.
++  const before = tzOffsetMinutes(timeZone, wallMs - 24 * 3600_000);
++  const after = tzOffsetMinutes(timeZone, wallMs + 24 * 3600_000);
++  const candidates = [before, after]
++    .map((off) => ({ off, utc: wallMs - off * 60000 }))
++    .filter((c) => tzOffsetMinutes(timeZone, c.utc) === c.off)
++    .map((c) => c.utc);
++  // Ambiguous (clocks go back): earliest occurrence. Nonexistent (clocks go
++  // forward): interpret with the pre-transition offset, i.e. shift forward.
++  return candidates.length ? Math.min(...candidates) : wallMs - before * 60000;
+ }
+ 
+ /** ISO weekday (1 = Monday … 7 = Sunday) of local date `YYYY-MM-DD`. */
