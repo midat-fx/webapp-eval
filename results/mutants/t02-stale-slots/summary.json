@@ -1,0 +1,36 @@
+{
+  "task": "t02-stale-slots",
+  "hunks": 2,
+  "not_source": 0,
+  "graded": 2,
+  "killed": 1,
+  "broken": 1,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 12.7
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "late response for the previous date is ignored (2500 ms)",
+        "late response for the previous date is ignored (1200 ms)",
+        "late response for the previous staff member is ignored",
+        "both_checks_booked"
+      ],
+      "seconds": 31.0
+    }
+  ]
+}

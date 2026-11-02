@@ -400,5 +400,127 @@
       "as_expected": 5,
       "n": 5
     }
-  ]
+  ],
+  "mutants": {
+    "hunks": 56,
+    "graded": 55,
+    "killed": 32,
+    "broken": 18,
+    "survived": 5,
+    "verifier_kill_rate": 0.865,
+    "by_task": {
+      "t01-phone-format": {
+        "hunks": 6,
+        "not_source": 0,
+        "graded": 6,
+        "killed": 2,
+        "broken": 4,
+        "survived": 0
+      },
+      "t02-stale-slots": {
+        "hunks": 2,
+        "not_source": 0,
+        "graded": 2,
+        "killed": 1,
+        "broken": 1,
+        "survived": 0
+      },
+      "t03-default-date-tz": {
+        "hunks": 3,
+        "not_source": 0,
+        "graded": 3,
+        "killed": 2,
+        "broken": 1,
+        "survived": 0
+      },
+      "t04-sse-subscriber-leak": {
+        "hunks": 3,
+        "not_source": 0,
+        "graded": 3,
+        "killed": 1,
+        "broken": 1,
+        "survived": 1
+      },
+      "t05-overlap-race": {
+        "hunks": 3,
+        "not_source": 0,
+        "graded": 3,
+        "killed": 2,
+        "broken": 1,
+        "survived": 0
+      },
+      "t06-dst-slots": {
+        "hunks": 2,
+        "not_source": 1,
+        "graded": 1,
+        "killed": 1,
+        "broken": 0,
+        "survived": 0
+      },
+      "t07-staff-permissions": {
+        "hunks": 16,
+        "not_source": 0,
+        "graded": 16,
+        "killed": 10,
+        "broken": 4,
+        "survived": 2
+      },
+      "t08-status-transitions": {
+        "hunks": 2,
+        "not_source": 0,
+        "graded": 2,
+        "killed": 0,
+        "broken": 1,
+        "survived": 1
+      },
+      "t09-booking-note": {
+        "hunks": 10,
+        "not_source": 0,
+        "graded": 10,
+        "killed": 5,
+        "broken": 5,
+        "survived": 0
+      },
+      "t10-wizard-a11y": {
+        "hunks": 9,
+        "not_source": 0,
+        "graded": 9,
+        "killed": 8,
+        "broken": 0,
+        "survived": 1
+      }
+    },
+    "survivors": [
+      {
+        "mutant": "t04-sse-subscriber-leak/h00",
+        "file": "src/app/api/admin/events/route.ts",
+        "class": "redundant",
+        "why": "Comment only."
+      },
+      {
+        "mutant": "t07-staff-permissions/h02",
+        "file": "src/app/admin/actions.ts",
+        "class": "gap",
+        "why": "toggleService stays open to staff. The issue names hiding services, and the replay test never submitted that button."
+      },
+      {
+        "mutant": "t07-staff-permissions/h08",
+        "file": "src/app/admin/layout.tsx",
+        "class": "redundant",
+        "why": "Comment only."
+      },
+      {
+        "mutant": "t08-status-transitions/h01",
+        "file": "src/lib/booking.ts",
+        "class": "redundant",
+        "why": "Publishes a calendar refresh after a no-op. Nothing changes for a user and the issue doesn't forbid it; the alternative fix publishes unconditionally too."
+      },
+      {
+        "mutant": "t10-wizard-a11y/h06",
+        "file": "src/app/[slug]/wizard.tsx",
+        "class": "gap",
+        "why": "The Loading text under the date keeps its low contrast. The issue names it, but axe never ran while the times were loading."
+      }
+    ]
+  }
 }

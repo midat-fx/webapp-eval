@@ -1,0 +1,47 @@
+{
+  "task": "t05-overlap-race",
+  "hunks": 3,
+  "not_source": 0,
+  "graded": 3,
+  "killed": 2,
+  "broken": 1,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "drizzle/0004_booking_no_overlap.sql",
+      "title": "",
+      "outcome": "broken",
+      "reason": "migrate_failed",
+      "failed_checks": [],
+      "seconds": 13.7
+    },
+    {
+      "hunk": 1,
+      "file": "drizzle/meta/_journal.json",
+      "title": "",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "different start, different duration still collide",
+        "no_overlapping_confirmed_bookings"
+      ],
+      "seconds": 17.9
+    },
+    {
+      "hunk": 2,
+      "file": "src/lib/booking.ts",
+      "title": "export async function createBooking(opts: {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "exactly one of six overlapping checkouts wins, every round",
+        "different start, different duration still collide"
+      ],
+      "seconds": 17.2
+    }
+  ]
+}

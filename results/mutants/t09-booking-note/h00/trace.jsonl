@@ -1,0 +1,5 @@
+{"ts":"2026-11-02T18:38:37.119Z","step":"start","status":"ok","detail":"t09-booking-note"}
+{"ts":"2026-11-02T18:38:37.132Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:38:37.160Z","step":"apply","status":"ok","detail":"4 files touched"}
+{"ts":"2026-11-02T18:38:48.238Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 17ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 5.9s\n  Running TypeScript ...\nsrc/app/[slug]/wizard.tsx(162,9): error TS18004: No value exists in scope for the shorthand property 'note'. Either declare one or provide an initializer.\nsrc/app/[slug]/wizard.tsx(339,24): error TS2304: Cannot find name 'note'.\nsrc/app/[slug]/wizard.tsx(342,34): error TS2304: Cannot find name 'setNote'.\nFailed to type check."}
+{"ts":"2026-11-02T18:38:48.288Z","step":"done","status":"fail","detail":"build_failed"}

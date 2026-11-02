@@ -1,0 +1,40 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "exactly one of six overlapping checkouts wins, every round",
+      "pass": false,
+      "detail": "Error: round 0: confirmed bookings, codes 200,200,200,200,200,200\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m6\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "different start, different duration still collide",
+      "pass": false,
+      "detail": "Error: {\"bookingId\":\"c3f2be83-c4b7-44fd-a868-fc25825166bd\"}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m409\u001b[39m\nReceived: \u001b[31m200\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "other masters and cancelled bookings don't block",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_overlapping_confirmed_bookings",
+      "pass": false,
+      "detail": "[{\"a\":\"56264bba-c570-425e-9a5f-faa58c837f11\",\"b\":\"b7ae55c3-6281-4c98-8ebc-f0ff46bd8ad8\",\"start_at\":\"2026-11-10T06:20:00.000Z\"},{\"a\":\"1470594e-269b-4833-b35e-51114d03a4d2\",\"b\":\"56264bba-c570-425e-9a5f-faa58c837f11\",\"start_at\":\"2026-11-10T06:50:00.000Z\"},{\"a\":\"1470594e-269b-4833-b35e-51114d03a4d2\",\"b\":\"30ce9802-57f6-43a5-8251-4e7b69abb586\",\"start_at\":\"2026-11-10T06:30:00.000Z\"},{\"a\":\"1470594e-269b-4833-b35e-51114d03a4d2\",\"b\":\"3736de5b-f354-4ca6-8a85-21aca4936089\",\"start_at\":\"2026-11-10T06:00:00.000Z\"},{\"a\":\"1470594e-269b-4833-b35e-51114d03a4d2\",\"b\":\"b7ae55c3-6281-4c98-8ebc-f0ff46bd8ad8\",\"start_at\":\"2026-11-10T06:20:00.000Z\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "every_winner_has_its_outbox_message",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "losers_left_no_booking_rows",
+      "pass": true
+    }
+  ],
+  "task": "t05-overlap-race",
+  "seconds": 17.9
+}

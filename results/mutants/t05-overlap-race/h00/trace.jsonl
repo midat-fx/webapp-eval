@@ -1,0 +1,7 @@
+{"ts":"2026-11-02T18:35:14.650Z","step":"start","status":"ok","detail":"t05-overlap-race"}
+{"ts":"2026-11-02T18:35:14.671Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:35:14.694Z","step":"apply","status":"ok","detail":"10 files touched"}
+{"ts":"2026-11-02T18:35:25.250Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T18:35:27.732Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T18:35:28.131Z","step":"migrate","status":"fail","detail":"No config path provided, using default 'drizzle.config.ts'\nReading config file '/opt/kezek/drizzle.config.ts'\nUsing 'pg' driver for database querying\n[⣷] applying migrations...\u001b[2K\u001b[1G[⣷] applying migrations..."}
+{"ts":"2026-11-02T18:35:28.163Z","step":"done","status":"fail","detail":"migrate_failed"}

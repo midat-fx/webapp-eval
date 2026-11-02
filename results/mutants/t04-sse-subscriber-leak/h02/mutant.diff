@@ -1,0 +1,21 @@
+diff --git a/src/app/api/admin/events/route.ts b/src/app/api/admin/events/route.ts
+index 1a0aabc..f7c1827 100644
+--- a/src/app/api/admin/events/route.ts
++++ b/src/app/api/admin/events/route.ts
+@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
+ 
+ // SSE stream of calendar changes for the admin UI.
+ // Each connection gets its own Redis subscriber (a subscribing connection
+-// can't run other commands).
++// can't run other commands); closed on client disconnect.
+ export async function GET() {
+   const session = await getSession();
+   if (!session) return new Response("unauthorized", { status: 401 });
+@@ -14,6 +14,7 @@ export async function GET() {
+   const sub = redis().duplicate();
+   await sub.subscribe(calendarChannel(session.businessId));
+   const encoder = new TextEncoder();
++  let heartbeat: ReturnType<typeof setInterval>;
+ 
+   const stream = new ReadableStream({
+     start(controller) {

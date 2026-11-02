@@ -1,0 +1,46 @@
+{
+  "task": "t03-default-date-tz",
+  "hunks": 3,
+  "not_source": 0,
+  "graded": 3,
+  "killed": 2,
+  "broken": 1,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "type Service = { id: string; name: string; durationMin: number; priceKzt: number",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 10.7
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT-14",
+        "opens on the business's today in Pacific/Kiritimati"
+      ],
+      "seconds": 17.9
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "opens on the business's today in Etc/GMT-14",
+        "opens on the business's today in Pacific/Kiritimati"
+      ],
+      "seconds": 17.9
+    }
+  ]
+}

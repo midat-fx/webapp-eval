@@ -1,0 +1,20 @@
+diff --git a/src/lib/slots.test.ts b/src/lib/slots.test.ts
+index ff1de20..3720ca7 100644
+--- a/src/lib/slots.test.ts
++++ b/src/lib/slots.test.ts
+@@ -20,6 +20,15 @@ describe("localTimeToUtc", () => {
+   });
+ });
+ 
++describe("localTimeToUtc on DST days", () => {
++  it("Berlin spring forward: 10:00 CEST = 08:00 UTC", () => {
++    expect(localTimeToUtc("2027-03-28", "10:00", "Europe/Berlin")).toBe(Date.UTC(2027, 2, 28, 8, 0));
++  });
++  it("Berlin fall back: 10:00 CET = 09:00 UTC", () => {
++    expect(localTimeToUtc("2027-10-31", "10:00", "Europe/Berlin")).toBe(Date.UTC(2027, 9, 31, 9, 0));
++  });
++});
++
+ describe("isoWeekday", () => {
+   it("Monday=1, Sunday=7", () => {
+     expect(isoWeekday("2026-08-10")).toBe(1); // Monday

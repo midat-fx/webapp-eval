@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "migrate_failed",
+  "checks": [],
+  "task": "t05-overlap-race",
+  "seconds": 13.7
+}

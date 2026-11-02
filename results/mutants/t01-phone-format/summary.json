@@ -1,0 +1,74 @@
+{
+  "task": "t01-phone-format",
+  "hunks": 6,
+  "not_source": 0,
+  "graded": 6,
+  "killed": 2,
+  "broken": 4,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/api/public/[slug]/book/route.ts",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 13.6
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/api/public/[slug]/book/route.ts",
+      "title": "const body = z.object({",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "wizard books with a formatted phone",
+        "API books with spaces in the phone",
+        "both_bookings_on_that_client"
+      ],
+      "seconds": 41.5
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/api/public/[slug]/waitlist/route.ts",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 11.4
+    },
+    {
+      "hunk": 3,
+      "file": "src/app/api/public/[slug]/waitlist/route.ts",
+      "title": "const body = z.object({",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "waitlist accepts dashes",
+        "waitlist_entry_on_that_client"
+      ],
+      "seconds": 17.7
+    },
+    {
+      "hunk": 4,
+      "file": "src/lib/public.ts",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 12.8
+    },
+    {
+      "hunk": 5,
+      "file": "src/lib/public.ts",
+      "title": "export async function businessBySlug(slug: string) {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.3
+    }
+  ]
+}

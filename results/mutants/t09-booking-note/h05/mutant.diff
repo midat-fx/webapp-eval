@@ -1,0 +1,108 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..cc056ed 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -88,6 +88,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+   const [holdLeft, setHoldLeft] = useState(0);
+   const [name, setName] = useState("");
+   const [phone, setPhone] = useState("");
++  const [note, setNote] = useState("");
+   const [error, setError] = useState<string | null>(null);
+   const [done, setDone] = useState(false);
+   const [busy, setBusy] = useState(false);
+@@ -159,6 +160,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+         holdToken: hold.holdToken,
+         name,
+         phone,
++        note,
+       }),
+     });
+     setBusy(false);
+@@ -329,6 +331,19 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+               onChange={(e) => setPhone(e.target.value)}
+               className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+             />
++            <div>
++              <label htmlFor="booking-note" className="text-sm text-zinc-700">
++                Note for the salon (optional)
++              </label>
++              <textarea
++                id="booking-note"
++                value={note}
++                maxLength={500}
++                rows={3}
++                onChange={(e) => setNote(e.target.value)}
++                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2"
++              />
++            </div>
+             <div className="flex gap-2">
+               <button
+                 onClick={confirm}
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index 68dc9d7..1e0ae66 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -45,6 +45,7 @@ export default async function CalendarPage(ctx: {
+       serviceName: s.services.name,
+       clientName: s.clients.name,
+       clientPhone: s.clients.phone,
++      note: s.bookings.note,
+     })
+     .from(s.bookings)
+     .innerJoin(s.staff, eq(s.bookings.staffId, s.staff.id))
+@@ -116,6 +117,11 @@ export default async function CalendarPage(ctx: {
+                       <div className="text-zinc-600">
+                         {r.clientName} · {r.clientPhone} · {r.priceKzt.toLocaleString("en-GB")} ₸
+                       </div>
++                      {r.note && (
++                        <p className="mt-1 whitespace-pre-line rounded bg-white/70 px-2 py-1 text-zinc-700">
++                          {r.note}
++                        </p>
++                      )}
+                       {r.status === "confirmed" && (
+                         <div className="mt-2 flex gap-1">
+                           {(
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..a77ce9d 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
+   const biz = await businessBySlug(slug);
+   if (!biz) return NextResponse.json({ error: "not_found" }, { status: 404 });
+ 
+-  const { serviceId, staffId, startMs, endMs, holdToken, name, phone } = parsed.data;
++  const { serviceId, staffId, startMs, endMs, holdToken, name, phone, note } = parsed.data;
+   const result = await createBooking({
+     businessId: biz.id,
+     staffId,
+@@ -32,6 +32,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
+     slot: { startMs, endMs },
+     holdToken,
+     client: { name, phone },
++    note,
+   });
+   if (!result.ok) {
+     return NextResponse.json({ error: result.error }, { status: 409 });
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..6c8610f 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -132,8 +132,9 @@ export async function createBooking(opts: {
+   slot: Range;
+   holdToken: string;
+   client: { name: string; phone: string };
++  note?: string | null;
+ }): Promise<BookResult> {
+-  const { businessId, staffId, serviceId, slot, holdToken, client } = opts;
++  const { businessId, staffId, serviceId, slot, holdToken, client, note } = opts;
+ 
+   // The hold must still be alive and belong to this caller.
+   const raw = await redis().get(holdKey(staffId, slot.startMs));
+@@ -174,6 +175,7 @@ export async function createBooking(opts: {
+           endAt: new Date(slot.endMs),
+           status: "confirmed",
+           priceKzt: service.priceKzt,
++          note: note ?? null,
+         })
+         .returning();
+ 

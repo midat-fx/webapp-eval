@@ -1,0 +1,42 @@
+{
+  "task": "t04-sse-subscriber-leak",
+  "hunks": 3,
+  "not_source": 0,
+  "graded": 3,
+  "killed": 1,
+  "broken": 1,
+  "survived": 1,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/api/admin/events/route.ts",
+      "title": "export const dynamic = \"force-dynamic\";",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 23.9
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/api/admin/events/route.ts",
+      "title": "export async function GET() {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.8
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/api/admin/events/route.ts",
+      "title": "export async function GET() {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "closed tabs release their Redis subscriber and connection"
+      ],
+      "seconds": 24.7
+    }
+  ]
+}

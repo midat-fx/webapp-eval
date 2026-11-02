@@ -1,0 +1,24 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..498e0cb 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -6,6 +6,10 @@ type Service = { id: string; name: string; durationMin: number; priceKzt: number
+ type Slot = { startMs: number; endMs: number };
+ type Hold = { holdToken: string; expiresInSec: number; slot: Slot };
+ 
++/** Today's date where the business is, not in UTC or wherever the visitor is. */
++const businessToday = (timeZone: string) =>
++  new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date());
++
+ const fmtPrice = (kzt: number) => `${kzt.toLocaleString("en-GB")} ₸`;
+ 
+ /** Offered instead of an empty slot grid: a full day is a lead, not a dead end. */
+@@ -272,7 +276,7 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+           <input
+             type="date"
+             value={date}
+-            min={new Date().toISOString().slice(0, 10)}
++            min={businessToday(timezone)}
+             onChange={(e) => {
+               setDate(e.target.value);
+               setSlots(null);

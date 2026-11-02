@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "build_failed",
+  "checks": [],
+  "task": "t08-status-transitions",
+  "seconds": 9.7
+}

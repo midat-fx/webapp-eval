@@ -1,0 +1,5 @@
+{"ts":"2026-11-02T18:40:14.629Z","step":"start","status":"ok","detail":"t09-booking-note"}
+{"ts":"2026-11-02T18:40:14.644Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:40:14.673Z","step":"apply","status":"ok","detail":"4 files touched"}
+{"ts":"2026-11-02T18:40:23.931Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 10ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 5.4s\n  Running TypeScript ...\nsrc/app/api/public/[slug]/book/route.ts(27,71): error TS2339: Property 'note' does not exist on type '{ serviceId: string; staffId: string; startMs: number; endMs: number; holdToken: string; name: string; phone: string; }'.\nFailed to type check."}
+{"ts":"2026-11-02T18:40:23.963Z","step":"done","status":"fail","detail":"build_failed"}

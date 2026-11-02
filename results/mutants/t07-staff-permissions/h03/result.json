@@ -1,0 +1,65 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "staff cannot open owner-only pages",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "staff navigation only links to what staff can use",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "replayed owner forms are refused for staff",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoHaveLength\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected length: \u001b[32m0\u001b[39m\nReceived length: \u001b[31m1\u001b[39m\nReceived array:  \u001b[31m[{\"?column?\": 1}]\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "the same replay still works for the owner",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "staff can still run the day",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "owner keeps every page and button",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_change_prices",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_hide_anything",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_staff_rows_created_by_staff",
+      "pass": false,
+      "detail": "[{\"id\":\"410c8252-01f3-42a5-8a9e-90ae2771597b\",\"name\":\"Intruder\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "no_owner_audit_entries_by_staff",
+      "pass": false,
+      "detail": "[{\"action\":\"staff.create\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "owner_changes_went_through",
+      "pass": true
+    }
+  ],
+  "task": "t07-staff-permissions",
+  "seconds": 19.6
+}

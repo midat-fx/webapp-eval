@@ -1,0 +1,50 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "wizard: labelled note is saved as typed",
+      "pass": false,
+      "detail": "TimeoutError: locator.fill: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/note/i)\u001b[22m\n"
+    },
+    {
+      "kind": "axe",
+      "name": "step 4 has no accessibility violations",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel(/note/i)\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByLabel(/note/i) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/note/i)\u001b[22m\n"
+    },
+    {
+      "kind": "playwright",
+      "name": "wizard without a note stores NULL",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "API: 500 characters is the limit, blank is no note",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "admin calendar shows the note as plain text",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('article').filter({ hasText: 'Note Writer' })\nExpected substring: \u001b[32m\"Allergic to ammonia dye.\"\u001b[39m\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('article').filter({ hasText: 'Note Writer' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Note Writer' })\u001b[22m\n"
+    },
+    {
+      "kind": "sql",
+      "name": "notes_within_limit",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_blank_notes",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "rejected_note_created_nothing",
+      "pass": true
+    }
+  ],
+  "task": "t09-booking-note",
+  "seconds": 81.5
+}

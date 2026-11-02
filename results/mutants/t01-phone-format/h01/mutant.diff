@@ -1,0 +1,61 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..37f5c95 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -1,7 +1,7 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { createBooking } from "@/lib/booking";
+-import { businessBySlug, clientIp } from "@/lib/public";
++import { businessBySlug, clientIp, phoneSchema } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
+ 
+ const body = z.object({
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..b66ca97 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -1,6 +1,6 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+-import { businessBySlug, clientIp } from "@/lib/public";
++import { businessBySlug, clientIp, phoneSchema } from "@/lib/public";
+ import { rateLimit } from "@/lib/ratelimit";
+ import { joinWaitlist } from "@/lib/waitlist";
+ 
+@@ -9,7 +9,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: phoneSchema,
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/lib/public.ts b/src/lib/public.ts
+index 22ea0e9..6dc1d1a 100644
+--- a/src/lib/public.ts
++++ b/src/lib/public.ts
+@@ -1,6 +1,7 @@
+ import "server-only";
+ import { eq } from "drizzle-orm";
+ import { headers } from "next/headers";
++import { z } from "zod";
+ import { db, schema as s } from "@/db";
+ 
+ export async function businessBySlug(slug: string) {
+@@ -10,3 +11,14 @@ export async function businessBySlug(slug: string) {
+ export async function clientIp(): Promise<string> {
+   return (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+ }
++
++/**
++ * Phone as typed by a person: spaces, dashes, dots and brackets are only
++ * formatting. Parses to the canonical `+77011234567` form so one person is
++ * one client row however they typed it.
++ */
++export const phoneSchema = z
++  .string()
++  .trim()
++  .transform((v) => v.replace(/[\s\-.()]/g, ""))
++  .pipe(z.string().regex(/^\+?\d{10,15}$/));

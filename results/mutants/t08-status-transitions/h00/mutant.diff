@@ -1,0 +1,15 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..1e43943 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -275,8 +275,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
+-  await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  if (changed) await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 
+ export async function staffForService(businessId: string, serviceId: string) {

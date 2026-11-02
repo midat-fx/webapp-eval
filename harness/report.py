@@ -63,8 +63,27 @@ def flakes() -> list:
     return [load(p) for p in sorted((RES / "flake").glob("*/*/summary.json"))]
 
 
+def mutants() -> dict:
+    """Kill rate counts only mutants that built: a compile error says nothing about a verifier."""
+    d = RES / "mutants"
+    notes = load(d / "classification.json") if (d / "classification.json").exists() else {}
+    by_task, survivors = {}, []
+    for p in sorted(d.glob("*/summary.json")):
+        s = load(p)
+        by_task[s["task"]] = {k: s[k] for k in ("hunks", "not_source", "graded", "killed", "broken", "survived")}
+        for r in s["rows"]:
+            if r["outcome"] == "survived":
+                key = f"{s['task']}/h{r['hunk']:02}"
+                survivors.append({"mutant": key, "file": r["file"]} | notes.get(key, {"class": "unclassified"}))
+    total = lambda k: sum(t[k] for t in by_task.values())
+    built = total("killed") + total("survived")
+    return {"hunks": total("hunks"), "graded": total("graded"), "killed": total("killed"), "broken": total("broken"),
+            "survived": total("survived"), "verifier_kill_rate": round(total("killed") / built, 3) if built else None,
+            "by_task": by_task, "survivors": survivors}
+
+
 def main() -> None:
-    out = {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes()}
+    out = {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants()}
     (RES / "summary.json").write_text(json.dumps(out, indent=2) + "\n")
     sc, ag = out["selfcheck"], out["agents"]
     print(f"Verifier self-check: {sc['agree']}/{sc['total']} variants as expected; "
@@ -82,6 +101,14 @@ def main() -> None:
             print(f"  {src}: {json.dumps(a)}")
     for f in out["flake"]:
         print(f"flake {f['task']} {f['variant']}: {f['as_expected']}/{f['n']} as expected ({f['expected']})")
+    mu = out["mutants"]
+    print(f"\nmutants: {mu['graded']} graded, {mu['killed']} killed, {mu['broken']} broken, {mu['survived']} survived, "
+          f"verifier kill rate {mu['verifier_kill_rate']}")
+    print("| Task | Hunks | Killed | Didn't build | Survived |\n|---|---|---|---|---|")
+    for t, m in mu["by_task"].items():
+        print(f"| {t} | {m['hunks']} | {m['killed']} | {m['broken']} | {m['survived']} |")
+    for x in mu["survivors"]:
+        print(f"  {x['mutant']} {x['file']}: {x['class']}")
 
 
 if __name__ == "__main__":

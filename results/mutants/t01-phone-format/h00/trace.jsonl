@@ -1,0 +1,5 @@
+{"ts":"2026-11-02T18:33:17.428Z","step":"start","status":"ok","detail":"t01-phone-format"}
+{"ts":"2026-11-02T18:33:17.447Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:33:17.491Z","step":"apply","status":"ok","detail":"3 files touched"}
+{"ts":"2026-11-02T18:33:30.590Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 18ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 7.9s\n  Running TypeScript ...\nsrc/app/api/public/[slug]/book/route.ts(14,10): error TS2304: Cannot find name 'phoneSchema'.\nFailed to type check."}
+{"ts":"2026-11-02T18:33:30.659Z","step":"done","status":"fail","detail":"build_failed"}

@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "build_failed",
+  "checks": [],
+  "task": "t02-stale-slots",
+  "seconds": 12.7
+}

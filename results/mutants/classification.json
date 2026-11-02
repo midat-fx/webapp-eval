@@ -1,0 +1,22 @@
+{
+  "t04-sse-subscriber-leak/h00": {
+    "class": "redundant",
+    "why": "Comment only."
+  },
+  "t07-staff-permissions/h02": {
+    "class": "gap",
+    "why": "toggleService stays open to staff. The issue names hiding services, and the replay test never submitted that button."
+  },
+  "t07-staff-permissions/h08": {
+    "class": "redundant",
+    "why": "Comment only."
+  },
+  "t08-status-transitions/h01": {
+    "class": "redundant",
+    "why": "Publishes a calendar refresh after a no-op. Nothing changes for a user and the issue doesn't forbid it; the alternative fix publishes unconditionally too."
+  },
+  "t10-wizard-a11y/h06": {
+    "class": "gap",
+    "why": "The Loading text under the date keeps its low contrast. The issue names it, but axe never ran while the times were loading."
+  }
+}

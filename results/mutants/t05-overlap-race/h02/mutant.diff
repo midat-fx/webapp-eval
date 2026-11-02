@@ -1,0 +1,38 @@
+diff --git a/drizzle/0004_booking_no_overlap.sql b/drizzle/0004_booking_no_overlap.sql
+new file mode 100644
+index 0000000..62b7137
+--- /dev/null
++++ b/drizzle/0004_booking_no_overlap.sql
+@@ -0,0 +1,12 @@
++-- Holds only stop two clients checking out the *same* start time. Two
++-- different starts can still overlap (14:00 for 60 min, 14:15 for 45 min),
++-- and two app servers can race past each other's checks. The database is the
++-- one place that sees every insert, so it gets the final word.
++CREATE EXTENSION IF NOT EXISTS btree_gist;
++--> statement-breakpoint
++ALTER TABLE "bookings" ADD CONSTRAINT "bookings_no_overlap"
++  EXCLUDE USING gist (
++    "staff_id" WITH =,
++    tstzrange("start_at", "end_at") WITH &&
++  )
++  WHERE ("status" = 'confirmed');
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index ecdda1a..2f898c8 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1786183773099,
+       "tag": "0003_waitlist",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "7",
++      "when": 1793520000000,
++      "tag": "0004_booking_no_overlap",
++      "breakpoints": true
+     }
+   ]
+-}
+\ No newline at end of file
++}

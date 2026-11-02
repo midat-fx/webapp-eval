@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "build_failed",
+  "checks": [],
+  "task": "t03-default-date-tz",
+  "seconds": 10.7
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -129,6 +130,53 @@ def cmd_flake(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_mutants(a: argparse.Namespace) -> int:
+    """Grade the reference fix minus one hunk, for every source hunk of every task."""
+    from harness import mutants
+
+    out_root = ROOT / a.out
+    jobs = []
+    plan = {}
+    for task in a.tasks or grading.task_ids():
+        text = (grading.TASKS / task / "solution.patch").read_text()
+        hs = mutants.hunks(text)
+        plan[task] = hs
+        jobs += [(task, i, h, text) for i, h in enumerate(hs) if mutants.gradable(h)]
+
+    def run(job):
+        task, i, h, text = job
+        d = out_root / task / f"h{i:02}"
+        done = d / "result.json"
+        if done.exists() and json.loads(done.read_text())["verdict"] in ("pass", "fail"):
+            r = json.loads(done.read_text())
+        elif shutil.disk_usage(ROOT).free < a.min_free_gb * 2**30:
+            print(f"SKIP {task} h{i:02}: under {a.min_free_gb} GB free", flush=True)
+            return task, {"hunk": i, "file": h.path, "outcome": "not_graded"}
+        else:
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "mutant.diff").write_text(mutants.drop(text, i))
+            r = grading.grade(task, d / "mutant.diff", d)
+        row = {"hunk": i, "file": h.path, "title": h.title, "outcome": mutants.outcome(r), "reason": r.get("reason"),
+               "failed_checks": [c["name"] for c in r["checks"] if not c["pass"]], "seconds": r["seconds"]}
+        print(f"{row['outcome']:9} {task:28} h{i:02} {h.path} {r['seconds']}s {row['failed_checks'][:2]}", flush=True)
+        return task, row
+
+    with ThreadPoolExecutor(max_workers=a.jobs) as ex:
+        done_rows = list(ex.map(run, jobs))
+    clean = True
+    for task, hs in plan.items():
+        rows = [row for t, row in done_rows if t == task]
+        count = lambda o: sum(r["outcome"] == o for r in rows)
+        clean = clean and not (count("error") or count("invalid") or count("not_graded"))
+        summary = {"task": task, "hunks": len(hs), "not_source": sum(not mutants.gradable(h) for h in hs),
+                   "graded": len(rows) - count("not_graded"), "killed": count("killed"), "broken": count("broken"),
+                   "survived": count("survived"), "invalid": count("invalid"), "error": count("error"), "rows": rows}
+        (out_root / task).mkdir(parents=True, exist_ok=True)
+        (out_root / task / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+        print(f"{task}: {summary['killed']} killed, {summary['broken']} broken, {summary['survived']} survived")
+    return 0 if clean else 1
+
+
 def cmd_regrade(a: argparse.Namespace) -> int:
     """Re-grade saved agent patches whose grading is missing or hit an infra
     error. Re-grading never re-runs the agent, so it costs no run budget."""
@@ -191,6 +239,12 @@ def main(argv: list[str] | None = None) -> int:
     fl.add_argument("variant")
     fl.add_argument("-n", type=int, default=5)
     fl.set_defaults(fn=cmd_flake)
+    mu = sub.add_parser("mutants", help="grade the reference fix minus one hunk at a time")
+    mu.add_argument("tasks", nargs="*")
+    mu.add_argument("-j", "--jobs", type=int, default=2)
+    mu.add_argument("--out", default="results/mutants")
+    mu.add_argument("--min-free-gb", type=int, default=12)
+    mu.set_defaults(fn=cmd_mutants)
     rg = sub.add_parser("regrade", help="re-grade saved agent patches (missing or infra-error results)")
     rg.add_argument("tasks", nargs="*")
     rg.add_argument("--all", action="store_true")

@@ -1,0 +1,26 @@
+diff --git a/src/app/[slug]/wizard.tsx b/src/app/[slug]/wizard.tsx
+index 7f577bf..547d626 100644
+--- a/src/app/[slug]/wizard.tsx
++++ b/src/app/[slug]/wizard.tsx
+@@ -107,12 +107,19 @@ export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri
+ 
+   // Data lands asynchronously; loading state is `slots === null`,
+   // reset in the event handlers that change service/master/date.
++  // Responses can arrive out of order, so only the latest request may land.
++  const slotsRequest = useRef(0);
+   const loadSlots = useCallback(() => {
+     if (!service || !master) return;
++    const request = ++slotsRequest.current;
+     fetch(`/api/public/${slug}/slots?serviceId=${service.id}&staffId=${master.id}&date=${date}`)
+       .then((r) => r.json())
+-      .then((d) => setSlots(d.slots ?? []))
+-      .catch(() => setError("Could not load available times"));
++      .then((d) => {
++        if (request === slotsRequest.current) setSlots(d.slots ?? []);
++      })
++      .catch(() => {
++        if (request === slotsRequest.current) setError("Could not load available times");
++      });
+   }, [slug, service, master, date]);
+ 
+   useEffect(loadSlots, [loadSlots]);

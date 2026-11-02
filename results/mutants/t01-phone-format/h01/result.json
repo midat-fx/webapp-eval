@@ -1,0 +1,55 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "wizard books with a formatted phone",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('You are booked!')\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText('You are booked!') with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText('You are booked!')\u001b[22m\n"
+    },
+    {
+      "kind": "playwright",
+      "name": "API books with spaces in the phone",
+      "pass": false,
+      "detail": "Error: {\"error\":\"bad_request\"}\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m200\u001b[39m\nReceived: \u001b[31m400\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "waitlist accepts dashes",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "non-numbers are still rejected",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "one_client_per_number",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "stored_in_canonical_form",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "both_bookings_on_that_client",
+      "pass": false,
+      "detail": "[{\"bookings\":\"0\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_entry_on_that_client",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "rejected_input_left_no_rows",
+      "pass": true
+    }
+  ],
+  "task": "t01-phone-format",
+  "seconds": 41.5
+}

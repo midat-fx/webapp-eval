@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "build_failed",
+  "checks": [],
+  "task": "t01-phone-format",
+  "seconds": 9.3
+}

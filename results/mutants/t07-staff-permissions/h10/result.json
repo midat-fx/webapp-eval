@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "reason": "build_failed",
+  "checks": [],
+  "task": "t07-staff-permissions",
+  "seconds": 9.3
+}

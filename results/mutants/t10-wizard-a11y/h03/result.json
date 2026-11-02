@@ -1,0 +1,28 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "axe",
+      "name": "every wizard state passes axe",
+      "pass": false,
+      "detail": "Error: service list\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"color-contrast (serious): button:nth-child(1) > span:nth-child(1) > .text-zinc-400 | button:nth-child(2) > span:nth-child(1) > .text-zinc-400 | button:nth-child(3) > span:nth-child(1) > .text-zinc-400 | button:nth-child(4) > span:nth-child(1) > .text-zinc-400 | button:nth-child(5) > span:nth-child(1) > .text-zinc-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "fields have real labels and nothing visible was dropped",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "selection is exposed to assistive tech",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "errors are announced",
+      "pass": true
+    }
+  ],
+  "task": "t10-wizard-a11y",
+  "seconds": 17.5
+}

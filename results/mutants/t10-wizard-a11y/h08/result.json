@@ -1,0 +1,28 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "axe",
+      "name": "every wizard state passes axe",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "fields have real labels and nothing visible was dropped",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "selection is exposed to assistive tech",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "errors are announced",
+      "pass": false,
+      "detail": "Error: booking error\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
+    }
+  ],
+  "task": "t10-wizard-a11y",
+  "seconds": 20.0
+}

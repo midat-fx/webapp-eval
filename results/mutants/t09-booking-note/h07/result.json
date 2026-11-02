@@ -1,0 +1,50 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "wizard: labelled note is saved as typed",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 2\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"Allergic to ammonia dye.\u001b[39m\n\u001b[32m- Please use the gentle one.\",\u001b[39m\n\u001b[31m+   null,\u001b[39m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "axe",
+      "name": "step 4 has no accessibility violations",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "wizard without a note stores NULL",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "API: 500 characters is the limit, blank is no note",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 1\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[32m-   \"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    },
+    {
+      "kind": "playwright",
+      "name": "admin calendar shows the note as plain text",
+      "pass": false,
+      "detail": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('article').filter({ hasText: 'Note Writer' })\nExpected substring: \u001b[32m\"Allergic to ammonia dye.\"\u001b[39m\nReceived string:    \u001b[31m\"12:00\u201313:00confirmedWomen's haircutNote Writer \u00b7 +77013330001 \u00b7 8,000 \u20b8\u2713 CompletedNo-showCancel\"\u001b[39m\nTimeout: 20000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" locator('article').filter({ hasText: 'Note Writer' }) with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('article').filter({ hasText: 'Note Writer' })\u001b[22m\n\u001b[2m    44 \u00d7 locator re"
+    },
+    {
+      "kind": "sql",
+      "name": "notes_within_limit",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_blank_notes",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "rejected_note_created_nothing",
+      "pass": true
+    }
+  ],
+  "task": "t09-booking-note",
+  "seconds": 38.8
+}

@@ -1,10 +1,12 @@
 """Fast checks of the harness itself; the verifiers are checked by `selfcheck`."""
 
 import json
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
-from harness import agent, grading, judge
+from harness import agent, grading, judge, mutants
 
 
 class TaskLayout(unittest.TestCase):
@@ -56,6 +58,75 @@ class Judge(unittest.TestCase):
 
     def test_unparsed_verdicts_are_left_out(self):
         self.assertEqual(judge.agreement([("pass", "unparsed")])["n"], 0)
+
+
+class Mutants(unittest.TestCase):
+    OLD = "".join(f"line {i}\n" for i in range(1, 31))
+
+    def diff(self, repo: Path) -> str:
+        return subprocess.run(["git", "diff"], cwd=repo, capture_output=True, text=True, check=True).stdout
+
+    def repo(self, tmp: str) -> Path:
+        repo = Path(tmp)
+        git = lambda *a: subprocess.run(["git", *a], cwd=repo, check=True, capture_output=True)
+        git("init", "-q")
+        (repo / "a.txt").write_text(self.OLD)
+        (repo / "b.txt").write_text("only line\n")
+        git("add", "-A")
+        git("-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "-qm", "start")
+        return repo
+
+    def test_each_mutant_applies_and_lacks_only_its_hunk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = self.repo(tmp)
+            # a.txt: two hunks, the first one grows the file so the second one shifts. b.txt: one hunk.
+            lines = self.OLD.splitlines(keepends=True)
+            (repo / "a.txt").write_text("".join(lines[:2] + ["new A1\n", "new A2\n"] + lines[2:25] + ["new B\n"] + lines[25:]))
+            (repo / "b.txt").write_text("changed line\n")
+            patch = self.diff(repo)
+            subprocess.run(["git", "checkout", "-q", "."], cwd=repo, check=True)
+            self.assertEqual([h.path for h in mutants.hunks(patch)], ["a.txt", "a.txt", "b.txt"])
+            for i, (a_has, a_lacks, b_text) in enumerate([("new B", "new A1", "changed line\n"),
+                                                          ("new A1", "new B", "changed line\n"),
+                                                          ("new A1", "changed", "only line\n")]):
+                mutant = repo / ".git" / f"m{i}.diff"
+                mutant.write_text(mutants.drop(patch, i))
+                subprocess.run(["git", "apply", "--check", str(mutant)], cwd=repo, check=True)
+                subprocess.run(["git", "apply", str(mutant)], cwd=repo, check=True)
+                a = (repo / "a.txt").read_text()
+                self.assertIn(a_has, a)
+                self.assertNotIn(a_lacks, a)
+                self.assertEqual((repo / "b.txt").read_text(), b_text)
+                subprocess.run(["git", "checkout", "-q", "."], cwd=repo, check=True)
+
+    def test_later_hunk_line_numbers_follow_the_dropped_hunk(self):
+        patch = ("diff --git a/x b/x\n--- a/x\n+++ b/x\n"
+                 "@@ -1,1 +1,3 @@\n a\n+b\n+c\n@@ -9,1 +11,2 @@ fn\n z\n+y\n")
+        self.assertIn("@@ -9,1 +9,2 @@ fn\n", mutants.drop(patch, 0))
+
+    def test_dropping_a_files_only_hunk_drops_the_file(self):
+        patch = "diff --git a/x b/x\n--- a/x\n+++ b/x\n@@ -1 +1 @@\n-a\n+b\n"
+        self.assertEqual(mutants.drop(patch, 0), "")
+
+    def test_only_source_hunks_are_graded(self):
+        h = lambda p: mutants.Hunk(p, ["@@ -1 +1 @@"])
+        self.assertTrue(mutants.gradable(h("src/lib/slots.ts")))
+        self.assertTrue(mutants.gradable(h("drizzle/0004_x.sql")))
+        self.assertFalse(mutants.gradable(h("src/lib/slots.test.ts")))
+        self.assertFalse(mutants.gradable(h("README.md")))
+
+    def test_every_reference_patch_splits_into_its_hunks(self):
+        for t in grading.task_ids():
+            text = (grading.TASKS / t / "solution.patch").read_text()
+            self.assertEqual(len(mutants.hunks(text)), text.count("\n@@ "), t)
+
+    def test_build_failures_and_bad_applies_are_not_verifier_kills(self):
+        o = lambda v, reason=None: mutants.outcome({"verdict": v, "reason": reason})
+        self.assertEqual(o("pass"), "survived")
+        self.assertEqual(o("fail"), "killed")
+        self.assertEqual(o("fail", "build_failed"), "broken")
+        self.assertEqual(o("fail", "patch_does_not_apply"), "invalid")
+        self.assertEqual(o("error", "build_infra_failure"), "error")
 
 
 class AgentTrace(unittest.TestCase):

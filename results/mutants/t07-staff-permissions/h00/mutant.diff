@@ -1,0 +1,195 @@
+diff --git a/src/app/admin/actions.ts b/src/app/admin/actions.ts
+index f797cff..0bb881b 100644
+--- a/src/app/admin/actions.ts
++++ b/src/app/admin/actions.ts
+@@ -20,7 +20,7 @@ export async function updateBookingStatus(formData: FormData): Promise<void> {
+ }
+ 
+ export async function saveService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const id = formData.get("id") ? String(formData.get("id")) : null;
+   const values = {
+     name: String(formData.get("name") ?? "").trim(),
+@@ -49,7 +49,7 @@ export async function saveService(formData: FormData): Promise<void> {
+ }
+ 
+ export async function toggleService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const id = String(formData.get("id"));
+   const [svc] = await db
+     .select()
+@@ -61,7 +61,7 @@ export async function toggleService(formData: FormData): Promise<void> {
+ }
+ 
+ export async function saveStaff(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const name = String(formData.get("name") ?? "").trim();
+   if (!name) return;
+   await db.insert(s.staff).values({ businessId: session.businessId, name });
+@@ -76,7 +76,7 @@ export async function saveStaff(formData: FormData): Promise<void> {
+ }
+ 
+ export async function toggleStaff(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const id = String(formData.get("id"));
+   const [row] = await db
+     .select()
+@@ -88,7 +88,7 @@ export async function toggleStaff(formData: FormData): Promise<void> {
+ }
+ 
+ export async function toggleStaffService(formData: FormData): Promise<void> {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const staffId = String(formData.get("staffId"));
+   const serviceId = String(formData.get("serviceId"));
+   // both must belong to this business
+diff --git a/src/app/admin/analytics/page.tsx b/src/app/admin/analytics/page.tsx
+index 293e0ac..24fd954 100644
+--- a/src/app/admin/analytics/page.tsx
++++ b/src/app/admin/analytics/page.tsx
+@@ -1,12 +1,12 @@
+ import { cohorts, revenueTrend, topClients, utilization } from "@/lib/analytics";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ import { TrendChart } from "./trend-chart";
+ 
+ const kzt = (n: number) => `${n.toLocaleString("en-GB")} ₸`;
+ const pct = (n: number) => `${Math.round(n * 100)}%`;
+ 
+ export default async function AnalyticsPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const [trend, util, cohortRows, clients] = await Promise.all([
+     revenueTrend(session.businessId, 30),
+     utilization(session.businessId, 30),
+diff --git a/src/app/admin/audit/page.tsx b/src/app/admin/audit/page.tsx
+index 792a918..1b02a02 100644
+--- a/src/app/admin/audit/page.tsx
++++ b/src/app/admin/audit/page.tsx
+@@ -1,9 +1,9 @@
+ import { desc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ 
+ export default async function AuditPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const rows = await db
+     .select({
+       id: s.auditLog.id,
+diff --git a/src/app/admin/layout.tsx b/src/app/admin/layout.tsx
+index cfccc03..e1b8bff 100644
+--- a/src/app/admin/layout.tsx
++++ b/src/app/admin/layout.tsx
+@@ -2,6 +2,7 @@ import Link from "next/link";
+ import { requireSession } from "@/lib/session";
+ import { logout } from "@/app/login/actions";
+ 
++// Staff see the first two; everything else is the owner's.
+ const nav = [
+   ["/admin", "Calendar"],
+   ["/admin/clients", "Clients"],
+@@ -22,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
+           <div className="flex items-center gap-6 overflow-x-auto">
+             <span className="text-lg font-bold">kezek</span>
+             <nav className="flex gap-4 text-sm">
+-              {nav.map(([href, label]) => (
++              {(session.role === "owner" ? nav : nav.slice(0, 2)).map(([href, label]) => (
+                 <Link key={href} href={href} className="whitespace-nowrap text-zinc-600 hover:text-zinc-900">
+                   {label}
+                 </Link>
+diff --git a/src/app/admin/notifications/page.tsx b/src/app/admin/notifications/page.tsx
+index 35d81e5..0c0447e 100644
+--- a/src/app/admin/notifications/page.tsx
++++ b/src/app/admin/notifications/page.tsx
+@@ -1,6 +1,6 @@
+ import { desc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ 
+ const statusStyle: Record<string, string> = {
+   pending: "bg-amber-100 text-amber-800",
+@@ -11,7 +11,7 @@ const statusStyle: Record<string, string> = {
+ };
+ 
+ export default async function NotificationsPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+ 
+   const queue = await db
+     .select()
+diff --git a/src/app/admin/reports/page.tsx b/src/app/admin/reports/page.tsx
+index 032a85a..3ce7048 100644
+--- a/src/app/admin/reports/page.tsx
++++ b/src/app/admin/reports/page.tsx
+@@ -1,10 +1,10 @@
+ import { and, desc, eq, gte, sql } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ import { RevenueChart } from "./revenue-chart";
+ 
+ export default async function ReportsPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const [biz] = await db.select().from(s.businesses).where(eq(s.businesses.id, session.businessId));
+   // Server component renders per request — "now" is legitimately request-scoped.
+   // eslint-disable-next-line react-hooks/purity
+diff --git a/src/app/admin/services/page.tsx b/src/app/admin/services/page.tsx
+index e380df2..6ef6e03 100644
+--- a/src/app/admin/services/page.tsx
++++ b/src/app/admin/services/page.tsx
+@@ -1,10 +1,10 @@
+ import { asc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ import { saveService, toggleService } from "../actions";
+ 
+ export default async function ServicesPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const rows = await db
+     .select()
+     .from(s.services)
+diff --git a/src/app/admin/staff/page.tsx b/src/app/admin/staff/page.tsx
+index 80d223d..f7518f3 100644
+--- a/src/app/admin/staff/page.tsx
++++ b/src/app/admin/staff/page.tsx
+@@ -1,10 +1,10 @@
+ import { asc, eq } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+-import { requireSession } from "@/lib/session";
++import { requireOwner } from "@/lib/session";
+ import { saveStaff, toggleStaff, toggleStaffService } from "../actions";
+ 
+ export default async function StaffPage() {
+-  const session = await requireSession();
++  const session = await requireOwner();
+   const masters = await db
+     .select()
+     .from(s.staff)
+diff --git a/src/lib/session.ts b/src/lib/session.ts
+index 95dba70..ff03129 100644
+--- a/src/lib/session.ts
++++ b/src/lib/session.ts
+@@ -47,6 +47,13 @@ export async function requireSession(): Promise<Session> {
+   return session;
+ }
+ 
++/** Owner-only pages and actions: staff are sent back to the calendar. */
++export async function requireOwner(): Promise<Session> {
++  const session = await requireSession();
++  if (session.role !== "owner") redirect("/admin");
++  return session;
++}
++
+ export async function destroySession(): Promise<void> {
+   const store = await cookies();
+   const token = store.get(SESSION_COOKIE)?.value;

@@ -1,0 +1,63 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "staff cannot open owner-only pages",
+      "pass": false,
+      "detail": "Error: /admin/services: landed on /admin/services with 200\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "staff navigation only links to what staff can use",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "replayed owner forms are refused for staff",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "the same replay still works for the owner",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "staff can still run the day",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "owner keeps every page and button",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_change_prices",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "staff_did_not_hide_anything",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_staff_rows_created_by_staff",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_owner_audit_entries_by_staff",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "owner_changes_went_through",
+      "pass": true
+    }
+  ],
+  "task": "t07-staff-permissions",
+  "seconds": 17.5
+}

@@ -1,0 +1,120 @@
+{
+  "task": "t09-booking-note",
+  "hunks": 10,
+  "not_source": 0,
+  "graded": 10,
+  "killed": 5,
+  "broken": 5,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 11.5
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 43.7
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/[slug]/wizard.tsx",
+      "title": "export function BookingWizard({ slug, timezone }: { slug: string; timezone: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "step 4 has no accessibility violations",
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 81.5
+    },
+    {
+      "hunk": 3,
+      "file": "src/app/admin/page.tsx",
+      "title": "export default async function CalendarPage(ctx: {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 10.3
+    },
+    {
+      "hunk": 4,
+      "file": "src/app/admin/page.tsx",
+      "title": "export default async function CalendarPage(ctx: {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 37.1
+    },
+    {
+      "hunk": 5,
+      "file": "src/app/api/public/[slug]/book/route.ts",
+      "title": "const body = z.object({",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.5
+    },
+    {
+      "hunk": 6,
+      "file": "src/app/api/public/[slug]/book/route.ts",
+      "title": "export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.9
+    },
+    {
+      "hunk": 7,
+      "file": "src/app/api/public/[slug]/book/route.ts",
+      "title": "export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "API: 500 characters is the limit, blank is no note",
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 38.8
+    },
+    {
+      "hunk": 8,
+      "file": "src/lib/booking.ts",
+      "title": "export async function createBooking(opts: {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 9.6
+    },
+    {
+      "hunk": 9,
+      "file": "src/lib/booking.ts",
+      "title": "export async function createBooking(opts: {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "wizard: labelled note is saved as typed",
+        "API: 500 characters is the limit, blank is no note",
+        "admin calendar shows the note as plain text"
+      ],
+      "seconds": 37.2
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{"ts":"2026-11-02T18:38:27.431Z","step":"start","status":"ok","detail":"t08-status-transitions"}
+{"ts":"2026-11-02T18:38:27.445Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T18:38:27.468Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-02T18:38:36.888Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 11ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 5.7s\n  Running TypeScript ...\nsrc/lib/booking.ts(280,7): error TS2304: Cannot find name 'changed'.\nFailed to type check."}
+{"ts":"2026-11-02T18:38:36.917Z","step":"done","status":"fail","detail":"build_failed"}

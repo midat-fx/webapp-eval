@@ -1,0 +1,32 @@
+{
+  "task": "t06-dst-slots",
+  "hunks": 2,
+  "not_source": 1,
+  "graded": 1,
+  "killed": 1,
+  "broken": 0,
+  "survived": 0,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 1,
+      "file": "src/lib/slots.ts",
+      "title": "export function tzOffsetMinutes(timeZone: string, utcMs: number): number {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "slots follow opening hours in Europe/Berlin on 2027-03-28",
+        "slots follow opening hours in Europe/Berlin on 2027-10-31",
+        "slots follow opening hours in Europe/Berlin on 2028-03-26",
+        "slots follow opening hours in Europe/Berlin on 2028-10-29",
+        "slots follow opening hours in America/New_York on 2027-03-14",
+        "slots follow opening hours in America/New_York on 2027-11-07",
+        "slots follow opening hours in America/New_York on 2028-03-12",
+        "slots follow opening hours in America/New_York on 2028-11-05",
+        "wizard shows the Berlin opening time on the spring-forward day"
+      ],
+      "seconds": 39.6
+    }
+  ]
+}
