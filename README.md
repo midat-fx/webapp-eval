@@ -20,40 +20,55 @@ Every number here is computed by `python3 -m harness.report` from files in
 fail, all ten reference and ten alternative fixes pass, and 33/33 known-bad
 patches are rejected.
 
-**Agents: 49/49 graded runs pass** (Claude Code headless, `claude -p`,
+**Agents: 59/59 graded runs pass** (Claude Code headless, `claude -p`,
 [`results/agent/`](results/agent/)):
 
 | Task | Haiku 5.5 | Sonnet 5.5 |
 |---|---|---|
-| t01-phone-format | 3/3 | 2/2 |
-| t02-stale-slots | 3/3 | 2/2 |
-| t03-default-date-tz | 3/3 | 2/2 |
-| t04-sse-subscriber-leak | 3/3 | 2/2 |
-| t05-overlap-race | 3/3 | 2/2 |
-| t06-dst-slots | 3/3 | 2/2 |
-| t07-staff-permissions | 3/3 | 2/2 |
-| t08-status-transitions | 3/3 | 2/2 |
-| t09-booking-note | 3/3 | 2/2 |
-| t10-wizard-a11y | 2/2 | 2/2 |
-| **total** | **29/29** | **20/20** |
-| mean wall time | 87 s | 38 s |
-| mean turns | 19.0 | 8.2 |
-| mean cost (CLI-reported) | $0.84 | $0.19 |
+| t01-phone-format | 3/3 | 3/3 |
+| t02-stale-slots | 3/3 | 3/3 |
+| t03-default-date-tz | 3/3 | 3/3 |
+| t04-sse-subscriber-leak | 3/3 | 3/3 |
+| t05-overlap-race | 3/3 | 3/3 |
+| t06-dst-slots | 3/3 | 3/3 |
+| t07-staff-permissions | 3/3 | 3/3 |
+| t08-status-transitions | 3/3 | 3/3 |
+| t09-booking-note | 3/3 | 3/3 |
+| t10-wizard-a11y | 3/3 | 2/2 |
+| **total** | **30/30** | **29/29** |
+| mean wall time | 87 s | 41 s |
+| mean turns | 18.7 | 8.0 |
+| mean cost (CLI-reported) | $0.84 | $0.20 |
 
 That's a ceiling. These ten tasks don't separate the two models on pass rate,
-only on effort: Haiku takes about 2.3× the turns, 2.3× the time and 4.4× the
+only on effort: Haiku takes about 2.3× the turns, 2.1× the time and 4.2× the
 cost. Harder tasks are the obvious next step. Some other details:
 
-- 50 of a 60-run budget used ([`ledger.jsonl`](results/agent/ledger.jsonl)):
-  49 graded runs plus one lost to a harness incident. The remaining 10 runs
-  are not done yet, which is why some cells have 2 attempts.
-- 0/49 traces touched anything outside their workdir (`touched_outside_workdir`
+- The whole 60-run budget is used ([`ledger.jsonl`](results/agent/ledger.jsonl)):
+  59 graded runs plus one lost to a harness incident. That lost run is why
+  Sonnet has only two attempts on t10: its third attempt would have been run 61.
+- 0/59 traces touched anything outside their workdir (`touched_outside_workdir`
   in each `meta.json`).
 - Two wave-1 failures turned out to be the verifiers' fault, not the
   agents'. Each one is in [`REGRADES.md`](results/agent/REGRADES.md); no
   agent was ever re-run to improve a score.
 - The very first run (`haiku/t01-phone-format/a1`) used a shorter
   disallowed-tools list (`meta.json` records the list for every run).
+
+**Race verifiers are stable** ([`results/flake/`](results/flake/)). The three
+known-bad patches that are wrong only under concurrency were each graded five
+more times, and so were the two reference fixes they compete with:
+
+| Variant | Expected | As expected |
+|---|---|---|
+| t05 check-then-insert | fail | 5/5 |
+| t05 in-process lock (two servers) | fail | 5/5 |
+| t08 read-then-update | fail | 5/5 |
+| t05 reference fix | pass | 5/5 |
+| t08 reference fix | pass | 5/5 |
+
+Five runs is enough to show the checks aren't coin flips, not enough to
+put a number on a rare miss.
 
 **LLM judge vs. verifiers** (Sonnet 5.5, issue + diff only, no tools,
 [`results/judge/sonnet/`](results/judge/sonnet/summary.json)):
@@ -62,8 +77,8 @@ cost. Harder tasks are the obvious next step. Some other details:
 |---|---|---|---|---|
 | reference + alternative fixes | 20 | 19/20 | – | 1 |
 | known-bad patches | 33 | 33/33 | 0 | – |
-| agent patches | 49 | 47/49 | – | 2 |
-| **all** | **102** | **97.1 %, κ = 0.93** | **0** | **3** |
+| agent patches | 59 | 57/59 | – | 2 |
+| **all** | **112** | **97.3 %, κ = 0.94** | **0** | **3** |
 
 The judge never accepted a wrong patch, but it couldn't be tested against an
 agent's wrong patch, because there weren't any. Its three false rejects all

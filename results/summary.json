@@ -141,8 +141,8 @@
     }
   },
   "agents": {
-    "runs": 49,
-    "ledger_invocations": 50,
+    "runs": 59,
+    "ledger_invocations": 60,
     "table": {
       "t01-phone-format": {
         "claude-haiku-5-5": [
@@ -150,8 +150,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t02-stale-slots": {
@@ -160,8 +160,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t03-default-date-tz": {
@@ -170,8 +170,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t04-sse-subscriber-leak": {
@@ -180,8 +180,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t05-overlap-race": {
@@ -190,8 +190,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t06-dst-slots": {
@@ -200,8 +200,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t07-staff-permissions": {
@@ -210,8 +210,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t08-status-transitions": {
@@ -220,8 +220,8 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t09-booking-note": {
@@ -230,14 +230,14 @@
           3
         ],
         "claude-sonnet-5-5": [
-          2,
-          2
+          3,
+          3
         ]
       },
       "t10-wizard-a11y": {
         "claude-haiku-5-5": [
-          2,
-          2
+          3,
+          3
         ],
         "claude-sonnet-5-5": [
           2,
@@ -247,18 +247,18 @@
     },
     "totals": {
       "claude-haiku-5-5": [
-        29,
-        29
+        30,
+        30
       ],
       "claude-sonnet-5-5": [
-        20,
-        20
+        29,
+        29
       ]
     },
     "stats": {
       "claude-haiku-5-5": {
-        "mean_seconds": 86.82,
-        "mean_turns": 19.0,
+        "mean_seconds": 86.98,
+        "mean_turns": 18.7,
         "mean_cost_usd": 0.84,
         "errors": 0,
         "served_models": [
@@ -266,9 +266,9 @@
         ]
       },
       "claude-sonnet-5-5": {
-        "mean_seconds": 37.8,
-        "mean_turns": 8.15,
-        "mean_cost_usd": 0.19,
+        "mean_seconds": 40.73,
+        "mean_turns": 7.97,
+        "mean_cost_usd": 0.2,
         "errors": 0,
         "served_models": [
           "claude-sonnet-5-5"
@@ -281,28 +281,28 @@
     "sonnet": {
       "model": "claude-sonnet-5-5",
       "overall": {
-        "n": 102,
-        "tp": 66,
+        "n": 112,
+        "tp": 76,
         "tn": 33,
         "fp": 0,
         "fn": 3,
-        "accuracy": 0.971,
-        "kappa": 0.934,
+        "accuracy": 0.973,
+        "kappa": 0.937,
         "false_accept_rate": 0.0,
-        "false_reject_rate": 0.043
+        "false_reject_rate": 0.038
       },
       "unparsed": 0,
       "by_source": {
         "agent": {
-          "n": 49,
-          "tp": 47,
+          "n": 59,
+          "tp": 57,
           "tn": 0,
           "fp": 0,
           "fn": 2,
-          "accuracy": 0.959,
+          "accuracy": 0.966,
           "kappa": 0.0,
           "false_accept_rate": null,
-          "false_reject_rate": 0.041
+          "false_reject_rate": 0.034
         },
         "known-bad": {
           "n": 33,
@@ -329,5 +329,76 @@
       }
     }
   },
-  "flake": []
+  "flake": [
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-check-then-insert",
+      "expected": "fail",
+      "verdicts": [
+        "fail",
+        "fail",
+        "fail",
+        "fail",
+        "fail"
+      ],
+      "as_expected": 5,
+      "n": 5
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "bad-in-process-lock",
+      "expected": "fail",
+      "verdicts": [
+        "fail",
+        "fail",
+        "fail",
+        "fail",
+        "fail"
+      ],
+      "as_expected": 5,
+      "n": 5
+    },
+    {
+      "task": "t05-overlap-race",
+      "variant": "solution",
+      "expected": "pass",
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "as_expected": 5,
+      "n": 5
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "bad-read-then-update",
+      "expected": "fail",
+      "verdicts": [
+        "fail",
+        "fail",
+        "fail",
+        "fail",
+        "fail"
+      ],
+      "as_expected": 5,
+      "n": 5
+    },
+    {
+      "task": "t08-status-transitions",
+      "variant": "solution",
+      "expected": "pass",
+      "verdicts": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "as_expected": 5,
+      "n": 5
+    }
+  ]
 }

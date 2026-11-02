@@ -1,0 +1,52 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "a cancelled booking stays cancelled",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "a completed booking can't be cancelled or turned into a no-show",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "simultaneous clicks on two servers: exactly one change wins",
+      "pass": false,
+      "detail": "Error: audit trail of a26c073f-0c95-477f-be1c-b29076fb91f9\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 0\u001b[39m\n\u001b[31m+ Received  + 8\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[31m+   \"booking.completed\",\u001b[39m\n\u001b[2m    \"booking.no_show\",\u001b[22m\n\u001b[31m+   \"booking.no_show\",\u001b[39m\n\u001b[31m+   \"booking.cancelled\",\u001b[39m\n\u001b[2m  ]\u001b[22m"
+    },
+    {
+      "kind": "playwright",
+      "name": "normal use still works",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "at_most_one_status_change_per_booking",
+      "pass": false,
+      "detail": "[{\"entity_id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"array_agg\":[\"booking.completed\",\"booking.cancelled\",\"booking.cancelled\",\"booking.no_show\",\"booking.completed\",\"booking.completed\",\"booking.no_show\",\"booking.no_show\",\"booking.cancelled\"]}]"
+    },
+    {
+      "kind": "sql",
+      "name": "audit_matches_final_status",
+      "pass": false,
+      "detail": "[{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\",\"action\":\"booking.completed\"},{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\",\"action\":\"booking.completed\"},{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\",\"action\":\"booking.cancelled\"},{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\",\"action\":\"booking.cancelled\"},{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\",\"action\":\"booking.cancelled\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_offers_only_for_cancelled",
+      "pass": false,
+      "detail": "[{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "cancellation_messages_only_for_cancelled",
+      "pass": false,
+      "detail": "[{\"id\":\"a26c073f-0c95-477f-be1c-b29076fb91f9\",\"status\":\"no_show\"}]"
+    }
+  ],
+  "task": "t08-status-transitions",
+  "seconds": 16.7
+}

@@ -1,0 +1,14 @@
+{
+  "task": "t08-status-transitions",
+  "variant": "solution",
+  "expected": "pass",
+  "verdicts": [
+    "pass",
+    "pass",
+    "pass",
+    "pass",
+    "pass"
+  ],
+  "as_expected": 5,
+  "n": 5
+}

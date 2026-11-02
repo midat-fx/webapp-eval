@@ -1,0 +1,39 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "exactly one of six overlapping checkouts wins, every round",
+      "pass": false,
+      "detail": "Error: round 0: confirmed bookings, codes 409,200,200,200,200,200\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m5\u001b[39m"
+    },
+    {
+      "kind": "playwright",
+      "name": "different start, different duration still collide",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "other masters and cancelled bookings don't block",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_overlapping_confirmed_bookings",
+      "pass": false,
+      "detail": "[{\"a\":\"0b459d7d-f8f0-4837-9ab7-f23d52d8e87f\",\"b\":\"0e326867-dc29-45a8-84fd-a5bd5593d880\",\"start_at\":\"2026-11-10T06:10:00.000Z\"},{\"a\":\"0b459d7d-f8f0-4837-9ab7-f23d52d8e87f\",\"b\":\"f63aeafc-b490-4409-84ef-de70ec6368a7\",\"start_at\":\"2026-11-10T06:30:00.000Z\"},{\"a\":\"0b459d7d-f8f0-4837-9ab7-f23d52d8e87f\",\"b\":\"5dab79be-b3e8-4557-88d5-c6d173a81257\",\"start_at\":\"2026-11-10T06:40:00.000Z\"},{\"a\":\"0b459d7d-f8f0-4837-9ab7-f23d52d8e87f\",\"b\":\"b3963e83-3e93-4c1d-a0fe-07837c9178dd\",\"start_at\":\"2026-11-10T06:20:00.000Z\"},{\"a\":\"0e326867-dc29-45a8-84fd-a5bd5593d880\",\"b\":\"f63aeafc-b490-4409-84ef-de70ec6368a7\",\"start_at\":\"2026-11-10T06:30:00.000Z\"}]"
+    },
+    {
+      "kind": "sql",
+      "name": "every_winner_has_its_outbox_message",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "losers_left_no_booking_rows",
+      "pass": true
+    }
+  ],
+  "task": "t05-overlap-race",
+  "seconds": 16.3
+}

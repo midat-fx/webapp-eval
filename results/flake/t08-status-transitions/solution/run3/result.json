@@ -1,0 +1,47 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "a cancelled booking stays cancelled",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "a completed booking can't be cancelled or turned into a no-show",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "simultaneous clicks on two servers: exactly one change wins",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "normal use still works",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "at_most_one_status_change_per_booking",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "audit_matches_final_status",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_offers_only_for_cancelled",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "cancellation_messages_only_for_cancelled",
+      "pass": true
+    }
+  ],
+  "task": "t08-status-transitions",
+  "seconds": 15.9
+}

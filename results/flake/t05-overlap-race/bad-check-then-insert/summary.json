@@ -1,0 +1,14 @@
+{
+  "task": "t05-overlap-race",
+  "variant": "bad-check-then-insert",
+  "expected": "fail",
+  "verdicts": [
+    "fail",
+    "fail",
+    "fail",
+    "fail",
+    "fail"
+  ],
+  "as_expected": 5,
+  "n": 5
+}

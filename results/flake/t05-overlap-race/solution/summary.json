@@ -1,0 +1,14 @@
+{
+  "task": "t05-overlap-race",
+  "variant": "solution",
+  "expected": "pass",
+  "verdicts": [
+    "pass",
+    "pass",
+    "pass",
+    "pass",
+    "pass"
+  ],
+  "as_expected": 5,
+  "n": 5
+}

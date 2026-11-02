@@ -98,8 +98,10 @@ Three known-bad patches are only wrong under concurrency (t05
 check-then-insert and in-process lock, t08 read-then-update). Their
 verifiers race many requests over several rounds and two servers, which makes
 a miss unlikely but not impossible. `harness.cli flake` grades the same patch
-repeatedly and writes the catch rate to `results/flake/`. Those runs haven't
-been done yet, so the README makes no claim about catch rates.
+repeatedly and writes the catch rate to `results/flake/`. Each of the three
+was caught 5/5 times, and the reference fixes for t05 and t08 passed 5/5.
+Six racers over eight rounds make a miss need every round to serialise by
+luck. Five runs per variant rules out a coin flip, not a rare miss.
 
 ### Time-dependent checks are made time-independent
 
@@ -186,7 +188,8 @@ verifiers: its disagreements are a list of places to look.
 
 - Ten tasks from one app: good for depth, says nothing about other stacks.
 - Agent sandboxing on the host is audited, not enforced.
-- Race verifiers are probabilistic, and their catch rate is not measured yet.
+- Race verifiers are probabilistic: 5/5 catches per known-bad patch is the
+  whole measurement.
 - t04 can't trigger the abort-then-cancel race described above
   deterministically, so a fix with that bug would still pass.
 - Each grading builds the app from scratch (~10–30 s on an idle machine,

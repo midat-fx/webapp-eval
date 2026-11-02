@@ -1,0 +1,10 @@
+{"ts":"2026-11-02T08:01:12.377Z","step":"start","status":"ok","detail":"t05-overlap-race"}
+{"ts":"2026-11-02T08:01:12.397Z","step":"setup","status":"ok"}
+{"ts":"2026-11-02T08:01:12.415Z","step":"apply","status":"ok","detail":"11 files touched"}
+{"ts":"2026-11-02T08:01:20.747Z","step":"build","status":"ok"}
+{"ts":"2026-11-02T08:01:23.172Z","step":"services","status":"ok"}
+{"ts":"2026-11-02T08:01:23.819Z","step":"seed","status":"ok"}
+{"ts":"2026-11-02T08:01:24.895Z","step":"server","status":"ok","detail":"2 instance(s)"}
+{"ts":"2026-11-02T08:01:25.790Z","step":"playwright","status":"exit:0"}
+{"ts":"2026-11-02T08:01:25.836Z","step":"invariants","status":"exit:0"}
+{"ts":"2026-11-02T08:01:25.864Z","step":"done","status":"auto","detail":"checks"}
