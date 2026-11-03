@@ -18,5 +18,13 @@
   "t10-wizard-a11y/h06": {
     "class": "gap",
     "why": "The Loading text under the date keeps its low contrast. The issue names it, but axe never ran while the times were loading."
+  },
+  "t11-decline-offer/h02": {
+    "class": "redundant",
+    "why": "Without it the client lands on a 404 after No thanks instead of a confirmation. The issue asks for nothing after the tap, and the decline itself still works."
+  },
+  "t11-decline-offer/h03": {
+    "class": "redundant",
+    "why": "The confirmation text after No thanks; without it the page says the offer is no longer active. The issue asks for nothing after the tap."
   }
 }

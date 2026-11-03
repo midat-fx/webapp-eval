@@ -1,0 +1,5 @@
+{"ts":"2026-11-03T14:10:38.006Z","step":"start","status":"ok","detail":"t11-decline-offer"}
+{"ts":"2026-11-03T14:10:38.053Z","step":"setup","status":"ok"}
+{"ts":"2026-11-03T14:10:38.230Z","step":"apply","status":"ok","detail":"4 files touched"}
+{"ts":"2026-11-03T14:11:30.899Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 209ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 34.9s\n  Running TypeScript ...\nsrc/lib/waitlist.ts(207,11): error TS2304: Cannot find name 'cancelByDedupeKey'.\nFailed to type check."}
+{"ts":"2026-11-03T14:11:30.954Z","step":"done","status":"fail","detail":"build_failed"}

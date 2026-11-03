@@ -1,0 +1,90 @@
+{
+  "task": "t11-decline-offer",
+  "hunks": 8,
+  "not_source": 0,
+  "graded": 8,
+  "killed": 1,
+  "broken": 5,
+  "survived": 2,
+  "invalid": 0,
+  "error": 0,
+  "rows": [
+    {
+      "hunk": 0,
+      "file": "src/app/w/[token]/actions.ts",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 66.8
+    },
+    {
+      "hunk": 1,
+      "file": "src/app/w/[token]/page.tsx",
+      "title": "",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 93.5
+    },
+    {
+      "hunk": 2,
+      "file": "src/app/w/[token]/page.tsx",
+      "title": "export default async function WaitlistOfferPage(ctx: {",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 160.7
+    },
+    {
+      "hunk": 3,
+      "file": "src/app/w/[token]/page.tsx",
+      "title": "export default async function WaitlistOfferPage(ctx: {",
+      "outcome": "survived",
+      "reason": null,
+      "failed_checks": [],
+      "seconds": 151.0
+    },
+    {
+      "hunk": 4,
+      "file": "src/app/w/[token]/page.tsx",
+      "title": "export default async function WaitlistOfferPage(ctx: {",
+      "outcome": "killed",
+      "reason": null,
+      "failed_checks": [
+        "No thanks hands the time to the next client in the queue",
+        "with nobody else waiting the time is back on sale at once",
+        "a double tap across two servers declines once",
+        "No thanks after claiming changes nothing"
+      ],
+      "seconds": 220.0
+    },
+    {
+      "hunk": 5,
+      "file": "src/db/schema.ts",
+      "title": "export const bookings = pgTable(\"bookings\", {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 67.5
+    },
+    {
+      "hunk": 6,
+      "file": "src/lib/waitlist.ts",
+      "title": "import { randomBytes } from \"node:crypto\";",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 53.8
+    },
+    {
+      "hunk": 7,
+      "file": "src/lib/waitlist.ts",
+      "title": "export async function expireOffer(entryId: string): Promise<void> {",
+      "outcome": "broken",
+      "reason": "build_failed",
+      "failed_checks": [],
+      "seconds": 29.9
+    }
+  ]
+}

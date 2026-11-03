@@ -3,7 +3,7 @@
 A small benchmark of full-stack web tasks for coding agents, where the
 grade comes from a browser and a database, not from unit tests.
 
-Ten tasks are cut from [kezek](https://github.com/midat-fx/kezek), a real
+Eleven tasks are cut from [kezek](https://github.com/midat-fx/kezek), a real
 Next.js 16 + PostgreSQL + Redis booking app, at a pinned commit. Each task is
 an issue as a user would file it, plus a reference patch. The hidden
 verifiers build the candidate's version of the app in a container with no
@@ -15,9 +15,9 @@ scenario, and run axe-core on the UI it touches.
 Every number here is computed by `python3 -m harness.report` from files in
 [`results/`](results/) ([`results/summary.json`](results/summary.json)).
 
-**Verifiers: 65/65 self-check variants graded as expected**
-([`results/selfcheck/`](results/selfcheck/summary.json)). All ten start states
-fail, all ten reference and ten alternative fixes pass, and 35/35 known-bad
+**Verifiers: 71/71 self-check variants graded as expected**
+([`results/selfcheck/`](results/selfcheck/summary.json)). All eleven start states
+fail, all eleven reference and eleven alternative fixes pass, and 38/38 known-bad
 patches are rejected.
 
 **Agents: 59/59 graded runs pass** (Claude Code headless, `claude -p`,
@@ -42,7 +42,10 @@ patches are rejected.
 
 That's a ceiling. These ten tasks don't separate the two models on pass rate,
 only on effort: Haiku takes about 2.3× the turns, 2.1× the time and 4.2× the
-cost. Harder tasks are the obvious next step. Some other details:
+cost. Harder tasks are the obvious next step, and t11 is the first: a feature
+that spans the offer page, the waitlist code, Redis holds and the outbox
+workers. It came after the 60-run budget was spent, so no agent has run on it
+yet and it isn't in the table. Some other details:
 
 - The whole 60-run budget is used ([`ledger.jsonl`](results/agent/ledger.jsonl)):
   59 graded runs plus one lost to a harness incident. That lost run is why
@@ -72,7 +75,7 @@ put a number on a rare miss.
 
 **Verifiers vs. mutants** ([`results/mutants/`](results/mutants/)). A mutant is
 a reference fix with one hunk dropped, so it is a partial fix nobody had to
-think of. There are 56 hunks; one only touches a test file, which leaves 55
+think of. There are 64 hunks; one only touches a test file, which leaves 63
 mutants to grade:
 
 | Task | Hunks | Rejected by a verifier | Didn't build | Survived |
@@ -87,14 +90,18 @@ mutants to grade:
 | t08-status-transitions | 2 | 0 | 1 | 1 |
 | t09-booking-note | 10 | 5 | 5 | 0 |
 | t10-wizard-a11y | 9 | 9 | 0 | 0 |
-| **total** | **56** | **34** | **18** | **3** |
+| t11-decline-offer | 8 | 1 | 5 | 2 |
+| **total** | **64** | **35** | **23** | **5** |
 
-Of the 37 mutants that built, the verifiers reject 34. The 18 that didn't
+Of the 40 mutants that built, the verifiers reject 35. The 23 that didn't
 build say nothing about the verifiers, so they aren't counted as kills (one of
-them is a migration failure, the rest are compile errors). The three survivors
-change nothing a user can see: two drop only a comment, and one sends a
-calendar refresh after a no-op, as my alternative fix does too
-([`classification.json`](results/mutants/classification.json)).
+them is a migration failure, the rest are compile errors). None of the five
+survivors breaks a requirement in its issue
+([`classification.json`](results/mutants/classification.json)). Two drop only
+a comment. One sends a calendar refresh after a no-op, as my alternative fix
+does too. The two in t11 only change what the page shows after "No thanks": a
+404 or "no longer active" instead of a thank-you. The issue doesn't ask for
+either, so I didn't add a check for it.
 
 The first pass had five survivors, and two were real holes in my verifiers,
 both on requirements the issue states outright. The t07 replay never submitted
@@ -110,10 +117,10 @@ agent had benefited from either hole. The first verdicts are in
 
 | Patches | n | agreement | false accepts | false rejects |
 |---|---|---|---|---|
-| reference + alternative fixes | 20 | 19/20 | – | 1 |
-| known-bad patches | 35 | 34/35 | 1 | – |
+| reference + alternative fixes | 22 | 21/22 | – | 1 |
+| known-bad patches | 38 | 37/38 | 1 | – |
 | agent patches | 59 | 57/59 | – | 2 |
-| **all** | **114** | **96.5 %, κ = 0.92** | **1** | **3** |
+| **all** | **119** | **96.6 %, κ = 0.92** | **1** | **3** |
 
 The judge's one false accept is a mutant: the t10 patch that darkens one
 "Loading…" and misses the other. The judge read that as "darkens the Loading
@@ -147,6 +154,7 @@ re-judged; the first versions and their verdicts are in
 | [t08-status-transitions](tasks/t08-status-transitions/issue.md) | API/DB race | a cancelled booking can be completed later; double clicks double-count | replayed forms, 9 concurrent changes across 2 servers, SQL: one audit entry per booking |
 | [t09-booking-note](tasks/t09-booking-note/issue.md) | small feature | let clients leave a note, show it on the calendar | wizard + API limits, axe on the step, XSS check on the calendar |
 | [t10-wizard-a11y](tasks/t10-wizard-a11y/issue.md) | UI accessibility | unlabelled fields, low contrast, silent errors, selection only by colour | axe on every wizard state, live regions, ARIA selection state |
+| [t11-decline-offer](tasks/t11-decline-offer/issue.md) | feature across processes | a waitlist offer can't be turned down; the time sits on hold for 15 minutes | 2 app servers + 2 outbox workers: next client's SMS, slot back on sale, 6 concurrent declines, decline after claim; SQL: one live offer per time |
 
 ## How grading works
 

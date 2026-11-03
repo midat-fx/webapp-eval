@@ -5,7 +5,7 @@ alternative it beat.
 
 ## Tasks come from one real app, at a pinned commit
 
-All ten tasks are cut from [kezek](https://github.com/midat-fx/kezek) at
+All eleven tasks are cut from [kezek](https://github.com/midat-fx/kezek) at
 `base/kezek.sha`: a Next.js 16 / Postgres / Redis booking app with real
 concurrency (slot holds, an exclusion constraint, a transactional outbox) and
 real UI state (a four-step wizard, an SSE-driven admin calendar).
@@ -24,7 +24,7 @@ Two kinds of task:
 
 | Origin | Tasks | How the start state is made |
 |---|---|---|
-| Existing behaviour at the pinned commit | t01, t02, t03, t07, t08, t09, t10 | the pinned code as is; the issue describes a real gap |
+| Existing behaviour at the pinned commit | t01, t02, t03, t07, t08, t09, t10, t11 | the pinned code as is; the issue describes a real gap |
 | Injected regression | t04, t05, t06 | `setup.patch` removes or breaks something that kezek gets right |
 
 Injected regressions remove their own fingerprints: t05 drops the overlap
@@ -140,6 +140,26 @@ that. Only the reference fix is mutated, and race mutants are graded once, so
 for those a single rejection is the whole measurement. Dropping two hunks
 together isn't tried.
 
+### t11 runs the outbox workers too
+
+t11 ("No thanks" on a waitlist offer) is the first task where the behaviour
+happens outside the request: the next client hears about the time through the
+outbox, which `pnpm worker` drains. The spec starts two workers itself, with
+the command from the candidate's own `package.json`, next to the two app
+servers that `task.json` asks for. The checks then read what a client would
+get, the SMS in `message_log`, and claim the slot through that SMS's link. A
+fix that offers the time to the next client but leaves the declined client's
+Redis hold in place fails here: the worker can't hold a time that's still held.
+
+I also wrote a fifth bad patch and dropped it. It declines check-then-act
+(read the status, then update) and offers the time in-process. Two declines
+that both read "offered" could each release a hold, and the second release
+could delete the hold the first one just placed for the next client. It passed
+the verifier: six concurrent declines across two servers all read and release
+before any offer exists, and that ordering hides the bug. A patch that the
+verifier can't fail doesn't belong in `bad/`. The reference fix doesn't have
+this problem because the status check is part of the `UPDATE`.
+
 ### Time-dependent checks are made time-independent
 
 t03 ("the wizard opens on the business's today") depends on the wall clock.
@@ -228,7 +248,11 @@ until the mutant run. A skim of a diff doesn't see what the diff left out.
 
 ## Known limitations
 
-- Ten tasks from one app: good for depth, says nothing about other stacks.
+- Eleven tasks from one app: good for depth, says nothing about other stacks.
+- t11 can't tell a check-then-act decline from a correct one (see above), and
+  it can't catch a fix that releases the hold just after committing the
+  hand-over rather than before: the worker would have to poll inside that
+  millisecond. t11 has no agent runs yet.
 - Agent sandboxing on the host is audited, not enforced.
 - Mutants only drop one hunk of the reference fix at a time: a survivor-free
   task can still miss a wrong fix that adds code.
