@@ -1,0 +1,125 @@
+diff --git a/src/app/w/[token]/actions.ts b/src/app/w/[token]/actions.ts
+index 5360856..abdd435 100644
+--- a/src/app/w/[token]/actions.ts
++++ b/src/app/w/[token]/actions.ts
+@@ -1,9 +1,15 @@
+ "use server";
+ import { redirect } from "next/navigation";
+-import { acceptOffer } from "@/lib/waitlist";
++import { acceptOffer, declineOffer } from "@/lib/waitlist";
+ 
+ export async function accept(formData: FormData): Promise<void> {
+   const token = String(formData.get("token") ?? "");
+   const result = await acceptOffer(token);
+   redirect(`/w/${token}?status=${result.ok ? "booked" : result.error}`);
+ }
++
++export async function decline(formData: FormData): Promise<void> {
++  const token = String(formData.get("token") ?? "");
++  await declineOffer(token);
++  redirect(`/w/${token}?status=declined`);
++}
+diff --git a/src/app/w/[token]/page.tsx b/src/app/w/[token]/page.tsx
+index 7a6b296..e33c91f 100644
+--- a/src/app/w/[token]/page.tsx
++++ b/src/app/w/[token]/page.tsx
+@@ -1,7 +1,7 @@
+ import { eq } from "drizzle-orm";
+ import { notFound } from "next/navigation";
+ import { db, schema as s } from "@/db";
+-import { accept } from "./actions";
++import { accept, decline } from "./actions";
+ 
+ /**
+  * Landing page for the link in a waitlist offer. Deliberately a single button:
+@@ -50,6 +50,15 @@ export default async function WaitlistOfferPage(ctx: {
+     );
+   }
+ 
++  if (status === "declined") {
++    return shell(
++      <>
++        <h1 className="mt-2 text-xl font-semibold text-zinc-900">No problem</h1>
++        <p className="mt-2 text-zinc-600">The slot has gone to the next person in the queue.</p>
++      </>,
++    );
++  }
++
+   if (status === "expired" || entry.status !== "offered") {
+     return shell(
+       <>
+@@ -83,6 +92,12 @@ export default async function WaitlistOfferPage(ctx: {
+         <button className="mt-5 w-full rounded-lg bg-zinc-900 px-4 py-2 text-white hover:bg-zinc-700">
+           Claim this slot
+         </button>
++        <button
++          formAction={decline}
++          className="mt-3 w-full rounded-lg px-4 py-2 text-sm text-zinc-600 underline hover:text-zinc-900"
++        >
++          No thanks, I can't make it
++        </button>
+       </form>
+     </>,
+   );
+diff --git a/src/lib/waitlist.ts b/src/lib/waitlist.ts
+index cbfb68c..3a0e477 100644
+--- a/src/lib/waitlist.ts
++++ b/src/lib/waitlist.ts
+@@ -1,6 +1,6 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, asc, eq, isNull, or } from "drizzle-orm";
++import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { createBooking, createHold, publishCalendar } from "./booking";
+ import { enqueue } from "./outbox";
+@@ -175,6 +175,49 @@ export async function expireOffer(entryId: string): Promise<void> {
+   await releaseHold(slot.staffId, slot.startMs);
+ }
+ 
++// Deletes a hold only if it is still the one we placed: a newer hold on the
++// same time belongs to someone else.
++const RELEASE_OWN_HOLD = `
++local v = redis.call('GET', KEYS[1])
++if v and cjson.decode(v).token == ARGV[1] then return redis.call('DEL', KEYS[1]) end
++return 0`;
++
++/**
++ * "No thanks" on an offer: the client leaves the queue for that day and the
++ * time is offered to the next person at once.
++ */
++export async function declineOffer(token: string): Promise<boolean> {
++  const declined = await db.transaction(async (tx) => {
++    const { rows } = await tx.execute<{ id: string }>(
++      sql`SELECT id FROM waitlist_entries WHERE offer_token = ${token} AND status = 'offered' FOR UPDATE`,
++    );
++    if (rows.length === 0) return null;
++    const [entry] = await tx
++      .update(s.waitlistEntries)
++      .set({ status: "cancelled", offerExpiresAt: null })
++      .where(eq(s.waitlistEntries.id, rows[0].id))
++      .returning();
++    if (entry.offerHoldToken) {
++      await redis().eval(
++        RELEASE_OWN_HOLD,
++        1,
++        `hold:${entry.offerStaffId}:${entry.offerSlotStartAt!.getTime()}`,
++        entry.offerHoldToken,
++      );
++    }
++    return entry;
++  });
++  if (!declined) return false;
++
++  await offerFreedSlot(declined.businessId, {
++    staffId: declined.offerStaffId!,
++    serviceId: declined.serviceId,
++    startMs: declined.offerSlotStartAt!.getTime(),
++    endMs: declined.offerSlotEndAt!.getTime(),
++  });
++  return true;
++}
++
+ async function releaseHold(staffId: string, startMs: number): Promise<void> {
+   await redis().del(`hold:${staffId}:${startMs}`);
+ }

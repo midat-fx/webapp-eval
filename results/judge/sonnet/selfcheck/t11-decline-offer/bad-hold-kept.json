@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t11-decline-offer/bad-hold-kept",
+  "task": "t11-decline-offer",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"declineOffer never releases the Redis hold (`releaseHold`), which `expireOffer` does, and never calls `publishCalendar`. The time stays held for up to 15 minutes, so it isn't back on the public booking page immediately when nobody is waiting, and the next client's new hold may also fail.\"}",
+  "cost_usd": 0.0353634,
+  "is_error": false
+}

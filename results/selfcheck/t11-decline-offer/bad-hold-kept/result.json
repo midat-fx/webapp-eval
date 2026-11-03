@@ -1,0 +1,40 @@
+{
+  "verdict": "fail",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "No thanks hands the time to the next client in the queue",
+      "pass": false,
+      "detail": "Error: offer SMS to +77015550112\n\noffer SMS to +77015550112\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\nCall Log:\n- Timeout 30000ms exceeded while waiting on the predicate"
+    },
+    {
+      "kind": "playwright",
+      "name": "with nobody else waiting the time is back on sale at once",
+      "pass": false,
+      "detail": "Error: back on sale\n\nback on sale\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\nCall Log:\n- Timeout 10000ms exceeded while waiting on the predicate"
+    },
+    {
+      "kind": "playwright",
+      "name": "a double tap across two servers declines once",
+      "pass": false,
+      "detail": "Error: offer SMS to +77015550312\n\noffer SMS to +77015550312\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\nCall Log:\n- Timeout 30000ms exceeded while waiting on the predicate"
+    },
+    {
+      "kind": "playwright",
+      "name": "No thanks after claiming changes nothing",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "one_live_offer_per_slot",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_offer_for_a_booked_time",
+      "pass": true
+    }
+  ],
+  "task": "t11-decline-offer",
+  "seconds": 190.8
+}

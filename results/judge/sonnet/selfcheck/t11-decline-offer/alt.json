@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t11-decline-offer/alt",
+  "task": "t11-decline-offer",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"declineOffer row-locks the entry with FOR UPDATE, so double taps and two-process races decline only once. It cancels the entry so the link is dead and the client isn't re-offered, releases only its own hold, and calls offerFreedSlot so the next client is offered immediately. An already-claimed offer no longer has status 'offered', so declining it does nothing. I couldn't see offerFreedSlot, expireOffer or acceptOffer, so this assumes their behaviour.\"}",
+  "cost_usd": 0.06305039999999999,
+  "is_error": false
+}

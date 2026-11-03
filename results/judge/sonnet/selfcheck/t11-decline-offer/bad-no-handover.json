@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t11-decline-offer/bad-no-handover",
+  "task": "t11-decline-offer",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"declineOffer marks the entry declined, cancels the expire job and deletes the Redis hold, but never offers the slot to the next waitlisted client or enqueues the SMS that an expired offer triggers. It also doesn't republish the calendar, so the 'next client straight away' and 'back on the booking page immediately' requirements are unmet.\"}",
+  "cost_usd": 0.030303399999999998,
+  "is_error": false
+}

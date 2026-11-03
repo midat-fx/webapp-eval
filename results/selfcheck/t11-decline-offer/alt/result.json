@@ -1,0 +1,37 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "No thanks hands the time to the next client in the queue",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "with nobody else waiting the time is back on sale at once",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "a double tap across two servers declines once",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "No thanks after claiming changes nothing",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "one_live_offer_per_slot",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "no_offer_for_a_booked_time",
+      "pass": true
+    }
+  ],
+  "task": "t11-decline-offer",
+  "seconds": 170.1
+}

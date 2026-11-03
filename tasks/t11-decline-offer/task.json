@@ -1,0 +1,7 @@
+{
+  "id": "t11-decline-offer",
+  "title": "Let clients turn down a waitlist offer",
+  "category": "feature",
+  "origin": "new feature across the offer page, its server action and the waitlist/outbox code",
+  "instances": 2
+}

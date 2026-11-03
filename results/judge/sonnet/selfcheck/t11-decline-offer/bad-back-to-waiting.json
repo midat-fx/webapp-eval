@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t11-decline-offer/bad-back-to-waiting",
+  "task": "t11-decline-offer",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"`declineOffer` puts the declining client back to status \\\"waiting\\\" with no record of the declined slot, so the `waitlist.slot_freed` handler can pick them again as first in the queue. That breaks \\\"not offered that time again\\\", and when nobody else is waiting the slot is re-offered to the decliner instead of returning to the public booking page.\"}",
+  "cost_usd": 0.0336964,
+  "is_error": false
+}

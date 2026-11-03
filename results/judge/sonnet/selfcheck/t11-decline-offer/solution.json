@@ -1,0 +1,10 @@
+{
+  "id": "selfcheck/t11-decline-offer/solution",
+  "task": "t11-decline-offer",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"The decline is a single atomic UPDATE guarded by status='offered', so double taps, two tabs and two servers decline once, and a claimed offer is left alone. The same transaction cancels the pending expiry job, enqueues one slot_freed message and releases the hold, and the declined entry is no longer 'waiting'. I could not see `cancelByDedupeKey`, the slot_freed handler, or whether the status column needs a migration, so this verdict rests on the diff alone.\"}",
+  "cost_usd": 0.0665197,
+  "is_error": false
+}

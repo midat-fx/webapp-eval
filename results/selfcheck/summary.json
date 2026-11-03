@@ -782,8 +782,77 @@
         "every wizard state passes axe"
       ],
       "seconds": 23.7
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "baseline",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "No thanks hands the time to the next client in the queue",
+        "with nobody else waiting the time is back on sale at once",
+        "a double tap across two servers declines once",
+        "No thanks after claiming changes nothing"
+      ],
+      "seconds": 185.4
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "solution",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 104.0
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "alt",
+      "expected": "pass",
+      "verdict": "pass",
+      "ok": true,
+      "failed_checks": [],
+      "seconds": 170.1
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "bad-back-to-waiting",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "No thanks hands the time to the next client in the queue",
+        "a double tap across two servers declines once"
+      ],
+      "seconds": 193.3
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "bad-hold-kept",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "No thanks hands the time to the next client in the queue",
+        "with nobody else waiting the time is back on sale at once",
+        "a double tap across two servers declines once"
+      ],
+      "seconds": 190.8
+    },
+    {
+      "task": "t11-decline-offer",
+      "variant": "bad-no-handover",
+      "expected": "fail",
+      "verdict": "fail",
+      "ok": true,
+      "failed_checks": [
+        "No thanks hands the time to the next client in the queue",
+        "a double tap across two servers declines once"
+      ],
+      "seconds": 223.7
     }
   ],
-  "total": 65,
-  "agree": 65
+  "total": 71,
+  "agree": 71
 }

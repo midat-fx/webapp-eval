@@ -1,9 +1,9 @@
 {
   "selfcheck": {
-    "agree": 65,
-    "total": 65,
-    "known_bad": 35,
-    "known_bad_caught": 35,
+    "agree": 71,
+    "total": 71,
+    "known_bad": 38,
+    "known_bad_caught": 38,
     "by_task": {
       "t01-phone-format": {
         "accepted": [
@@ -137,6 +137,19 @@
           "bad-drop-low-contrast-text",
           "bad-errors-not-announced",
           "bad-loading-text-still-light"
+        ],
+        "wrong": []
+      },
+      "t11-decline-offer": {
+        "accepted": [
+          "solution",
+          "alt"
+        ],
+        "rejected": [
+          "baseline",
+          "bad-back-to-waiting",
+          "bad-hold-kept",
+          "bad-no-handover"
         ],
         "wrong": []
       }
@@ -283,15 +296,15 @@
     "sonnet": {
       "model": "claude-sonnet-5-5",
       "overall": {
-        "n": 114,
-        "tp": 76,
-        "tn": 34,
+        "n": 119,
+        "tp": 78,
+        "tn": 37,
         "fp": 1,
         "fn": 3,
-        "accuracy": 0.965,
-        "kappa": 0.919,
-        "false_accept_rate": 0.029,
-        "false_reject_rate": 0.038
+        "accuracy": 0.966,
+        "kappa": 0.924,
+        "false_accept_rate": 0.026,
+        "false_reject_rate": 0.037
       },
       "unparsed": 0,
       "by_source": {
@@ -307,26 +320,26 @@
           "false_reject_rate": 0.034
         },
         "known-bad": {
-          "n": 35,
+          "n": 38,
           "tp": 0,
-          "tn": 34,
+          "tn": 37,
           "fp": 1,
           "fn": 0,
-          "accuracy": 0.971,
+          "accuracy": 0.974,
           "kappa": 0.0,
-          "false_accept_rate": 0.029,
+          "false_accept_rate": 0.026,
           "false_reject_rate": null
         },
         "reference": {
-          "n": 20,
-          "tp": 19,
+          "n": 22,
+          "tp": 21,
           "tn": 0,
           "fp": 0,
           "fn": 1,
-          "accuracy": 0.95,
+          "accuracy": 0.955,
           "kappa": 0.0,
           "false_accept_rate": null,
-          "false_reject_rate": 0.05
+          "false_reject_rate": 0.045
         }
       }
     }
@@ -404,12 +417,12 @@
     }
   ],
   "mutants": {
-    "hunks": 56,
-    "graded": 55,
-    "killed": 34,
-    "broken": 18,
-    "survived": 3,
-    "verifier_kill_rate": 0.919,
+    "hunks": 64,
+    "graded": 63,
+    "killed": 35,
+    "broken": 23,
+    "survived": 5,
+    "verifier_kill_rate": 0.875,
     "by_task": {
       "t01-phone-format": {
         "hunks": 6,
@@ -490,6 +503,14 @@
         "killed": 9,
         "broken": 0,
         "survived": 0
+      },
+      "t11-decline-offer": {
+        "hunks": 8,
+        "not_source": 0,
+        "graded": 8,
+        "killed": 1,
+        "broken": 5,
+        "survived": 2
       }
     },
     "survivors": [
@@ -510,6 +531,18 @@
         "file": "src/lib/booking.ts",
         "class": "redundant",
         "why": "Publishes a calendar refresh after a no-op. Nothing changes for a user and the issue doesn't forbid it; the alternative fix publishes unconditionally too."
+      },
+      {
+        "mutant": "t11-decline-offer/h02",
+        "file": "src/app/w/[token]/page.tsx",
+        "class": "redundant",
+        "why": "Without it the client lands on a 404 after No thanks instead of a confirmation. The issue asks for nothing after the tap, and the decline itself still works."
+      },
+      {
+        "mutant": "t11-decline-offer/h03",
+        "file": "src/app/w/[token]/page.tsx",
+        "class": "redundant",
+        "why": "The confirmation text after No thanks; without it the page says the offer is no longer active. The issue asks for nothing after the tap."
       }
     ],
     "gaps_found": [

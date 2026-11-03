@@ -1,15 +1,15 @@
 {
   "model": "claude-sonnet-5-5",
   "overall": {
-    "n": 114,
-    "tp": 76,
-    "tn": 34,
+    "n": 119,
+    "tp": 78,
+    "tn": 37,
     "fp": 1,
     "fn": 3,
-    "accuracy": 0.965,
-    "kappa": 0.919,
-    "false_accept_rate": 0.029,
-    "false_reject_rate": 0.038
+    "accuracy": 0.966,
+    "kappa": 0.924,
+    "false_accept_rate": 0.026,
+    "false_reject_rate": 0.037
   },
   "unparsed": 0,
   "by_source": {
@@ -25,26 +25,26 @@
       "false_reject_rate": 0.034
     },
     "known-bad": {
-      "n": 35,
+      "n": 38,
       "tp": 0,
-      "tn": 34,
+      "tn": 37,
       "fp": 1,
       "fn": 0,
-      "accuracy": 0.971,
+      "accuracy": 0.974,
       "kappa": 0.0,
-      "false_accept_rate": 0.029,
+      "false_accept_rate": 0.026,
       "false_reject_rate": null
     },
     "reference": {
-      "n": 20,
-      "tp": 19,
+      "n": 22,
+      "tp": 21,
       "tn": 0,
       "fp": 0,
       "fn": 1,
-      "accuracy": 0.95,
+      "accuracy": 0.955,
       "kappa": 0.0,
       "false_accept_rate": null,
-      "false_reject_rate": 0.05
+      "false_reject_rate": 0.045
     }
   }
 }
