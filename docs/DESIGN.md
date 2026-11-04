@@ -183,6 +183,11 @@ servers) and headless Chromium all live in the one container.
   as a deploy would apply it.
 - **Verifiers arrive last**: specs are copied in after the candidate is
   built, from a directory the candidate's code never sees at build time.
+- CI keeps the image's layers in the GitHub Actions cache (buildx,
+  `type=gha`). I expected that to be the big win and it wasn't: an uncached
+  build took 77 s of a 27-minute run, and the 71 gradings are the rest. The
+  cache still skips the kezek clone and both `pnpm install`s, which is the part
+  that can break on someone else's outage.
 - One image instead of compose: on this machine colima's host port
   forwarding is broken, and a single container with loopback-only services
   also needs no orchestration in CI.
@@ -260,5 +265,6 @@ until the mutant run. A skim of a diff doesn't see what the diff left out.
   whole measurement.
 - t04 can't trigger the abort-then-cancel race described above
   deterministically, so a fix with that bug would still pass.
-- Each grading builds the app from scratch (~10–30 s on an idle machine,
-  minutes when the host is loaded); fine for tens of runs, slow for thousands.
+- Each grading builds the app from scratch: 28 s median and 81 s p90 over
+  197 published gradings (`results/timing.json`), on a loaded shared machine.
+  Fine for hundreds of runs, slow for thousands.

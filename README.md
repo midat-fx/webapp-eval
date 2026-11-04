@@ -140,6 +140,29 @@ re-judged; the first versions and their verdicts are in
 [`results/judge/superseded/`](results/judge/superseded/).
 
 
+**Grading time** ([`results/timing.json`](results/timing.json)). Wall time
+of every published grading that got as far as the checks (builds that failed
+stop early and are left out), on a shared Mac whose load ranged from idle to
+100+:
+
+| Task | Gradings | p50 | p90 |
+|---|---|---|---|
+| t01-phone-format | 14 | 26 s | 39 s |
+| t02-stale-slots | 13 | 30 s | 36 s |
+| t03-default-date-tz | 14 | 47 s | 83 s |
+| t04-sse-subscriber-leak | 14 | 30 s | 78 s |
+| t05-overlap-race | 30 | 17 s | 51 s |
+| t06-dst-slots | 13 | 43 s | 72 s |
+| t07-staff-permissions | 26 | 18 s | 38 s |
+| t08-status-transitions | 23 | 21 s | 54 s |
+| t09-booking-note | 19 | 37 s | 82 s |
+| t10-wizard-a11y | 22 | 26 s | 56 s |
+| t11-decline-offer | 9 | 185 s | 221 s |
+| **all** | **197** | **28 s** | **81 s** |
+
+t11 is slow by design: its checks wait for outbox workers that poll every two
+seconds, and all nine of its gradings ran while the machine was at its busiest.
+
 ## Tasks
 
 | Task | Kind | What's wrong | Verified by |

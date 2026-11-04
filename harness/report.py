@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import statistics
 from collections import defaultdict
 from pathlib import Path
 
@@ -83,8 +84,27 @@ def mutants() -> dict:
             "gaps_found": [k for k, v in notes.items() if v["class"] == "gap"]}
 
 
+def timing() -> dict:
+    """Wall time per grading, from every published result.json that got as far as
+    the checks. Builds that failed stop early and would drag the median down."""
+    by_task = defaultdict(list)
+    for p in RES.rglob("result.json"):
+        r = load(p)
+        if r.get("checks") and isinstance(r.get("seconds"), (int, float)):
+            by_task[r["task"]].append(r["seconds"])
+    def stats(xs):
+        xs = sorted(xs)
+        p90 = statistics.quantiles(xs, n=10, method="inclusive")[8] if len(xs) > 1 else xs[0]
+        return {"n": len(xs), "p50": round(statistics.median(xs), 1), "p90": round(p90, 1), "max": xs[-1]}
+    out = {"by_task": {t: stats(xs) for t, xs in sorted(by_task.items())},
+           "all": stats([x for xs in by_task.values() for x in xs])}
+    (RES / "timing.json").write_text(json.dumps(out, indent=2) + "\n")
+    return out
+
+
 def main() -> None:
-    out = {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants()}
+    out = {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants(),
+           "timing": timing()}
     (RES / "summary.json").write_text(json.dumps(out, indent=2) + "\n")
     sc, ag = out["selfcheck"], out["agents"]
     print(f"Verifier self-check: {sc['agree']}/{sc['total']} variants as expected; "
@@ -111,6 +131,9 @@ def main() -> None:
     print(f"verifier gaps found and closed: {mu['gaps_found']}")
     for x in mu["survivors"]:
         print(f"  {x['mutant']} {x['file']}: {x['class']}")
+    print("\n| Task | Gradings | p50 | p90 |\n|---|---|---|---|")
+    for t, m in {**out["timing"]["by_task"], "**all**": out["timing"]["all"]}.items():
+        print(f"| {t} | {m['n']} | {m['p50']:.0f} s | {m['p90']:.0f} s |")
 
 
 if __name__ == "__main__":
