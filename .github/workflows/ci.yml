@@ -34,7 +34,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       # `make test` minus `image`, which the step above already did.
-      - run: make unit check-verifiers JOBS=2
+      - run: make unit check-verifiers JOBS=2 MIN_FREE_GB=2
       - if: always()
         uses: actions/upload-artifact@v4
         with:

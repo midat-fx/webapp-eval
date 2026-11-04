@@ -129,6 +129,21 @@ class Mutants(unittest.TestCase):
         self.assertEqual(o("error", "build_infra_failure"), "error")
 
 
+class Readme(unittest.TestCase):
+    def test_readme_tables_match_results(self):
+        from harness import report
+        blocks = report.readme_blocks((grading.ROOT / "README.md").read_text())
+        self.assertEqual(blocks, report.tables(report.collect()), "run `python3 -m harness.report --readme`")
+
+
+class DiskGuard(unittest.TestCase):
+    def test_low_disk_skips_only_below_the_threshold(self):
+        from argparse import Namespace
+        from harness import cli
+        self.assertTrue(cli.low_disk(Namespace(min_free_gb=10**9), "x"))
+        self.assertFalse(cli.low_disk(Namespace(min_free_gb=0), "x"))
+
+
 class AgentTrace(unittest.TestCase):
     def test_sanitize_strips_host_paths(self):
         work = Path("/var/folders/x/T/webeval-abc")

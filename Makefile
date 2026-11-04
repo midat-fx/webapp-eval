@@ -1,5 +1,7 @@
 IMAGE ?= webapp-eval-runner:dev
 JOBS ?= 2
+# Gradings stop starting below this much free disk (GitHub runners have ~14 GB).
+MIN_FREE_GB ?= 12
 PY ?= python3
 export WEBEVAL_IMAGE := $(IMAGE)
 
@@ -17,11 +19,11 @@ image:
 	docker build -f docker/Dockerfile --build-arg KEZEK_SHA=$$(cat base/kezek.sha) -t $(IMAGE) .
 
 check-verifiers:
-	$(PY) -m harness.cli selfcheck -j $(JOBS) --out .cache/selfcheck
+	$(PY) -m harness.cli selfcheck -j $(JOBS) --min-free-gb $(MIN_FREE_GB) --out .cache/selfcheck
 
 # The runs behind the numbers in README.md.
 selfcheck: image
-	$(PY) -m harness.cli selfcheck -j $(JOBS) --out results/selfcheck
+	$(PY) -m harness.cli selfcheck -j $(JOBS) --min-free-gb $(MIN_FREE_GB) --out results/selfcheck
 
 mutants: image
 	$(PY) -m harness.cli mutants -j $(JOBS)

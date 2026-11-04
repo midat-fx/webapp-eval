@@ -14,6 +14,16 @@ from harness import grading
 ROOT = grading.ROOT
 
 
+def low_disk(a: argparse.Namespace, what: str) -> bool:
+    """True (and says so) when free disk is under --min-free-gb: a grading
+    image plus build output can fill the last few GB and take the host down."""
+    free = shutil.disk_usage(ROOT).free / 2**30
+    if free < a.min_free_gb:
+        print(f"SKIP {what}: {free:.1f} GB free, under {a.min_free_gb} GB", flush=True)
+        return True
+    return False
+
+
 def cmd_grade(a: argparse.Namespace) -> int:
     r = grading.grade(a.task, Path(a.patch) if a.patch else None, Path(a.out).resolve())
     print(json.dumps({k: r[k] for k in ("verdict", "seconds")} | {"failed": [c["name"] for c in r["checks"] if not c["pass"]]}))
@@ -31,6 +41,9 @@ def cmd_selfcheck(a: argparse.Namespace) -> int:
         done = out_root / task / name / "result.json"
         if a.resume and done.exists() and json.loads(done.read_text())["verdict"] in ("pass", "fail"):
             r = json.loads(done.read_text())
+        elif low_disk(a, f"{task} {name}"):
+            return {"task": task, "variant": name, "expected": expected, "verdict": "not_graded", "ok": False,
+                    "failed_checks": [], "seconds": 0}
         else:
             r = grading.grade(task, patch, out_root / task / name)
         ok = r["verdict"] == expected
@@ -72,6 +85,8 @@ def cmd_agent(a: argparse.Namespace) -> int:
 
     def run(job):
         task, model, n = job
+        if low_disk(a, f"{model} {task} a{n}"):  # before the ledger: a skipped run costs no budget
+            return None
         with ledger.open("a") as f:
             f.write(json.dumps({"task": task, "model": model, "attempt": n}) + "\n")
         r = agent.attempt(task, MODELS[model], out_root / model / task / f"a{n}")
@@ -149,8 +164,7 @@ def cmd_mutants(a: argparse.Namespace) -> int:
         done = d / "result.json"
         if done.exists() and json.loads(done.read_text())["verdict"] in ("pass", "fail"):
             r = json.loads(done.read_text())
-        elif shutil.disk_usage(ROOT).free < a.min_free_gb * 2**30:
-            print(f"SKIP {task} h{i:02}: under {a.min_free_gb} GB free", flush=True)
+        elif low_disk(a, f"{task} h{i:02}"):
             return task, {"hunk": i, "file": h.path, "outcome": "not_graded"}
         else:
             d.mkdir(parents=True, exist_ok=True)
@@ -187,7 +201,9 @@ def cmd_regrade(a: argparse.Namespace) -> int:
         if res.exists() and json.loads(res.read_text())["verdict"] in ("pass", "fail") and not a.all:
             continue
         task = json.loads(meta.read_text())["task"]
-        if a.tasks and task not in a.tasks:
+        if a.tasks and task not in a.tasks or a.attempt and run.name != f"a{a.attempt}":
+            continue
+        if low_disk(a, str(run.relative_to(out_root))):
             continue
         patch = run / "patch.diff"
         r = grading.grade(task, patch, run / "grade") if patch.read_text().strip() else None
@@ -220,6 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("tasks", nargs="*")
     s.add_argument("-j", "--jobs", type=int, default=2)
     s.add_argument("--out", default="results/selfcheck")
+    s.add_argument("--min-free-gb", type=int, default=12)
     s.add_argument("--resume", action="store_true", help="reuse existing pass/fail results")
     s.set_defaults(fn=cmd_selfcheck)
     ag = sub.add_parser("agent", help="run Claude Code headless on tasks and grade the result")
@@ -228,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
     ag.add_argument("--attempts", type=int, default=1)
     ag.add_argument("--budget", type=int, default=60)
     ag.add_argument("-j", "--jobs", type=int, default=2)
+    ag.add_argument("--min-free-gb", type=int, default=12)
     ag.add_argument("--out", default="results/agent")
     ag.set_defaults(fn=cmd_agent)
     j = sub.add_parser("judge", help="LLM judge over every graded patch, scored against the verifiers")
@@ -248,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
     rg = sub.add_parser("regrade", help="re-grade saved agent patches (missing or infra-error results)")
     rg.add_argument("tasks", nargs="*")
     rg.add_argument("--all", action="store_true")
+    rg.add_argument("--attempt", type=int, help="only runs a<N>, e.g. 1 for the first attempt of every cell")
+    rg.add_argument("--min-free-gb", type=int, default=12)
     rg.add_argument("--out", default="results/agent")
     rg.set_defaults(fn=cmd_regrade)
     sc = sub.add_parser("scrub", help="strip host paths and account events from published traces")
