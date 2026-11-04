@@ -266,10 +266,20 @@ The first real runs found two things the hand checks hadn't
   and passed t01 anyway, in 134 s and 16 turns; its three audited t01 runs
   took 35–59 s and 7–10 turns.
 
-The slug is fixed. The unit test now creates that directory under the
-profile, and it passes. Neither run says anything about the sandbox's cost on
-a working shell. The comparison against the audited runs still needs runs
-with the fixed profile, which the day's `claude -p` budget didn't cover.
+The slug is fixed, and the unit test now creates that directory under the
+profile. With the fixed profile I ran six more: t01 and t08, two attempts per
+model. I compared them with the unsandboxed runs of the same two tasks:
+
+| | sandboxed (fixed) | unsandboxed |
+|---|---|---|
+| Haiku | 3/3, 60 s, 14.3 turns | 6/6, 64 s, 13.8 turns |
+| Sonnet | 2/3, 56 s, 8.3 turns | 6/6, 43 s, 8.8 turns |
+
+Pass rates and turns are within noise for samples this small, and no trace
+shows a sandbox denial. Sonnet's failure has nothing to do with the sandbox.
+Its t08 fix adds `if (status === "confirmed") return;`, which makes a later
+`status !== "confirmed"` a TypeScript error (TS2367), so `next build` fails.
+It ran the unit tests, which pass, and never ran `pnpm build`.
 
 ## The LLM judge baseline
 
@@ -300,10 +310,12 @@ verifiers: its disagreements are a list of places to look.
 All three false rejects came from not seeing the code around the diff.
 `judge --repo` runs the same prompt in a fresh copy of the task's start state,
 with only `Read,Grep,Glob` and a note that the repository is there. It
-accepted all three, in 4–5 turns each (`results/judge/sonnet-repo/`). The
-other half of the question is still open: whether context also talks it into
-accepting known-bad patches. That needs the same mode on a sample of them,
-and I ran out of the day's `claude -p` budget first.
+accepted all three, in 4–5 turns each. To check that context doesn't simply
+make it agree with everything, I also gave it seven known-bad patches, one
+from each of seven tasks (t01, t04, t05, t07, t08, t10, t11). It rejected all
+seven, including the t10 patch it had wrongly passed without the repository
+(`results/judge/sonnet-repo/`). On these ten patches, reading the code fixes
+both kinds of error. Ten is a sample, not a measurement of the whole matrix.
 
 It works in the other direction too. The judge's only false accept is a
 mutant: the wizard shows "Loading…" in two places, and the patch darkens just
@@ -316,9 +328,12 @@ until the mutant run. A skim of a diff doesn't see what the diff left out.
 - t11 can't tell a check-then-act decline from a correct one (see above), and
   it can't catch a fix that releases the hold just after committing the
   hand-over rather than before: the worker would have to poll inside that
-  millisecond. t11 has no agent runs yet.
-- Agent isolation on the host is audited in every published run. `--sandbox`
-  enforces it, but no published run has used it yet (see above).
+  millisecond. At least one of the six agent patches for t11
+  (`sonnet/t11-decline-offer/a2`) releases the hold after its transaction
+  commits. It passed, as this predicts.
+- Agent isolation is audited in every published run, and enforced only in
+  the eight `--sandbox` runs (`results/agent-sandbox/`). The main 59-run table
+  is from before the sandbox existed.
 - Mutants only drop one hunk of the reference fix at a time: a survivor-free
   task can still miss a wrong fix that adds code.
 - Race verifiers are probabilistic: 5/5 catches per known-bad patch is the

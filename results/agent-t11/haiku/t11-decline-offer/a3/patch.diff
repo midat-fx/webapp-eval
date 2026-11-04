@@ -1,0 +1,406 @@
+diff --git a/README.md b/README.md
+index 3390155..4a290ff 100644
+--- a/README.md
++++ b/README.md
+@@ -123,7 +123,7 @@ Step-by-step in [DEPLOY.md](DEPLOY.md), or one click:
+ - **Catalog** — services CRUD, masters, per-master service assignment (M:N), soft hide
+ - **Reports** — 30-day revenue chart, per-service breakdown, no-show rate
+ - **Audit log** — every mutation recorded with actor and metadata
+-- **Waitlist** — a full day offers the queue instead of a dead end; cancellations are offered down it automatically, each offer exclusive for 15 minutes
++- **Waitlist** — a full day offers the queue instead of a dead end; cancellations are offered down it automatically, each offer exclusive for 15 minutes or until the client declines it
+ - **Notifications** — confirmations and next-day reminders through the outbox; the admin sees the queue, its retries and what was delivered
+ - **Analytics** — trailing-mean revenue, master utilization, cohort retention, client Pareto
+ - **Public API** — versionless JSON endpoints (`catalog`, `slots`, `hold`, `book`, `waitlist`), all rate-limited, Zod-validated
+diff --git a/src/app/w/[token]/actions.ts b/src/app/w/[token]/actions.ts
+index 5360856..7c80863 100644
+--- a/src/app/w/[token]/actions.ts
++++ b/src/app/w/[token]/actions.ts
+@@ -1,9 +1,15 @@
+ "use server";
+ import { redirect } from "next/navigation";
+-import { acceptOffer } from "@/lib/waitlist";
++import { acceptOffer, declineOffer } from "@/lib/waitlist";
+ 
+ export async function accept(formData: FormData): Promise<void> {
+   const token = String(formData.get("token") ?? "");
+   const result = await acceptOffer(token);
+   redirect(`/w/${token}?status=${result.ok ? "booked" : result.error}`);
+ }
++
++export async function decline(formData: FormData): Promise<void> {
++  const token = String(formData.get("token") ?? "");
++  const result = await declineOffer(token);
++  redirect(`/w/${token}?status=${result.ok ? "declined" : result.error}`);
++}
+diff --git a/src/app/w/[token]/page.tsx b/src/app/w/[token]/page.tsx
+index 7a6b296..562c64d 100644
+--- a/src/app/w/[token]/page.tsx
++++ b/src/app/w/[token]/page.tsx
+@@ -1,11 +1,11 @@
+ import { eq } from "drizzle-orm";
+ import { notFound } from "next/navigation";
+ import { db, schema as s } from "@/db";
+-import { accept } from "./actions";
++import { accept, decline } from "./actions";
+ 
+ /**
+- * Landing page for the link in a waitlist offer. Deliberately a single button:
+- * the client tapped through from an SMS and the slot is on a countdown.
++ * Landing page for the link in a waitlist offer. Claim or decline: the client
++ * tapped through from an SMS and the slot is on a countdown.
+  */
+ export default async function WaitlistOfferPage(ctx: {
+   params: Promise<{ token: string }>;
+@@ -40,7 +40,7 @@ export default async function WaitlistOfferPage(ctx: {
+     </main>
+   );
+ 
+-  if (status === "booked") {
++  if (status === "booked" || entry.status === "booked") {
+     return shell(
+       <>
+         <div className="text-4xl">✅</div>
+@@ -50,6 +50,17 @@ export default async function WaitlistOfferPage(ctx: {
+     );
+   }
+ 
++  if (entry.status === "declined") {
++    return shell(
++      <>
++        <h1 className="text-xl font-semibold text-zinc-900">You declined this slot</h1>
++        <p className="mt-2 text-zinc-600">
++          Thanks for letting us know. It has been passed on to the next person in the queue.
++        </p>
++      </>,
++    );
++  }
++
+   if (status === "expired" || entry.status !== "offered") {
+     return shell(
+       <>
+@@ -84,6 +95,12 @@ export default async function WaitlistOfferPage(ctx: {
+           Claim this slot
+         </button>
+       </form>
++      <form action={decline}>
++        <input type="hidden" name="token" value={token} />
++        <button className="mt-2 w-full rounded-lg border border-zinc-300 px-4 py-2 text-zinc-700 hover:bg-zinc-100">
++          No thanks
++        </button>
++      </form>
+     </>,
+   );
+ }
+diff --git a/src/db/schema.ts b/src/db/schema.ts
+index de3da2f..075a3e8 100644
+--- a/src/db/schema.ts
++++ b/src/db/schema.ts
+@@ -122,7 +122,14 @@ export const bookings = pgTable("bookings", {
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
+-export const waitlistStatuses = ["waiting", "offered", "booked", "expired", "cancelled"] as const;
++export const waitlistStatuses = [
++  "waiting",
++  "offered",
++  "booked",
++  "declined",
++  "expired",
++  "cancelled",
++] as const;
+ 
+ /**
+  * A client who wants a day that is already full. When a booking is cancelled
+diff --git a/src/lib/waitlist.integration.test.ts b/src/lib/waitlist.integration.test.ts
+index 3ec8a13..c7b6537 100644
+--- a/src/lib/waitlist.integration.test.ts
++++ b/src/lib/waitlist.integration.test.ts
+@@ -5,7 +5,7 @@ import { createBooking, createHold, getAvailability, setBookingStatus } from "@/
+ import { drainOnce } from "@/lib/notify/worker";
+ import { redis } from "@/lib/redis";
+ import { atLocal, futureDateISO, resetAll, seedBusiness, type Fixture } from "@/test/fixtures";
+-import { acceptOffer, expireOffer, joinWaitlist } from "./waitlist";
++import { acceptOffer, declineOffer, expireOffer, joinWaitlist } from "./waitlist";
+ 
+ let f: Fixture;
+ const date = futureDateISO();
+@@ -252,3 +252,101 @@ describe("offer expiry moves down the queue", () => {
+       .toHaveLength(1);
+   });
+ });
++
++describe("declining an offer", () => {
++  const offers = () => db.select().from(s.outbox).where(eq(s.outbox.topic, "waitlist.offer"));
++
++  async function offerToFirstOfTwo() {
++    const booked = await book();
++    await join("+77012222222");
++    await join("+77013333333");
++    await cancel((booked as { bookingId: string }).bookingId);
++    await drainOnce();
++    return (await entries()).find((r) => r.status === "offered")!;
++  }
++
++  it("passes the slot to the next client straight away", async () => {
++    const first = await offerToFirstOfTwo();
++    expect(await declineOffer(first.offerToken!)).toEqual({ ok: true });
++    await drainOnce(); // slot_freed -> offer to the next client
++    await drainOnce(); // deliver it
++
++    const rows = await entries();
++    expect(rows.find((r) => r.id === first.id)!.status).toBe("declined");
++    const second = rows.find((r) => r.status === "offered")!;
++    const [client] = await db.select().from(s.clients).where(eq(s.clients.id, second.clientId));
++    expect(client.phone).toBe("+77013333333");
++  });
++
++  it("returns the slot to public stock when nobody else is waiting", async () => {
++    const booked = await book();
++    await join("+77012222222");
++    await cancel((booked as { bookingId: string }).bookingId);
++    await drainOnce();
++
++    const only = (await entries()).find((r) => r.status === "offered")!;
++    await declineOffer(only.offerToken!);
++
++    const free = await getAvailability({
++      businessId: f.business.id,
++      timeZone: f.business.timezone,
++      staffId: f.master.id,
++      serviceId: f.service.id,
++      dateISO: date,
++    });
++    expect(free.map((sl) => sl.startMs)).toContain(slotAt().startMs);
++  });
++
++  it("is idempotent: a double tap offers the slot onward once", async () => {
++    const first = await offerToFirstOfTwo();
++    expect(await declineOffer(first.offerToken!)).toEqual({ ok: true });
++    expect(await declineOffer(first.offerToken!)).toEqual({ ok: true });
++    await drainOnce();
++    await drainOnce();
++
++    expect(await offers()).toHaveLength(2); // one for the first client, one for the second
++    expect((await entries()).filter((r) => r.status === "offered")).toHaveLength(1);
++  });
++
++  it("settles a simultaneous claim and decline exactly once", async () => {
++    const first = await offerToFirstOfTwo();
++    const [claim, decline] = await Promise.all([
++      acceptOffer(first.offerToken!),
++      declineOffer(first.offerToken!),
++    ]);
++    await drainOnce();
++    await drainOnce();
++
++    const bookings = await db.select().from(s.bookings).where(eq(s.bookings.status, "confirmed"));
++    const offered = (await entries()).filter((r) => r.status === "offered");
++    if (claim.ok) {
++      expect(decline).toEqual({ ok: false, error: "expired" });
++      expect(bookings).toHaveLength(1);
++      expect(offered).toHaveLength(0);
++    } else {
++      expect(decline).toEqual({ ok: true });
++      expect(bookings).toHaveLength(0);
++      expect(offered).toHaveLength(1);
++    }
++  });
++
++  it("kills the link: it can no longer be claimed", async () => {
++    const first = await offerToFirstOfTwo();
++    await declineOffer(first.offerToken!);
++    expect(await acceptOffer(first.offerToken!)).toEqual({ ok: false, error: "expired" });
++  });
++
++  it("does nothing to a booking that was already claimed", async () => {
++    const first = await offerToFirstOfTwo();
++    expect((await acceptOffer(first.offerToken!)).ok).toBe(true);
++
++    expect(await declineOffer(first.offerToken!)).toEqual({ ok: false, error: "expired" });
++    await drainOnce();
++
++    expect((await entries()).find((r) => r.id === first.id)!.status).toBe("booked");
++    expect(await db.select().from(s.bookings).where(eq(s.bookings.status, "confirmed")))
++      .toHaveLength(1);
++    expect((await entries()).filter((r) => r.status === "offered")).toHaveLength(0);
++    expect(await offers()).toHaveLength(1);
++  });
++});
+diff --git a/src/lib/waitlist.ts b/src/lib/waitlist.ts
+index cbfb68c..8ba066c 100644
+--- a/src/lib/waitlist.ts
++++ b/src/lib/waitlist.ts
+@@ -1,9 +1,9 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, asc, eq, isNull, or } from "drizzle-orm";
+-import { db, schema as s } from "@/db";
++import { and, asc, eq, isNull, or, type SQL } from "drizzle-orm";
++import { db, schema as s, type Tx } from "@/db";
+ import { createBooking, createHold, publishCalendar } from "./booking";
+-import { enqueue } from "./outbox";
++import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+ 
+ /** How long a client has to accept a freed slot before it moves down the queue. */
+@@ -138,41 +138,46 @@ export async function offerFreedSlot(businessId: string, slot: FreedSlot): Promi
+   return entry.id;
+ }
+ 
+-/** Called by the worker when an offer's deadline passes. */
+-export async function expireOffer(entryId: string): Promise<void> {
+-  const [entry] = await db
+-    .select()
+-    .from(s.waitlistEntries)
+-    .where(eq(s.waitlistEntries.id, entryId));
+-  if (!entry || entry.status !== "offered") return; // accepted or cancelled already
++type OfferEntry = typeof s.waitlistEntries.$inferSelect;
++
++const isLive = (e: OfferEntry) =>
++  e.status === "offered" && !!e.offerExpiresAt && e.offerExpiresAt.getTime() >= Date.now();
+ 
++/** Row-locks an offer so accept, decline and expiry settle it exactly once. */
++async function lockOffer(tx: Tx, where: SQL): Promise<OfferEntry | undefined> {
++  const [entry] = await tx.select().from(s.waitlistEntries).where(where).for("update");
++  return entry;
++}
++
++/** Ends an outstanding offer and passes its slot to the next client in line. */
++async function closeOffer(tx: Tx, entry: OfferEntry, status: "declined" | "expired"): Promise<void> {
++  const startMs = entry.offerSlotStartAt!.getTime();
+   const slot = {
+     staffId: entry.offerStaffId!,
+     serviceId: entry.serviceId,
+-    startMs: entry.offerSlotStartAt!.getTime(),
++    startMs,
+     endMs: entry.offerSlotEndAt!.getTime(),
+   };
+ 
+-  await db.transaction(async (tx) => {
+-    await tx
+-      .update(s.waitlistEntries)
+-      .set({
+-        status: "expired",
+-        offerToken: null,
+-        offerExpiresAt: null,
+-      })
+-      .where(eq(s.waitlistEntries.id, entryId));
+-
+-    // Hand the slot to whoever is next.
+-    await enqueue(tx, {
+-      businessId: entry.businessId,
+-      topic: "waitlist.slot_freed",
+-      payload: slot,
+-      dedupeKey: `waitlist.refree:${entryId}:${slot.startMs}`,
+-    });
++  await tx.update(s.waitlistEntries).set({ status }).where(eq(s.waitlistEntries.id, entry.id));
++  await cancelByDedupeKey(tx, `waitlist.expire:${entry.id}:${startMs}`);
++  await enqueue(tx, {
++    businessId: entry.businessId,
++    topic: "waitlist.slot_freed",
++    payload: slot,
++    dedupeKey: `waitlist.refree:${entry.id}:${startMs}`,
+   });
++  // Released before commit: the worker can pick up the next offer as soon as this commits.
++  await releaseHold(slot.staffId, startMs);
++}
+ 
+-  await releaseHold(slot.staffId, slot.startMs);
++/** Called by the worker when an offer's deadline passes. */
++export async function expireOffer(entryId: string): Promise<void> {
++  await db.transaction(async (tx) => {
++    const entry = await lockOffer(tx, eq(s.waitlistEntries.id, entryId));
++    if (!entry || entry.status !== "offered") return; // accepted or declined already
++    await closeOffer(tx, entry, "expired");
++  });
+ }
+ 
+ async function releaseHold(staffId: string, startMs: number): Promise<void> {
+@@ -185,39 +190,56 @@ export type AcceptResult =
+ 
+ /** Turns an outstanding offer into a real booking. */
+ export async function acceptOffer(token: string): Promise<AcceptResult> {
+-  const [entry] = await db
+-    .select()
+-    .from(s.waitlistEntries)
+-    .where(eq(s.waitlistEntries.offerToken, token));
+-  if (!entry) return { ok: false, error: "not_found" };
+-  if (entry.status !== "offered") return { ok: false, error: "expired" };
+-  if (!entry.offerExpiresAt || entry.offerExpiresAt.getTime() < Date.now()) {
+-    return { ok: false, error: "expired" };
+-  }
+-
+-  const [client] = await db.select().from(s.clients).where(eq(s.clients.id, entry.clientId));
+-  const holdToken = entry.offerHoldToken;
+-  if (!holdToken) return { ok: false, error: "expired" };
+-
+-  const result = await createBooking({
+-    businessId: entry.businessId,
+-    staffId: entry.offerStaffId!,
+-    serviceId: entry.serviceId,
+-    slot: {
+-      startMs: entry.offerSlotStartAt!.getTime(),
+-      endMs: entry.offerSlotEndAt!.getTime(),
+-    },
+-    holdToken,
+-    client: { name: client.name, phone: client.phone },
++  return db.transaction(async (tx): Promise<AcceptResult> => {
++    const entry = await lockOffer(tx, eq(s.waitlistEntries.offerToken, token));
++    if (!entry) return { ok: false, error: "not_found" };
++    if (!isLive(entry) || !entry.offerHoldToken) return { ok: false, error: "expired" };
++
++    const [client] = await tx.select().from(s.clients).where(eq(s.clients.id, entry.clientId));
++
++    const result = await createBooking({
++      businessId: entry.businessId,
++      staffId: entry.offerStaffId!,
++      serviceId: entry.serviceId,
++      slot: {
++        startMs: entry.offerSlotStartAt!.getTime(),
++        endMs: entry.offerSlotEndAt!.getTime(),
++      },
++      holdToken: entry.offerHoldToken,
++      client: { name: client.name, phone: client.phone },
++    });
++    if (!result.ok) return { ok: false, error: "slot_taken" };
++
++    await tx
++      .update(s.waitlistEntries)
++      .set({ status: "booked", offerHoldToken: null })
++      .where(eq(s.waitlistEntries.id, entry.id));
++    await publishCalendar(entry.businessId, {
++      type: "booking.created",
++      bookingId: result.bookingId,
++    });
++
++    return { ok: true, bookingId: result.bookingId };
+   });
++}
+ 
+-  if (!result.ok) return { ok: false, error: "slot_taken" };
++export type DeclineResult = { ok: true } | { ok: false; error: "not_found" | "expired" };
+ 
+-  await db
+-    .update(s.waitlistEntries)
+-    .set({ status: "booked", offerToken: null, offerHoldToken: null })
+-    .where(eq(s.waitlistEntries.id, entry.id));
+-  await publishCalendar(entry.businessId, { type: "booking.created", bookingId: result.bookingId });
++/** The client cannot make the slot: pass it on now rather than after the deadline. */
++export async function declineOffer(token: string): Promise<DeclineResult> {
++  return db.transaction(async (tx): Promise<DeclineResult> => {
++    const entry = await lockOffer(tx, eq(s.waitlistEntries.offerToken, token));
++    if (!entry) return { ok: false, error: "not_found" };
++    if (entry.status === "declined") return { ok: true };
++    if (!isLive(entry)) return { ok: false, error: "expired" };
+ 
+-  return { ok: true, bookingId: result.bookingId };
++    await closeOffer(tx, entry, "declined");
++    await tx.insert(s.auditLog).values({
++      businessId: entry.businessId,
++      action: "waitlist.declined",
++      entity: "waitlist_entry",
++      entityId: entry.id,
++    });
++    return { ok: true };
++  });
+ }

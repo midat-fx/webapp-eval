@@ -30,13 +30,13 @@ def selfcheck() -> dict:
             "known_bad_caught": sum(r["verdict"] == "fail" for r in bad), "by_task": dict(by_task)}
 
 
-def agents() -> dict:
+def agents(root: Path = RES / "agent") -> dict:
     rows = []
-    for meta in sorted((RES / "agent").glob("*/*/a*/meta.json")):
+    for meta in sorted(root.glob("*/*/a*/meta.json")):
         m = load(meta)
         g = meta.parent / "grade" / "result.json"
         m["verdict"] = load(g)["verdict"] if g.exists() else "missing"
-        m["run"] = str(meta.parent.relative_to(RES / "agent"))
+        m["run"] = str(meta.parent.relative_to(root))
         rows.append(m)
     table = defaultdict(lambda: defaultdict(lambda: [0, 0]))
     for r in rows:
@@ -52,7 +52,7 @@ def agents() -> dict:
                  "mean_cost_usd": mean("cost_usd", m),
                  "errors": sum(1 for r in rows if r["model"] == m and r["verdict"] not in ("pass", "fail")),
                  "served_models": sorted({r.get("served_model") or "?" for r in rows if r["model"] == m})} for m in models}
-    ledger = RES / "agent" / "ledger.jsonl"
+    ledger = root / "ledger.jsonl"
     return {"runs": len(rows), "ledger_invocations": sum(1 for _ in ledger.open()) if ledger.exists() else 0,
             "table": {t: dict(v) for t, v in sorted(table.items())}, "totals": totals, "stats": stats,
             "contamination_flags": [r["run"] for r in rows if r.get("touched_outside_workdir")]}
@@ -107,8 +107,10 @@ NAMES = {"claude-haiku-5-5": "Haiku 5.5", "claude-sonnet-5-5": "Sonnet 5.5"}
 
 
 def collect() -> dict:
-    return {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants(),
-            "timing": timing()}
+    # t11 and the sandboxed runs came after the 60-run budget; each has its own ledger.
+    return {"selfcheck": selfcheck(), "agents": agents(), "agents_t11": agents(RES / "agent-t11"),
+            "agents_sandbox": agents(RES / "agent-sandbox"), "judge": judges(), "flake": flakes(),
+            "mutants": mutants(), "timing": timing()}
 
 
 def tables(out: dict) -> dict[str, str]:

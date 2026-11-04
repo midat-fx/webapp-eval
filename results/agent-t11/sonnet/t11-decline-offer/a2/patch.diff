@@ -1,0 +1,269 @@
+diff --git a/src/app/w/[token]/actions.ts b/src/app/w/[token]/actions.ts
+index 5360856..f6387ef 100644
+--- a/src/app/w/[token]/actions.ts
++++ b/src/app/w/[token]/actions.ts
+@@ -1,9 +1,15 @@
+ "use server";
+ import { redirect } from "next/navigation";
+-import { acceptOffer } from "@/lib/waitlist";
++import { acceptOffer, declineOffer } from "@/lib/waitlist";
+ 
+ export async function accept(formData: FormData): Promise<void> {
+   const token = String(formData.get("token") ?? "");
+   const result = await acceptOffer(token);
+   redirect(`/w/${token}?status=${result.ok ? "booked" : result.error}`);
+ }
++
++export async function decline(formData: FormData): Promise<void> {
++  const token = String(formData.get("token") ?? "");
++  const result = await declineOffer(token);
++  redirect(`/w/${token}?status=${result.ok ? "declined" : "expired"}`);
++}
+diff --git a/src/app/w/[token]/page.tsx b/src/app/w/[token]/page.tsx
+index 7a6b296..e24f6ca 100644
+--- a/src/app/w/[token]/page.tsx
++++ b/src/app/w/[token]/page.tsx
+@@ -1,7 +1,7 @@
+ import { eq } from "drizzle-orm";
+ import { notFound } from "next/navigation";
+ import { db, schema as s } from "@/db";
+-import { accept } from "./actions";
++import { accept, decline } from "./actions";
+ 
+ /**
+  * Landing page for the link in a waitlist offer. Deliberately a single button:
+@@ -30,7 +30,7 @@ export default async function WaitlistOfferPage(ctx: {
+     .innerJoin(s.businesses, eq(s.waitlistEntries.businessId, s.businesses.id))
+     .where(eq(s.waitlistEntries.offerToken, token));
+ 
+-  if (!entry && status !== "booked") notFound();
++  if (!entry && status !== "booked" && status !== "declined" && status !== "expired") notFound();
+ 
+   const shell = (children: React.ReactNode) => (
+     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-4">
+@@ -50,13 +50,23 @@ export default async function WaitlistOfferPage(ctx: {
+     );
+   }
+ 
+-  if (status === "expired" || entry.status !== "offered") {
++  if (status === "declined") {
++    return shell(
++      <>
++        <div className="text-4xl">👋</div>
++        <h1 className="mt-2 text-xl font-semibold text-zinc-900">No problem</h1>
++        <p className="mt-2 text-zinc-600">We have passed the slot on to the next person in the queue.</p>
++      </>,
++    );
++  }
++
++  if (status === "expired" || !entry || entry.status !== "offered") {
+     return shell(
+       <>
+         <div className="text-4xl">⌛</div>
+         <h1 className="mt-2 text-xl font-semibold text-zinc-900">This offer is no longer active</h1>
+         <p className="mt-2 text-zinc-600">
+-          The slot has moved on to the next person in the queue. You are still on the waitlist.
++          This slot can no longer be claimed with this link.
+         </p>
+       </>,
+     );
+@@ -84,6 +94,12 @@ export default async function WaitlistOfferPage(ctx: {
+           Claim this slot
+         </button>
+       </form>
++      <form action={decline}>
++        <input type="hidden" name="token" value={token} />
++        <button className="mt-2 w-full rounded-lg border border-zinc-300 px-4 py-2 text-zinc-700 hover:bg-zinc-100">
++          No thanks
++        </button>
++      </form>
+     </>,
+   );
+ }
+diff --git a/src/db/schema.ts b/src/db/schema.ts
+index de3da2f..558dbe3 100644
+--- a/src/db/schema.ts
++++ b/src/db/schema.ts
+@@ -122,7 +122,7 @@ export const bookings = pgTable("bookings", {
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
+-export const waitlistStatuses = ["waiting", "offered", "booked", "expired", "cancelled"] as const;
++export const waitlistStatuses = ["waiting", "offered", "claiming", "booked", "expired", "declined", "cancelled"] as const;
+ 
+ /**
+  * A client who wants a day that is already full. When a booking is cancelled
+diff --git a/src/lib/waitlist.ts b/src/lib/waitlist.ts
+index cbfb68c..26b21e5 100644
+--- a/src/lib/waitlist.ts
++++ b/src/lib/waitlist.ts
+@@ -1,9 +1,9 @@
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+-import { and, asc, eq, isNull, or } from "drizzle-orm";
++import { and, asc, eq, gt, inArray, isNull, or } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { createBooking, createHold, publishCalendar } from "./booking";
+-import { enqueue } from "./outbox";
++import { cancelByDedupeKey, enqueue } from "./outbox";
+ import { redis } from "./redis";
+ 
+ /** How long a client has to accept a freed slot before it moves down the queue. */
+@@ -144,7 +144,7 @@ export async function expireOffer(entryId: string): Promise<void> {
+     .select()
+     .from(s.waitlistEntries)
+     .where(eq(s.waitlistEntries.id, entryId));
+-  if (!entry || entry.status !== "offered") return; // accepted or cancelled already
++  if (!entry || (entry.status !== "offered" && entry.status !== "claiming")) return; // already resolved
+ 
+   const slot = {
+     staffId: entry.offerStaffId!,
+@@ -153,15 +153,22 @@ export async function expireOffer(entryId: string): Promise<void> {
+     endMs: entry.offerSlotEndAt!.getTime(),
+   };
+ 
+-  await db.transaction(async (tx) => {
+-    await tx
++  const lapsed = await db.transaction(async (tx) => {
++    const updated = await tx
+       .update(s.waitlistEntries)
+       .set({
+         status: "expired",
+         offerToken: null,
+         offerExpiresAt: null,
+       })
+-      .where(eq(s.waitlistEntries.id, entryId));
++      .where(
++        and(
++          eq(s.waitlistEntries.id, entryId),
++          inArray(s.waitlistEntries.status, ["offered", "claiming"]),
++        ),
++      )
++      .returning({ id: s.waitlistEntries.id });
++    if (updated.length === 0) return false; // declined or accepted in the meantime
+ 
+     // Hand the slot to whoever is next.
+     await enqueue(tx, {
+@@ -170,13 +177,75 @@ export async function expireOffer(entryId: string): Promise<void> {
+       payload: slot,
+       dedupeKey: `waitlist.refree:${entryId}:${slot.startMs}`,
+     });
++    return true;
+   });
+ 
+-  await releaseHold(slot.staffId, slot.startMs);
++  if (lapsed) await releaseHold(slot.staffId, slot.startMs);
+ }
+ 
+-async function releaseHold(staffId: string, startMs: number): Promise<void> {
+-  await redis().del(`hold:${staffId}:${startMs}`);
++async function releaseHold(staffId: string, startMs: number, onlyToken?: string): Promise<void> {
++  const key = `hold:${staffId}:${startMs}`;
++  if (onlyToken) {
++    // Past the deadline the hold may already belong to someone else.
++    const raw = await redis().get(key);
++    if (!raw || (JSON.parse(raw) as { token: string }).token !== onlyToken) return;
++  }
++  await redis().del(key);
++}
++
++export type DeclineResult = { ok: true } | { ok: false; error: "not_found" };
++
++/**
++ * The client turns the offer down. The status flip is a single conditional
++ * UPDATE, so of any number of concurrent declines (or a decline racing an
++ * accept) exactly one wins; only the winner frees the slot.
++ */
++export async function declineOffer(token: string): Promise<DeclineResult> {
++  if (!token) return { ok: false, error: "not_found" };
++
++  const declined = await db.transaction(async (tx) => {
++    const [entry] = await tx
++      .update(s.waitlistEntries)
++      .set({
++        status: "declined",
++        offerToken: null,
++        offerExpiresAt: null,
++        offerHoldToken: null,
++      })
++      .where(and(eq(s.waitlistEntries.offerToken, token), eq(s.waitlistEntries.status, "offered")))
++      .returning();
++    if (!entry) return null;
++
++    const slot = {
++      staffId: entry.offerStaffId!,
++      serviceId: entry.serviceId,
++      startMs: entry.offerSlotStartAt!.getTime(),
++      endMs: entry.offerSlotEndAt!.getTime(),
++    };
++
++    await tx.insert(s.auditLog).values({
++      businessId: entry.businessId,
++      action: "waitlist.declined",
++      entity: "waitlist_entry",
++      entityId: entry.id,
++      meta: { staffId: slot.staffId, startMs: slot.startMs },
++    });
++
++    await cancelByDedupeKey(tx, `waitlist.expire:${entry.id}:${slot.startMs}`);
++
++    await enqueue(tx, {
++      businessId: entry.businessId,
++      topic: "waitlist.slot_freed",
++      payload: slot,
++      dedupeKey: `waitlist.refree:${entry.id}:${slot.startMs}`,
++    });
++
++    return { slot, holdToken: entry.offerHoldToken };
++  });
++
++  if (!declined) return { ok: false, error: "not_found" };
++  await releaseHold(declined.slot.staffId, declined.slot.startMs, declined.holdToken ?? undefined);
++  return { ok: true };
+ }
+ 
+ export type AcceptResult =
+@@ -195,10 +264,27 @@ export async function acceptOffer(token: string): Promise<AcceptResult> {
+     return { ok: false, error: "expired" };
+   }
+ 
+-  const [client] = await db.select().from(s.clients).where(eq(s.clients.id, entry.clientId));
+   const holdToken = entry.offerHoldToken;
+   if (!holdToken) return { ok: false, error: "expired" };
+ 
++  // Claim the offer first so a concurrent "No thanks" cannot free the slot
++  // while the booking is being made.
++  const claimed = await db
++    .update(s.waitlistEntries)
++    .set({ status: "claiming" })
++    .where(
++      and(
++        eq(s.waitlistEntries.id, entry.id),
++        eq(s.waitlistEntries.offerToken, token),
++        eq(s.waitlistEntries.status, "offered"),
++        gt(s.waitlistEntries.offerExpiresAt, new Date()),
++      ),
++    )
++    .returning({ id: s.waitlistEntries.id });
++  if (claimed.length === 0) return { ok: false, error: "expired" };
++
++  const [client] = await db.select().from(s.clients).where(eq(s.clients.id, entry.clientId));
++
+   const result = await createBooking({
+     businessId: entry.businessId,
+     staffId: entry.offerStaffId!,
+@@ -211,7 +297,13 @@ export async function acceptOffer(token: string): Promise<AcceptResult> {
+     client: { name: client.name, phone: client.phone },
+   });
+ 
+-  if (!result.ok) return { ok: false, error: "slot_taken" };
++  if (!result.ok) {
++    await db
++      .update(s.waitlistEntries)
++      .set({ status: "offered" })
++      .where(and(eq(s.waitlistEntries.id, entry.id), eq(s.waitlistEntries.status, "claiming")));
++    return { ok: false, error: "slot_taken" };
++  }
+ 
+   await db
+     .update(s.waitlistEntries)

@@ -46,18 +46,26 @@ That's a ceiling. These ten tasks don't separate the two models on pass rate,
 only on effort: Haiku takes about 2.3× the turns, 2.1× the time and 4.2× the
 cost. Harder tasks are the obvious next step, and t11 is the first: a feature
 that spans the offer page, the waitlist code, Redis holds and the outbox
-workers. It came after the 60-run budget was spent, so no agent has run on it
-yet and it isn't in the table. Some other details:
+workers. It came after the 60-run budget was spent, so its runs have their own
+ledger ([`results/agent-t11/`](results/agent-t11/)). Both models pass all
+three attempts, so it doesn't break the ceiling on pass rate either. It does
+widen the effort gap. Haiku averaged 309 s, 40.3 turns and $3.59 per run, with
+one run at 65 turns. Sonnet averaged 134 s, 9.7 turns and $0.50. That's 4.2×
+the turns and 7.2× the cost, against 2.3× and 4.2× on t01–t10. Some other
+details:
 
 - The whole 60-run budget is used ([`ledger.jsonl`](results/agent/ledger.jsonl)):
   59 graded runs plus one lost to a harness incident. That lost run is why
   Sonnet has only two attempts on t10: its third attempt would have been run 61.
 - 0/59 traces touched anything outside their workdir (`touched_outside_workdir`
-  in each `meta.json`). Two later runs used `--sandbox`, which enforces this
-  ([`results/agent-sandbox/`](results/agent-sandbox/), separate ledger). They
-  exposed a bug in my profile that broke the agent's shell: Haiku gave up
-  with an empty patch, and Sonnet passed t01 using only file tools. They aren't
-  in the table above. See DESIGN.md.
+  in each `meta.json`). Eight later runs used `--sandbox`, which enforces this
+  ([`results/agent-sandbox/`](results/agent-sandbox/), separate ledger). The
+  first two exposed a bug in my profile that broke the agent's shell. On the
+  six runs with the fixed profile (t01 and t08), Haiku passed 3/3 and Sonnet
+  2/3, with time and turns close to the unsandboxed runs of the same cells.
+  Sonnet's failure is the first agent failure in this benchmark, and it's a
+  real one: its t08 fix doesn't type-check, and it only ran the unit tests.
+  None of these runs are in the table above. See DESIGN.md.
 - Two wave-1 failures turned out to be the verifiers' fault, not the
   agents'. Each one is in [`REGRADES.md`](results/agent/REGRADES.md); no
   agent was ever re-run to improve a score.
@@ -139,9 +147,11 @@ diff didn't define it, and twice it guessed that the browser blocks formatted
 phone numbers before the API sees them, which the wizard test shows it
 doesn't. Given read-only access to the repository at the start state
 (`judge --repo`, tools `Read,Grep,Glob`), the judge accepted all three
-([`results/judge/sonnet-repo/`](results/judge/sonnet-repo/summary.json)). I
-haven't yet checked whether the same access makes it accept known-bad
-patches, so this only shows that context fixes those three rejects.
+([`results/judge/sonnet-repo/`](results/judge/sonnet-repo/summary.json)). The
+same access didn't make it lenient: it rejected all 7 known-bad patches I gave
+it, one from each of seven tasks. That includes the t10 "Loading…" patch it
+had passed without the repository. Ten patches is a small sample, but on it
+context removes the false rejects and the false accept.
 
 The judge's first pass also beat my own verifiers twice. It rejected my
 alternative fixes for t09 (the admin card collapsed the note's line breaks)
@@ -160,18 +170,18 @@ stop early and are left out), on a shared Mac whose load ranged from idle to
 <!-- report:timing -->
 | Task | Gradings | p50 | p90 |
 |---|---|---|---|
-| t01-phone-format | 15 | 26 s | 39 s |
+| t01-phone-format | 17 | 25 s | 37 s |
 | t02-stale-slots | 13 | 30 s | 36 s |
 | t03-default-date-tz | 14 | 47 s | 83 s |
 | t04-sse-subscriber-leak | 14 | 30 s | 78 s |
 | t05-overlap-race | 30 | 17 s | 51 s |
 | t06-dst-slots | 13 | 43 s | 72 s |
 | t07-staff-permissions | 26 | 18 s | 38 s |
-| t08-status-transitions | 23 | 21 s | 54 s |
+| t08-status-transitions | 26 | 22 s | 53 s |
 | t09-booking-note | 19 | 37 s | 82 s |
 | t10-wizard-a11y | 22 | 26 s | 56 s |
-| t11-decline-offer | 9 | 185 s | 221 s |
-| **all** | **198** | **28 s** | **81 s** |
+| t11-decline-offer | 15 | 151 s | 209 s |
+| **all** | **209** | **28 s** | **80 s** |
 <!-- /report:timing -->
 
 t11 is slow by design: its checks wait for outbox workers that poll every two

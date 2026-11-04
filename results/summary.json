@@ -292,6 +292,110 @@
     },
     "contamination_flags": []
   },
+  "agents_t11": {
+    "runs": 6,
+    "ledger_invocations": 6,
+    "table": {
+      "t11-decline-offer": {
+        "claude-haiku-5-5": [
+          3,
+          3
+        ],
+        "claude-sonnet-5-5": [
+          3,
+          3
+        ]
+      }
+    },
+    "totals": {
+      "claude-haiku-5-5": [
+        3,
+        3
+      ],
+      "claude-sonnet-5-5": [
+        3,
+        3
+      ]
+    },
+    "stats": {
+      "claude-haiku-5-5": {
+        "mean_seconds": 308.97,
+        "mean_turns": 40.33,
+        "mean_cost_usd": 3.59,
+        "errors": 0,
+        "served_models": [
+          "claude-haiku-5-5"
+        ]
+      },
+      "claude-sonnet-5-5": {
+        "mean_seconds": 133.67,
+        "mean_turns": 9.67,
+        "mean_cost_usd": 0.5,
+        "errors": 0,
+        "served_models": [
+          "claude-sonnet-5-5"
+        ]
+      }
+    },
+    "contamination_flags": []
+  },
+  "agents_sandbox": {
+    "runs": 8,
+    "ledger_invocations": 8,
+    "table": {
+      "t01-phone-format": {
+        "claude-haiku-5-5": [
+          1,
+          2
+        ],
+        "claude-sonnet-5-5": [
+          2,
+          2
+        ]
+      },
+      "t08-status-transitions": {
+        "claude-haiku-5-5": [
+          2,
+          2
+        ],
+        "claude-sonnet-5-5": [
+          1,
+          2
+        ]
+      }
+    },
+    "totals": {
+      "claude-haiku-5-5": [
+        3,
+        4
+      ],
+      "claude-sonnet-5-5": [
+        3,
+        4
+      ]
+    },
+    "stats": {
+      "claude-haiku-5-5": {
+        "mean_seconds": 54.5,
+        "mean_turns": 11.0,
+        "mean_cost_usd": 0.59,
+        "errors": 0,
+        "served_models": [
+          "claude-haiku-5-5"
+        ]
+      },
+      "claude-sonnet-5-5": {
+        "mean_seconds": 75.67,
+        "mean_turns": 10.25,
+        "mean_cost_usd": 0.3,
+        "errors": 0,
+        "served_models": [
+          "claude-sonnet-5-5"
+        ]
+      }
+    },
+    "contamination_flags": []
+  },
   "judge": {
     "sonnet": {
       "model": "claude-sonnet-5-5",
@@ -346,14 +450,14 @@
     "sonnet-repo": {
       "model": "claude-sonnet-5-5",
       "overall": {
-        "n": 3,
+        "n": 10,
         "tp": 3,
-        "tn": 0,
+        "tn": 7,
         "fp": 0,
         "fn": 0,
         "accuracy": 1.0,
         "kappa": 1.0,
-        "false_accept_rate": null,
+        "false_accept_rate": 0.0,
         "false_reject_rate": 0.0
       },
       "unparsed": 0,
@@ -368,6 +472,17 @@
           "kappa": 1.0,
           "false_accept_rate": null,
           "false_reject_rate": 0.0
+        },
+        "known-bad": {
+          "n": 7,
+          "tp": 0,
+          "tn": 7,
+          "fp": 0,
+          "fn": 0,
+          "accuracy": 1.0,
+          "kappa": 1.0,
+          "false_accept_rate": 0.0,
+          "false_reject_rate": null
         },
         "reference": {
           "n": 1,
@@ -592,9 +707,9 @@
   "timing": {
     "by_task": {
       "t01-phone-format": {
-        "n": 15,
-        "p50": 26.1,
-        "p90": 38.6,
+        "n": 17,
+        "p50": 25.0,
+        "p90": 37.2,
         "max": 52.0
       },
       "t02-stale-slots": {
@@ -634,9 +749,9 @@
         "max": 47.7
       },
       "t08-status-transitions": {
-        "n": 23,
-        "p50": 21.1,
-        "p90": 54.2,
+        "n": 26,
+        "p50": 21.9,
+        "p90": 53.4,
         "max": 353.8
       },
       "t09-booking-note": {
@@ -652,16 +767,16 @@
         "max": 80.4
       },
       "t11-decline-offer": {
-        "n": 9,
-        "p50": 185.4,
-        "p90": 220.7,
+        "n": 15,
+        "p50": 151.0,
+        "p90": 209.3,
         "max": 223.7
       }
     },
     "all": {
-      "n": 198,
-      "p50": 28.1,
-      "p90": 80.7,
+      "n": 209,
+      "p50": 28.3,
+      "p90": 80.3,
       "max": 353.8
     }
   }
