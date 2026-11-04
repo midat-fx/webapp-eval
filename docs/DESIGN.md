@@ -252,10 +252,24 @@ spending any runs I checked by hand that `pnpm test`, `git status` and
 `claude --version` work in a real working copy under the profile, and that
 reading `tasks/*/solution.patch` fails.
 
-What isn't measured yet is a real agent run under the sandbox. When I got to
-it, the CLI on this machine wasn't logged in at all, with or without the
-sandbox, so a logged-in run may still trip over a path the profile denies. The
-4–6 comparison runs are waiting on a login.
+The first real runs found two things the hand checks hadn't
+(`results/agent-sandbox/`, one run each on t01, with their own ledger):
+
+- **The login is in the keychain.** Security.framework reads the keychain
+  file inside the CLI's own process, so `~/Library/Keychains` is now
+  readable. That gives the agent no more than it has without the sandbox.
+- **My slug was wrong.** The CLI's scratch directory is named after the
+  working copy, with every character that isn't a letter or digit replaced by
+  `-`. I had only replaced `/`, and `$TMPDIR` contains underscores. Every Bash
+  call in both runs failed with `EPERM` on that `mkdir`. Haiku stopped
+  after six failed Bash calls and left an empty patch. Sonnet worked around it with Read and Edit
+  and passed t01 anyway, in 134 s and 16 turns; its three audited t01 runs
+  took 35–59 s and 7–10 turns.
+
+The slug is fixed. The unit test now creates that directory under the
+profile, and it passes. Neither run says anything about the sandbox's cost on
+a working shell. The comparison against the audited runs still needs runs
+with the fixed profile, which the day's `claude -p` budget didn't cover.
 
 ## The LLM judge baseline
 
@@ -280,6 +294,16 @@ old alternative became `bad/collapsed-line-breaks.patch`. The first versions
 and the judge's verdicts on them are kept in `results/judge/superseded/`.
 That's the argument for running a cheap judge next to deterministic
 verifiers: its disagreements are a list of places to look.
+
+### Does repo context fix its false rejects?
+
+All three false rejects came from not seeing the code around the diff.
+`judge --repo` runs the same prompt in a fresh copy of the task's start state,
+with only `Read,Grep,Glob` and a note that the repository is there. It
+accepted all three, in 4–5 turns each (`results/judge/sonnet-repo/`). The
+other half of the question is still open: whether context also talks it into
+accepting known-bad patches. That needs the same mode on a sample of them,
+and I ran out of the day's `claude -p` budget first.
 
 It works in the other direction too. The judge's only false accept is a
 mutant: the wizard shows "Loading…" in two places, and the patch darkens just

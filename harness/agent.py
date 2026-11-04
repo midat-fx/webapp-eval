@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -84,7 +85,7 @@ def sandboxed(cmd: list[str], work: Path) -> list[str]:
     work = work.resolve()
     clitmp = Path(f"/private/tmp/claude-{os.getuid()}")
     return ["sandbox-exec", "-f", str(SANDBOX), "-D", f"HOME={Path.home()}", "-D", f"WORK={work}",
-            "-D", f"CLITMP={clitmp}", "-D", f"WORKSLUG={str(work).replace('/', '-')}", *cmd]
+            "-D", f"CLITMP={clitmp}", "-D", f"WORKSLUG={re.sub(r'[^A-Za-z0-9]', '-', str(work))}", *cmd]
 
 
 def agent_env() -> dict[str, str]:

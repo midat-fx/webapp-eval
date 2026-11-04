@@ -21,7 +21,10 @@
   (subpath (string-append (param "HOME") "/.cache/claude"))
   (subpath (string-append (param "HOME") "/Library/Caches/claude-cli-nodejs")))
 (allow file-read*
-  (literal (string-append (param "HOME") "/.local/bin/claude")))
+  (literal (string-append (param "HOME") "/.local/bin/claude"))
+  ;; The login lives in the keychain, and Security.framework opens the
+  ;; keychain file inside the CLI's own process.
+  (subpath (string-append (param "HOME") "/Library/Keychains")))
 
 ;; pnpm's content store (public npm packages). pnpm writes to it even for
 ;; `pnpm test`; without it, it decides node_modules is stale and tries to

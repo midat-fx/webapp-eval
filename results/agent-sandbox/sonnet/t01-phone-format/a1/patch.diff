@@ -1,0 +1,103 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..10ee6a2 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { createBooking } from "@/lib/booking";
+ import { businessBySlug, clientIp } from "@/lib/public";
++import { phoneSchema } from "@/lib/phone";
+ import { rateLimit } from "@/lib/ratelimit";
+ 
+ const body = z.object({
+@@ -11,7 +12,7 @@ const body = z.object({
+   endMs: z.number().int(),
+   holdToken: z.string().min(16),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: phoneSchema,
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..27ab465 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -1,6 +1,7 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { businessBySlug, clientIp } from "@/lib/public";
++import { phoneSchema } from "@/lib/phone";
+ import { rateLimit } from "@/lib/ratelimit";
+ import { joinWaitlist } from "@/lib/waitlist";
+ 
+@@ -9,7 +10,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: phoneSchema,
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..8cc07cf 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
+ import { and, eq, gte, inArray, lt } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { cancelByDedupeKey, enqueue } from "./outbox";
++import { normalizePhone } from "./phone";
+ import { redis } from "./redis";
+ import { localTimeToUtc, isoWeekday, slotsForDay, type Range } from "./slots";
+ 
+@@ -133,7 +134,8 @@ export async function createBooking(opts: {
+   holdToken: string;
+   client: { name: string; phone: string };
+ }): Promise<BookResult> {
+-  const { businessId, staffId, serviceId, slot, holdToken, client } = opts;
++  const { businessId, staffId, serviceId, slot, holdToken } = opts;
++  const client = { name: opts.client.name, phone: normalizePhone(opts.client.phone) };
+ 
+   // The hold must still be alive and belong to this caller.
+   const raw = await redis().get(holdKey(staffId, slot.startMs));
+diff --git a/src/lib/phone.ts b/src/lib/phone.ts
+new file mode 100644
+index 0000000..04c88cb
+--- /dev/null
++++ b/src/lib/phone.ts
+@@ -0,0 +1,11 @@
++import { z } from "zod";
++
++/** Strips spaces, dashes, dots and parentheses. Does not validate. */
++export function normalizePhone(raw: string): string {
++  return raw.replace(/[\s\-.()]/g, "");
++}
++
++export const phoneSchema = z
++  .string()
++  .transform(normalizePhone)
++  .pipe(z.string().regex(/^\+?\d{10,15}$/));
+diff --git a/src/lib/waitlist.ts b/src/lib/waitlist.ts
+index cbfb68c..75c7dba 100644
+--- a/src/lib/waitlist.ts
++++ b/src/lib/waitlist.ts
+@@ -4,6 +4,7 @@ import { and, asc, eq, isNull, or } from "drizzle-orm";
+ import { db, schema as s } from "@/db";
+ import { createBooking, createHold, publishCalendar } from "./booking";
+ import { enqueue } from "./outbox";
++import { normalizePhone } from "./phone";
+ import { redis } from "./redis";
+ 
+ /** How long a client has to accept a freed slot before it moves down the queue. */
+@@ -18,7 +19,8 @@ export async function joinWaitlist(opts: {
+   dateISO: string;
+   client: { name: string; phone: string };
+ }): Promise<JoinResult> {
+-  const { businessId, serviceId, staffId, dateISO, client } = opts;
++  const { businessId, serviceId, staffId, dateISO } = opts;
++  const client = { name: opts.client.name, phone: normalizePhone(opts.client.phone) };
+ 
+   return db.transaction(async (tx) => {
+     const [existing] = await tx

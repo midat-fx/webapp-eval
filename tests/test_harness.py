@@ -1,6 +1,8 @@
 """Fast checks of the harness itself; the verifiers are checked by `selfcheck`."""
 
 import json
+import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -149,6 +151,13 @@ class Sandbox(unittest.TestCase):
             self.assertTrue(can_read(work / "f"))
             self.assertFalse(can_read(grading.ROOT / "tasks" / "t01-phone-format" / "solution.patch"))
             self.assertFalse(can_read(grading.ROOT / "README.md"))
+            # The CLI's own scratch dir for this working copy (its Bash tool needs it):
+            # /tmp/claude-<uid>/<path with every non-alphanumeric as "-">.
+            slug = re.sub(r"[^A-Za-z0-9]", "-", str(work))
+            clidir = Path(f"/private/tmp/claude-{os.getuid()}") / slug
+            r = subprocess.run(agent.sandboxed(["mkdir", "-p", str(clidir)], work), cwd=work, capture_output=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            shutil.rmtree(clidir, ignore_errors=True)
             for p in (Path.home() / "projects", Path.home() / ".ssh"):
                 if p.exists():
                     r = subprocess.run(agent.sandboxed(["ls", str(p)], work), cwd=work, capture_output=True)

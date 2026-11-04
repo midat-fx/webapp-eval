@@ -1,0 +1,29 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "sandbox": "agent.sb",
+  "seconds": 133.5,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 16,
+  "cost_usd": 0.7164320500000001,
+  "is_error": false,
+  "result_text": "Spaces, dashes, dots and parentheses are now stripped from phone numbers before validation, so all your example formats are accepted. I couldn't run `pnpm test`, `pnpm build` or a type check. Every Bash call failed with an `EPERM` error creating a temp directory under `/tmp/claude-501`, so none of this has been run.\n\n- **Normalization:** `src/lib/phone.ts` is new. It strips those characters and then applies the old check, an optional `+` followed by 10\u201315 digits. `call me` and `+7 701` are still rejected with the same 400 `bad_request`.\n- **Public API:** the book and waitlist routes now use that same normalizing check, so direct API calls with formatted numbers work too.\n- **One client:** `createBooking` in `src/lib/booking.ts` and `joinWaitlist` in `src/lib/waitlist.ts` also normalize the phone before looking up or creating the client. `+7 (701) 555-12-34` and `+77015551234` therefore resolve to one client row, stored as `+77015551234`.\n\n- **Existing rows:** client rows already stored with spaces or dashes aren't migrated. A repeat customer matching one of those would still create a second row.\n- **UI messages:** I didn't change the booking wizard or waitlist form. The waitlist form still shows its generic error message for a number that really isn't valid.",
+  "stderr": "",
+  "patch_lines": 103,
+  "touched_outside_workdir": []
+}
