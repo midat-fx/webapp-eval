@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t10-wizard-a11y/bad-loading-text-still-light",
+  "task": "t10-wizard-a11y",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch fixes only the first \\\"Loading\u2026\\\" (services). The one in the Date and time section (wizard.tsx line 283) is still `text-zinc-400`, about 2.5:1 on white, so axe will still report a contrast violation there.\"}",
+  "cost_usd": 0.07475390000000001,
+  "is_error": false,
+  "num_turns": 2,
+  "with_repo": true
+}

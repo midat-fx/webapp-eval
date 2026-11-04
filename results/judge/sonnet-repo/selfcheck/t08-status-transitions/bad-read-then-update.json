@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t08-status-transitions/bad-read-then-update",
+  "task": "t08-status-transitions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The status check is a plain SELECT outside the transaction, and the UPDATE inside it still has no `status = 'confirmed'` condition. Two concurrent requests can both read 'confirmed', both update, and both write audit entries. The last write wins, which is the double-count race the issue describes.\"}",
+  "cost_usd": 0.038264,
+  "is_error": false,
+  "num_turns": 3,
+  "with_repo": true
+}

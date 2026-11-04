@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t01-phone-format/bad-ui-only",
+  "task": "t01-phone-format",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch only strips formatting characters in the client wizard (src/app/[slug]/wizard.tsx). The issue requires the public API to accept and normalize these numbers when called directly, and the server-side booking and waitlist validation and client dedup are unchanged. A direct API call with `+7 (701) 555-12-34` is still rejected or stored un-normalized.\"}",
+  "cost_usd": 0.058574,
+  "is_error": false,
+  "num_turns": 1,
+  "with_repo": true
+}

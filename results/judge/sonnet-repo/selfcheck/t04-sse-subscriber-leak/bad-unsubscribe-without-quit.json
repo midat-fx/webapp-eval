@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/bad-unsubscribe-without-quit",
+  "task": "t04-sse-subscriber-leak",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The cancel() handler only calls sub.unsubscribe(). It never calls quit() or disconnect(), so the duplicated Redis connection stays open after the tab closes. The issue requires that both the subscription and its connection go away, and the connection leak is what exhausts Redis clients.\"}",
+  "cost_usd": 0.0303153,
+  "is_error": false,
+  "num_turns": 2,
+  "with_repo": true
+}

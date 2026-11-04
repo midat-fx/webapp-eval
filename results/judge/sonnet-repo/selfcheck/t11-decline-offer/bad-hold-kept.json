@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t11-decline-offer/bad-hold-kept",
+  "task": "t11-decline-offer",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"`declineOffer` never releases the Redis hold (`hold:<staff>:<start>`), which `expireOffer` does through `releaseHold`. The next `offerFreedSlot` call uses `createHold` with NX, so it fails while the old hold exists and the next client gets no offer. The slot also stays hidden from the public booking page for up to 15 minutes.\"}",
+  "cost_usd": 0.1014045,
+  "is_error": false,
+  "num_turns": 5,
+  "with_repo": true
+}

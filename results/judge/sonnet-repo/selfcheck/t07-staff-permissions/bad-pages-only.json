@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t07-staff-permissions/bad-pages-only",
+  "task": "t07-staff-permissions",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch leaves the server actions in src/app/admin/actions.ts (saveService, toggleService, saveStaff, toggleStaff, toggleStaffService) on plain requireSession(). A staff login can still replay those form submissions and change prices, hide services or staff, and add staff, which the issue explicitly says must be refused on the server.\"}",
+  "cost_usd": 0.05983580000000001,
+  "is_error": false,
+  "num_turns": 3,
+  "with_repo": true
+}

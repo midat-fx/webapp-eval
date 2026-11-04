@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t05-overlap-race/bad-in-process-lock",
+  "task": "t05-overlap-race",
+  "source": "known-bad",
+  "truth": "fail",
+  "verdict": "fail",
+  "raw": "{\"verdict\": \"fail\", \"reason\": \"The patch serialises bookings with an in-process `Map` of promises, which does nothing across the two app servers the issue names. Across processes it is still a check-then-insert race under READ COMMITTED, and the patch adds no DB-level guard such as an exclusion constraint, advisory lock or row lock. Overlapping confirmed bookings can still be created.\"}",
+  "cost_usd": 0.0263819,
+  "is_error": false,
+  "num_turns": 1,
+  "with_repo": true
+}
