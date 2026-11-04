@@ -223,6 +223,40 @@ this repository, `~/projects` or the kezek GitHub URL are listed in
 Every invocation is appended to `results/agent/ledger.jsonl` before it
 starts, so the run budget (60) is auditable from the results alone.
 
+### Enforcing it: `--sandbox`
+
+`harness.cli agent --sandbox` runs the CLI under `sandbox-exec` with
+`harness/agent.sb`, which turns "nothing happened" into "nothing could
+happen". `sandbox-exec` is deprecated, but it still works on macOS 26.
+
+- **Deny the home directory, then allow back what's needed.** That's the
+  CLI's own config, binary and caches, plus pnpm's content store. pnpm writes
+  to the store even for `pnpm test`; without write access it decides
+  `node_modules` is stale and tries to reinstall. I found each of those by
+  running the real commands under the profile until they worked, not by
+  guessing.
+- **Deny everything else that's sensitive.** The working copy lives in
+  `$TMPDIR`, outside the home directory, so this repository and `~/projects`
+  are out of reach. So is `/tmp/claude-<uid>`, where other sessions keep
+  their scratch files. The CLI does need a directory there, so only the
+  subdirectory named after this working copy is allowed.
+- **Network stays open,** because the CLI talks to the API. The grading
+  container is where the candidate's code runs, and it has no network at all.
+- `~/.gitconfig` is denied, so git runs with `GIT_CONFIG_GLOBAL=/dev/null`.
+  The trace goes through a pipe rather than a file handle, because the sandbox
+  checks every write and `results/` is under the denied home directory.
+
+A unit test runs `cat` under the profile: it can read the working copy, and it
+can't read this repository's files or list `~/projects` and `~/.ssh`. Before
+spending any runs I checked by hand that `pnpm test`, `git status` and
+`claude --version` work in a real working copy under the profile, and that
+reading `tasks/*/solution.patch` fails.
+
+What isn't measured yet is a real agent run under the sandbox. When I got to
+it, the CLI on this machine wasn't logged in at all, with or without the
+sandbox, so a logged-in run may still trip over a path the profile denies. The
+4–6 comparison runs are waiting on a login.
+
 ## The LLM judge baseline
 
 `harness.cli judge` asks a model whether a diff resolves the issue — the
@@ -259,7 +293,8 @@ until the mutant run. A skim of a diff doesn't see what the diff left out.
   it can't catch a fix that releases the hold just after committing the
   hand-over rather than before: the worker would have to poll inside that
   millisecond. t11 has no agent runs yet.
-- Agent sandboxing on the host is audited, not enforced.
+- Agent isolation on the host is audited in every published run. `--sandbox`
+  enforces it, but no published run has used it yet (see above).
 - Mutants only drop one hunk of the reference fix at a time: a survivor-free
   task can still miss a wrong fix that adds code.
 - Race verifiers are probabilistic: 5/5 catches per known-bad patch is the

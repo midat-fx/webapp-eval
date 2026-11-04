@@ -89,7 +89,7 @@ def cmd_agent(a: argparse.Namespace) -> int:
             return None
         with ledger.open("a") as f:
             f.write(json.dumps({"task": task, "model": model, "attempt": n}) + "\n")
-        r = agent.attempt(task, MODELS[model], out_root / model / task / f"a{n}")
+        r = agent.attempt(task, MODELS[model], out_root / model / task / f"a{n}", sandbox=a.sandbox)
         print(f"{model:6} {task:28} a{n} {r['verdict']:5} {r['seconds']:7}s turns={r['num_turns']} cost={r['cost_usd']}", flush=True)
         return r
 
@@ -247,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     ag.add_argument("-j", "--jobs", type=int, default=2)
     ag.add_argument("--min-free-gb", type=int, default=12)
     ag.add_argument("--out", default="results/agent")
+    ag.add_argument("--sandbox", action="store_true", help="run claude under harness/agent.sb (macOS sandbox-exec)")
     ag.set_defaults(fn=cmd_agent)
     j = sub.add_parser("judge", help="LLM judge over every graded patch, scored against the verifiers")
     j.add_argument("--model", default="sonnet")

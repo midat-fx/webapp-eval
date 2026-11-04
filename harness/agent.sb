@@ -1,0 +1,49 @@
+;; macOS sandbox for `claude -p` agent runs; harness/agent.py `sandboxed()` passes
+;; HOME, WORK (the working copy), CLITMP (/private/tmp/claude-<uid>) and WORKSLUG.
+;; The agent may read and write anywhere outside the home directory except
+;; other sessions' scratch space; inside the home directory it gets only what
+;; the CLI itself needs. The working copy lives in $TMPDIR, outside $HOME.
+;; Network stays open: the CLI talks to the API.
+(version 1)
+(allow default)
+
+(deny file-read* file-write*
+  (subpath (param "HOME"))
+  (subpath (param "CLITMP"))
+  (subpath "/Volumes"))
+
+;; The CLI's own binary, config, session state and caches.
+(allow file-read* file-write*
+  (subpath (string-append (param "HOME") "/.claude"))
+  (regex (string-append "^" (param "HOME") "/\\.claude\\.json"))
+  (subpath (string-append (param "HOME") "/.local/share/claude"))
+  (subpath (string-append (param "HOME") "/.local/state/claude"))
+  (subpath (string-append (param "HOME") "/.cache/claude"))
+  (subpath (string-append (param "HOME") "/Library/Caches/claude-cli-nodejs")))
+(allow file-read*
+  (literal (string-append (param "HOME") "/.local/bin/claude")))
+
+;; pnpm's content store (public npm packages). pnpm writes to it even for
+;; `pnpm test`; without it, it decides node_modules is stale and tries to
+;; reinstall.
+(allow file-read* file-write*
+  (subpath (string-append (param "HOME") "/Library/pnpm")))
+
+;; Path lookups walk through these directories; listing them is still denied.
+(allow file-read-metadata
+  (literal (param "HOME"))
+  (literal (string-append (param "HOME") "/.local"))
+  (literal (string-append (param "HOME") "/.local/bin"))
+  (literal (string-append (param "HOME") "/.local/share"))
+  (literal (string-append (param "HOME") "/.local/state"))
+  (literal (string-append (param "HOME") "/.cache"))
+  (literal (string-append (param "HOME") "/Library"))
+  (literal (string-append (param "HOME") "/Library/Caches")))
+
+;; The working copy, wherever $TMPDIR puts it.
+(allow file-read* file-write* (subpath (param "WORK")))
+
+;; The CLI's scratch space for this working copy only: /tmp/claude-<uid>/<slug>.
+;; The rest of that directory belongs to other sessions.
+(allow file-read-metadata (literal (param "CLITMP")))
+(allow file-read* file-write* (subpath (string-append (param "CLITMP") "/" (param "WORKSLUG"))))

@@ -75,6 +75,18 @@ def prepare_workdir(task: str) -> Path:
     return work
 
 
+SANDBOX = Path(__file__).with_name("agent.sb")
+
+
+def sandboxed(cmd: list[str], work: Path) -> list[str]:
+    """`cmd` under the macOS sandbox profile: no reads or writes in the home
+    directory beyond the CLI's own files, read-write in the working copy."""
+    work = work.resolve()
+    clitmp = Path(f"/private/tmp/claude-{os.getuid()}")
+    return ["sandbox-exec", "-f", str(SANDBOX), "-D", f"HOME={Path.home()}", "-D", f"WORK={work}",
+            "-D", f"CLITMP={clitmp}", "-D", f"WORKSLUG={str(work).replace('/', '-')}", *cmd]
+
+
 def agent_env() -> dict[str, str]:
     # Drop the parent session's Claude Code variables so the child is a plain
     # CLI run with the user's own login.
@@ -89,7 +101,7 @@ def sanitize(text: str, work: Path) -> str:
     return "".join(l for l in text.splitlines(keepends=True) if '"type":"rate_limit_event"' not in l)
 
 
-def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:
+def attempt(task: str, model: str, out: Path, timeout: int = 1800, sandbox: bool = False) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     work = prepare_workdir(task)
     issue = (ROOT / "tasks" / task / "issue.md").read_text()
@@ -103,21 +115,24 @@ def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:
         "--output-format", "stream-json", "--verbose",
         "--no-session-persistence",
     ]
+    if sandbox:
+        cmd = sandboxed(cmd, work)
     t0 = time.monotonic()
     timed_out = False
-    with open(out / "trace.raw.jsonl", "w") as trace:
-        proc = subprocess.Popen(cmd, cwd=work, env=agent_env(), stdout=trace, stderr=subprocess.PIPE, text=True)
-        try:
-            _, err = proc.communicate(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            _, err = proc.communicate()
-            timed_out = True
+    # stdout through a pipe, not a file handle: the sandbox checks every write,
+    # and results/ is in the home directory it denies.
+    # ~/.gitconfig is out of the sandbox's reach; git fails outright without this.
+    env = agent_env() | ({"GIT_CONFIG_GLOBAL": "/dev/null"} if sandbox else {})
+    proc = subprocess.Popen(cmd, cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        raw, err = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        raw, err = proc.communicate()
+        timed_out = True
     elapsed = round(time.monotonic() - t0, 1)
 
-    raw = (out / "trace.raw.jsonl").read_text()
     (out / "trace.jsonl").write_text(sanitize(raw, work))
-    (out / "trace.raw.jsonl").unlink()
     run(["git", "add", "-A"], cwd=work)
     diff = run(["git", "diff", "--cached", "--binary", "HEAD"], cwd=work).stdout
     (out / "patch.diff").write_text(diff)
@@ -130,6 +145,7 @@ def attempt(task: str, model: str, out: Path, timeout: int = 1800) -> dict:
         "served_model": init.get("model"),
         "claude_version": run(["claude", "--version"]).stdout.strip(),
         "disallowed_tools": DISALLOWED,
+        "sandbox": SANDBOX.name if sandbox else None,
         "seconds": elapsed,
         "timed_out": timed_out,
         "exit_code": proc.returncode,

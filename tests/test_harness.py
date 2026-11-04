@@ -1,6 +1,7 @@
 """Fast checks of the harness itself; the verifiers are checked by `selfcheck`."""
 
 import json
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -134,6 +135,24 @@ class Readme(unittest.TestCase):
         from harness import report
         blocks = report.readme_blocks((grading.ROOT / "README.md").read_text())
         self.assertEqual(blocks, report.tables(report.collect()), "run `python3 -m harness.report --readme`")
+
+
+@unittest.skipUnless(shutil.which("sandbox-exec"), "macOS only")
+class Sandbox(unittest.TestCase):
+    def test_profile_denies_the_benchmark_and_allows_the_workdir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp).resolve()
+            (work / "f").write_text("ok")
+            def can_read(path):
+                cmd = agent.sandboxed(["cat", str(path)], work)
+                return subprocess.run(cmd, cwd=work, capture_output=True).returncode == 0
+            self.assertTrue(can_read(work / "f"))
+            self.assertFalse(can_read(grading.ROOT / "tasks" / "t01-phone-format" / "solution.patch"))
+            self.assertFalse(can_read(grading.ROOT / "README.md"))
+            for p in (Path.home() / "projects", Path.home() / ".ssh"):
+                if p.exists():
+                    r = subprocess.run(agent.sandboxed(["ls", str(p)], work), cwd=work, capture_output=True)
+                    self.assertNotEqual(r.returncode, 0, p)
 
 
 class DiskGuard(unittest.TestCase):
