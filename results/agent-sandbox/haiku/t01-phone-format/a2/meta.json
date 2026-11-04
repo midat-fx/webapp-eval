@@ -1,0 +1,29 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "sandbox": "agent.sb",
+  "seconds": 73.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 19,
+  "cost_usd": 0.7038635,
+  "is_error": false,
+  "result_text": "Booking and waitlist now accept phone numbers with spaces, dashes, dots or parentheses, and store them in the canonical `+77015551234` form, so they merge into one client. Unit tests pass (24) and `pnpm build` succeeds. I couldn't run the integration tests or the dev server here, since Postgres and Redis aren't running.\n\n- **New `src/lib/phone.ts`**: a shared zod schema that strips spaces, `()`, `-` and `.`, then applies the existing `^\\+?\\d{10,15}$` check. `call me` and `+7 701` are still rejected.\n- **`book/route.ts` and `waitlist/route.ts`**: both use `phoneSchema` instead of the raw regex. The stored phone is normalized before the client lookup in `createBooking` and `joinWaitlist`.\n- **`src/lib/phone.test.ts`**: covers the accepted formats from the issue and the rejected inputs.\n\nThe wizard still shows \"format +7701\u2026\" as its placeholder and error text. I left it alone since the API now accepts the printed formats.",
+  "stderr": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "patch_lines": 82,
+  "touched_outside_workdir": []
+}

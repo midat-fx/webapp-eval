@@ -1,0 +1,29 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-haiku-5-5",
+  "served_model": "claude-haiku-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "sandbox": "agent.sb",
+  "seconds": 45.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 13,
+  "cost_usd": 0.5355695000000001,
+  "is_error": false,
+  "result_text": "Only confirmed bookings can now change status, and each one changes exactly once, even when two requests race across app servers. The change is in `setBookingStatus` in `src/lib/booking.ts`; nothing is committed.\n\nThe cause was that the `UPDATE` matched on booking id and business only, so it overwrote whatever status the row had. The fix adds `status = 'confirmed'` to that `WHERE` clause. Postgres row locking then serializes concurrent attempts: the first one wins, and any later or competing one matches no row. Because the update returns nothing in that case, the audit entry, reminder cancellation, cancellation message, waitlist offer and calendar publish are all skipped.\n\nVerification: type check passes apart from a pre-existing `LayoutProps` error in `src/app/layout.tsx`, and the 12 unit tests pass. The integration tests for this path need Postgres and Redis, so I couldn't run them here.",
+  "stderr": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "patch_lines": 40,
+  "touched_outside_workdir": []
+}

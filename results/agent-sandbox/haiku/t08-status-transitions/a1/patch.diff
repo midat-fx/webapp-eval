@@ -1,0 +1,44 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..4999632 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -231,15 +231,23 @@ export async function setBookingStatus(opts: {
+   bookingId: string;
+   status: (typeof s.bookingStatuses)[number];
+   actorUserId: string;
+-}): Promise<void> {
++}): Promise<boolean> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  // Only a confirmed booking transitions. A racing writer waits on the row lock,
++  // then matches nothing, so the change happens exactly once.
++  const changed = await db.transaction(async (tx) => {
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -275,8 +283,10 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
+-  await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  if (changed) await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  return changed;
+ }
+ 
+ export async function staffForService(businessId: string, serviceId: string) {

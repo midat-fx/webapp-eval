@@ -1,0 +1,106 @@
+diff --git a/src/app/api/public/[slug]/book/route.ts b/src/app/api/public/[slug]/book/route.ts
+index 23554a5..ab257b6 100644
+--- a/src/app/api/public/[slug]/book/route.ts
++++ b/src/app/api/public/[slug]/book/route.ts
+@@ -1,3 +1,4 @@
++import { normalizePhone, PHONE_RE } from "@/lib/phone";
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { createBooking } from "@/lib/booking";
+@@ -11,7 +12,7 @@ const body = z.object({
+   endMs: z.number().int(),
+   holdToken: z.string().min(16),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().transform(normalizePhone).pipe(z.string().regex(PHONE_RE)),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/app/api/public/[slug]/waitlist/route.ts b/src/app/api/public/[slug]/waitlist/route.ts
+index fe8382c..16015e5 100644
+--- a/src/app/api/public/[slug]/waitlist/route.ts
++++ b/src/app/api/public/[slug]/waitlist/route.ts
+@@ -1,3 +1,4 @@
++import { normalizePhone, PHONE_RE } from "@/lib/phone";
+ import { NextRequest, NextResponse } from "next/server";
+ import { z } from "zod";
+ import { businessBySlug, clientIp } from "@/lib/public";
+@@ -9,7 +10,7 @@ const body = z.object({
+   staffId: z.uuid().nullable().optional(),
+   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+   name: z.string().trim().min(1).max(100),
+-  phone: z.string().trim().regex(/^\+?\d{10,15}$/),
++  phone: z.string().transform(normalizePhone).pipe(z.string().regex(PHONE_RE)),
+ });
+ 
+ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..1c15acd 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -1,3 +1,4 @@
++import { normalizePhone } from "@/lib/phone";
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+ import { and, eq, gte, inArray, lt } from "drizzle-orm";
+@@ -148,15 +149,16 @@ export async function createBooking(opts: {
+   if (!service) return { ok: false, error: "slot_taken" };
+ 
+   // Upsert client by (business, phone)
++  const phone = normalizePhone(client.phone);
+   const [existing] = await db
+     .select()
+     .from(s.clients)
+-    .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, client.phone)));
++    .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, phone)));
+   const clientRow =
+     existing ??
+     (await db
+       .insert(s.clients)
+-      .values({ businessId, name: client.name, phone: client.phone })
++      .values({ businessId, name: client.name, phone })
+       .returning())[0];
+ 
+   try {
+diff --git a/src/lib/phone.ts b/src/lib/phone.ts
+new file mode 100644
+index 0000000..fbf1f04
+--- /dev/null
++++ b/src/lib/phone.ts
+@@ -0,0 +1,5 @@
++export function normalizePhone(raw: string): string {
++  return raw.replace(/[\s\-.()]/g, "");
++}
++
++export const PHONE_RE = /^\+?\d{10,15}$/;
+diff --git a/src/lib/waitlist.ts b/src/lib/waitlist.ts
+index cbfb68c..fae7aeb 100644
+--- a/src/lib/waitlist.ts
++++ b/src/lib/waitlist.ts
+@@ -1,3 +1,4 @@
++import { normalizePhone } from "@/lib/phone";
+ import "server-only";
+ import { randomBytes } from "node:crypto";
+ import { and, asc, eq, isNull, or } from "drizzle-orm";
+@@ -20,17 +21,19 @@ export async function joinWaitlist(opts: {
+ }): Promise<JoinResult> {
+   const { businessId, serviceId, staffId, dateISO, client } = opts;
+ 
++  const phone = normalizePhone(client.phone);
++
+   return db.transaction(async (tx) => {
+     const [existing] = await tx
+       .select()
+       .from(s.clients)
+-      .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, client.phone)));
++      .where(and(eq(s.clients.businessId, businessId), eq(s.clients.phone, phone)));
+     const clientRow =
+       existing ??
+       (
+         await tx
+           .insert(s.clients)
+-          .values({ businessId, name: client.name, phone: client.phone })
++          .values({ businessId, name: client.name, phone })
+           .returning()
+       )[0];
+ 

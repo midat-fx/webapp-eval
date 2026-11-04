@@ -1,0 +1,52 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "kind": "playwright",
+      "name": "wizard books with a formatted phone",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "API books with spaces in the phone",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "waitlist accepts dashes",
+      "pass": true
+    },
+    {
+      "kind": "playwright",
+      "name": "non-numbers are still rejected",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "one_client_per_number",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "stored_in_canonical_form",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "both_bookings_on_that_client",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "waitlist_entry_on_that_client",
+      "pass": true
+    },
+    {
+      "kind": "sql",
+      "name": "rejected_input_left_no_rows",
+      "pass": true
+    }
+  ],
+  "task": "t01-phone-format",
+  "seconds": 17.4
+}

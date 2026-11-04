@@ -1,0 +1,29 @@
+{
+  "task": "t01-phone-format",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "sandbox": "agent.sb",
+  "seconds": 51.6,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 7,
+  "cost_usd": 0.15015230000000002,
+  "is_error": false,
+  "result_text": "Phone numbers with spaces, dashes, dots or parentheses are now accepted when booking and when joining the waitlist, including direct calls to the public API. They are stored in one canonical form, so `+7 (701) 555-12-34` and `+77015551234` end up as one client stored as `+77015551234`. I haven't run any of this against a real request. Type-check and the unit tests pass, but Postgres isn't available here, so the single-client behaviour is untested.\n\n- **Normalizing:** a new `src/lib/phone.ts` strips whitespace, `-`, `.`, `(` and `)`. It applies the same pattern as before to what's left: an optional `+` followed by 10\u201315 digits.\n- **API validation:** the book and waitlist routes in `src/app/api/public/[slug]/` now normalize the phone before validating it. `call me` and `+7 701` are still rejected.\n- **Client lookup:** `createBooking` in `src/lib/booking.ts` and `joinWaitlist` in `src/lib/waitlist.ts` also normalize before looking up or creating the client. A formatted number can't create a duplicate client even if those functions are called without going through the routes.\n\nThe wizard needed no change, since the server now accepts what it sends.\n\n- **No leading `+`:** a number typed without the leading `+` (`77015551234`) is still a different client from `+77015551234`. The issue only mentioned formatting characters, so I left that alone.\n- **Existing data:** I didn't touch existing client rows. Any already stored in a formatted form won't merge with the normalized ones.",
+  "stderr": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "patch_lines": 106,
+  "touched_outside_workdir": []
+}

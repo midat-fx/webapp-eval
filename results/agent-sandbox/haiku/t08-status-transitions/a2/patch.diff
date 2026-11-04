@@ -1,0 +1,40 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..c58108c 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,21 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  // Only a confirmed booking can transition. The guard lives in the UPDATE so
++  // concurrent attempts serialize on the row lock: the loser matches nothing.
++  const changed = await db.transaction(async (tx) => {
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -275,8 +283,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
+-  await publishCalendar(businessId, { type: "booking.updated", bookingId });
++  if (changed) await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 
+ export async function staffForService(businessId: string, serviceId: string) {

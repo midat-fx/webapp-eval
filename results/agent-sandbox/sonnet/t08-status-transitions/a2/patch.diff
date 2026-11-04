@@ -1,0 +1,40 @@
+diff --git a/src/lib/booking.ts b/src/lib/booking.ts
+index ccc300c..feaa934 100644
+--- a/src/lib/booking.ts
++++ b/src/lib/booking.ts
+@@ -233,13 +233,22 @@ export async function setBookingStatus(opts: {
+   actorUserId: string;
+ }): Promise<void> {
+   const { businessId, bookingId, status, actorUserId } = opts;
+-  await db.transaction(async (tx) => {
++  if (status === "confirmed") return;
++  const changed = await db.transaction(async (tx) => {
++    // Compare-and-set on the current status: a concurrent writer blocks on the
++    // row lock, then re-evaluates this WHERE and matches nothing.
+     const [updated] = await tx
+       .update(s.bookings)
+       .set({ status })
+-      .where(and(eq(s.bookings.id, bookingId), eq(s.bookings.businessId, businessId)))
++      .where(
++        and(
++          eq(s.bookings.id, bookingId),
++          eq(s.bookings.businessId, businessId),
++          eq(s.bookings.status, "confirmed"),
++        ),
++      )
+       .returning();
+-    if (!updated) return;
++    if (!updated) return false;
+     await tx.insert(s.auditLog).values({
+       businessId,
+       actorUserId,
+@@ -275,7 +284,9 @@ export async function setBookingStatus(opts: {
+         dedupeKey: `waitlist.freed:${bookingId}`,
+       });
+     }
++    return true;
+   });
++  if (!changed) return;
+   await publishCalendar(businessId, { type: "booking.updated", bookingId });
+ }
+ 

@@ -1,2 +1,8 @@
 {"task": "t01-phone-format", "model": "haiku", "attempt": 1}
 {"task": "t01-phone-format", "model": "sonnet", "attempt": 1}
+{"task": "t08-status-transitions", "model": "haiku", "attempt": 1}
+{"task": "t08-status-transitions", "model": "sonnet", "attempt": 1}
+{"task": "t01-phone-format", "model": "haiku", "attempt": 2}
+{"task": "t01-phone-format", "model": "sonnet", "attempt": 2}
+{"task": "t08-status-transitions", "model": "haiku", "attempt": 2}
+{"task": "t08-status-transitions", "model": "sonnet", "attempt": 2}

@@ -1,0 +1,29 @@
+{
+  "task": "t08-status-transitions",
+  "model": "claude-sonnet-5-5",
+  "served_model": "claude-sonnet-5-5",
+  "claude_version": "2.1.220 (Claude Code)",
+  "disallowed_tools": [
+    "WebFetch",
+    "WebSearch",
+    "SendMessage",
+    "PushNotification",
+    "RemoteTrigger",
+    "CronCreate",
+    "CronDelete",
+    "ScheduleWakeup",
+    "Workflow",
+    "DesignSync"
+  ],
+  "sandbox": "agent.sb",
+  "seconds": 55.3,
+  "timed_out": false,
+  "exit_code": 0,
+  "num_turns": 7,
+  "cost_usd": 0.1495908,
+  "is_error": false,
+  "result_text": "`setBookingStatus` in `src/lib/booking.ts` now only changes a booking that is still `confirmed`, and it does so exactly once. The type check and the 12 unit tests pass. The integration tests and a real concurrent run need Postgres and Redis, so I couldn't run them here.\n\n- **How it works:** the update now has `status = 'confirmed'` in its `WHERE` clause. Postgres locks the row, so on two app servers the second request waits for the first, re-checks, and finds no confirmed row to update.\n- **What a losing attempt does:** if the update matches nothing, the function stops there. It writes no audit entry, queues no cancellation message or waitlist offer, doesn't cancel the reminder, and sends no calendar event. That covers a stale-tab \"Completed\" after a cancel, a \"Cancel\" after a finished visit, and a Completed vs No-show race.\n- **Added guard:** asking for `confirmed` as the new status now does nothing, so a confirmed booking can't be \"re-confirmed\".\n\nThe normal path is unchanged, since a confirmed booking still moves to completed, no-show or cancelled with the same side effects as before.",
+  "stderr": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "patch_lines": 40,
+  "touched_outside_workdir": []
+}

@@ -1,0 +1,5 @@
+{"ts":"2026-11-04T21:10:22.785Z","step":"start","status":"ok","detail":"t08-status-transitions"}
+{"ts":"2026-11-04T21:10:22.809Z","step":"setup","status":"ok"}
+{"ts":"2026-11-04T21:10:22.853Z","step":"apply","status":"ok","detail":"1 files touched"}
+{"ts":"2026-11-04T21:10:45.497Z","step":"build","status":"fail","detail":"exit 1: ▲ Next.js 16.3.0 (Turbopack)\n✓ Running next.config.ts took 32ms\n\n⚠ The \"middleware\" file convention is deprecated. Please use \"proxy\" instead.\n\n  To migrate automatically, run:\n  npx @next/codemod@canary middleware-to-proxy .\n\n  Learn more: https://nextjs.org/docs/messages/middleware-to-proxy\n  Creating an optimized production build ...\n✓ Compiled successfully in 13.4s\n  Running TypeScript ...\nsrc/lib/booking.ts(260,9): error TS2367: This comparison appears to be unintentional because the types '\"completed\" | \"cancelled\" | \"no_show\"' and '\"confirmed\"' have no overlap.\nFailed to type check."}
+{"ts":"2026-11-04T21:10:45.560Z","step":"done","status":"fail","detail":"build_failed"}
