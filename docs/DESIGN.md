@@ -184,10 +184,11 @@ servers) and headless Chromium all live in the one container.
 - **Verifiers arrive last**: specs are copied in after the candidate is
   built, from a directory the candidate's code never sees at build time.
 - CI keeps the image's layers in the GitHub Actions cache (buildx,
-  `type=gha`). I expected that to be the big win and it wasn't: an uncached
-  build took 77 s of a 27-minute run, and the 71 gradings are the rest. The
-  cache still skips the kezek clone and both `pnpm install`s, which is the part
-  that can break on someone else's outage.
+  `type=gha`). I expected that to be the big win and it wasn't. An uncached
+  build took 77 s of a 27-minute run, a warm cache brings it to 25 s, and the
+  71 gradings take about 31 minutes either way (`results/ci/image-cache.json`).
+  The cache still skips the kezek clone and both `pnpm install`s, which is the
+  part that can break on someone else's outage.
 - One image instead of compose: on this machine colima's host port
   forwarding is broken, and a single container with loopback-only services
   also needs no orchestration in CI.

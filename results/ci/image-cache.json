@@ -1,0 +1,11 @@
+{
+  "what": "GitHub Actions step times for the grading image, from the run logs",
+  "runs": [
+    {"run": 41662333463, "commit": "1146673", "cache": "none (plain docker build inside make test)",
+     "image_build_seconds": 77, "note": "19:27:53 -> 19:29:10 UTC between `docker build` and `naming to`; gradings to 19:54:18"},
+    {"run": 41815746572, "commit": "a3db7cc", "cache": "cold: buildx exports every layer to type=gha",
+     "image_build_seconds": 162, "check_verifiers_seconds": 1898, "selfcheck": "71/71"},
+    {"run": 41819880655, "commit": "107b812", "cache": "warm: every layer CACHED",
+     "image_build_seconds": 25, "check_verifiers_seconds": 1832, "selfcheck": "71/71"}
+  ]
+}
