@@ -23,6 +23,7 @@ patches are rejected.
 **Agents: 59/59 graded runs pass** (Claude Code headless, `claude -p`,
 [`results/agent/`](results/agent/)):
 
+<!-- report:agents -->
 | Task | Haiku 5.5 | Sonnet 5.5 |
 |---|---|---|
 | t01-phone-format | 3/3 | 3/3 |
@@ -39,6 +40,7 @@ patches are rejected.
 | mean wall time | 87 s | 41 s |
 | mean turns | 18.7 | 8.0 |
 | mean cost (CLI-reported) | $0.84 | $0.20 |
+<!-- /report:agents -->
 
 That's a ceiling. These ten tasks don't separate the two models on pass rate,
 only on effort: Haiku takes about 2.3× the turns, 2.1× the time and 4.2× the
@@ -78,6 +80,7 @@ a reference fix with one hunk dropped, so it is a partial fix nobody had to
 think of. There are 64 hunks; one only touches a test file, which leaves 63
 mutants to grade:
 
+<!-- report:mutants -->
 | Task | Hunks | Rejected by a verifier | Didn't build | Survived |
 |---|---|---|---|---|
 | t01-phone-format | 6 | 2 | 4 | 0 |
@@ -92,6 +95,7 @@ mutants to grade:
 | t10-wizard-a11y | 9 | 9 | 0 | 0 |
 | t11-decline-offer | 8 | 1 | 5 | 2 |
 | **total** | **64** | **35** | **23** | **5** |
+<!-- /report:mutants -->
 
 Of the 40 mutants that built, the verifiers reject 35. The 23 that didn't
 build say nothing about the verifiers, so they aren't counted as kills (one of
@@ -145,6 +149,7 @@ of every published grading that got as far as the checks (builds that failed
 stop early and are left out), on a shared Mac whose load ranged from idle to
 100+:
 
+<!-- report:timing -->
 | Task | Gradings | p50 | p90 |
 |---|---|---|---|
 | t01-phone-format | 14 | 26 s | 39 s |
@@ -159,6 +164,7 @@ stop early and are left out), on a shared Mac whose load ranged from idle to
 | t10-wizard-a11y | 22 | 26 s | 56 s |
 | t11-decline-offer | 9 | 185 s | 221 s |
 | **all** | **197** | **28 s** | **81 s** |
+<!-- /report:timing -->
 
 t11 is slow by design: its checks wait for outbox workers that poll every two
 seconds, and all nine of its gradings ran while the machine was at its busiest.

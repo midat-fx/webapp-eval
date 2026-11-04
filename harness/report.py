@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import re
 import statistics
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -98,23 +100,63 @@ def timing() -> dict:
         return {"n": len(xs), "p50": round(statistics.median(xs), 1), "p90": round(p90, 1), "max": xs[-1]}
     out = {"by_task": {t: stats(xs) for t, xs in sorted(by_task.items())},
            "all": stats([x for xs in by_task.values() for x in xs])}
-    (RES / "timing.json").write_text(json.dumps(out, indent=2) + "\n")
     return out
 
 
+NAMES = {"claude-haiku-5-5": "Haiku 5.5", "claude-sonnet-5-5": "Sonnet 5.5"}
+
+
+def collect() -> dict:
+    return {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants(),
+            "timing": timing()}
+
+
+def tables(out: dict) -> dict[str, str]:
+    """The README tables, generated so they can't drift from results/."""
+    ag, mu, ti = out["agents"], out["mutants"], out["timing"]
+    models = sorted(ag["totals"])
+    row = lambda *cells: "| " + " | ".join(str(c) for c in cells) + " |"
+    st = lambda m, k: ag["stats"][m][k]
+    agents_md = [row("Task", *(NAMES.get(m, m) for m in models)), "|---|" + "---|" * len(models)]
+    agents_md += [row(t, *(f"{c.get(m, [0, 0])[0]}/{c.get(m, [0, 0])[1]}" for m in models)) for t, c in ag["table"].items()]
+    agents_md += [row("**total**", *(f"**{ag['totals'][m][0]}/{ag['totals'][m][1]}**" for m in models)),
+                  row("mean wall time", *(f"{st(m, 'mean_seconds'):.0f} s" for m in models)),
+                  row("mean turns", *(f"{st(m, 'mean_turns'):.1f}" for m in models)),
+                  row("mean cost (CLI-reported)", *(f"${st(m, 'mean_cost_usd'):.2f}" for m in models))]
+    mutants_md = [row("Task", "Hunks", "Rejected by a verifier", "Didn't build", "Survived"), "|---|---|---|---|---|"]
+    mutants_md += [row(t, m["hunks"], m["killed"], m["broken"], m["survived"]) for t, m in mu["by_task"].items()]
+    mutants_md += [row("**total**", *(f"**{mu[k]}**" for k in ("hunks", "killed", "broken", "survived")))]
+    timing_md = [row("Task", "Gradings", "p50", "p90"), "|---|---|---|---|"]
+    timing_md += [row(t, m["n"], f"{m['p50']:.0f} s", f"{m['p90']:.0f} s") for t, m in ti["by_task"].items()]
+    a = ti["all"]
+    timing_md += [row("**all**", f"**{a['n']}**", f"**{a['p50']:.0f} s**", f"**{a['p90']:.0f} s**")]
+    return {"agents": "\n".join(agents_md), "mutants": "\n".join(mutants_md), "timing": "\n".join(timing_md)}
+
+
+def readme_blocks(text: str) -> dict[str, str]:
+    return dict(re.findall(r"<!-- report:(\w+) -->\n(.*?)\n<!-- /report:\1 -->", text, re.S))
+
+
+def write_readme(out: dict) -> None:
+    path = ROOT / "README.md"
+    text = path.read_text()
+    for name, md in tables(out).items():
+        text = re.sub(rf"(<!-- report:{name} -->\n).*?(\n<!-- /report:{name} -->)",
+                      lambda m: m.group(1) + md + m.group(2), text, flags=re.S)
+    path.write_text(text)
+
+
 def main() -> None:
-    out = {"selfcheck": selfcheck(), "agents": agents(), "judge": judges(), "flake": flakes(), "mutants": mutants(),
-           "timing": timing()}
+    out = collect()
     (RES / "summary.json").write_text(json.dumps(out, indent=2) + "\n")
+    (RES / "timing.json").write_text(json.dumps(out["timing"], indent=2) + "\n")
+    if "--readme" in sys.argv:
+        write_readme(out)
     sc, ag = out["selfcheck"], out["agents"]
     print(f"Verifier self-check: {sc['agree']}/{sc['total']} variants as expected; "
           f"known-bad caught {sc['known_bad_caught']}/{sc['known_bad']}\n")
-    models = sorted(ag["totals"])
-    print("| Task | " + " | ".join(models) + " |")
-    print("|---|" + "---|" * len(models))
-    for t, cells in ag["table"].items():
-        print(f"| {t} | " + " | ".join(f"{cells.get(m, [0, 0])[0]}/{cells.get(m, [0, 0])[1]}" for m in models) + " |")
-    print("| **total** | " + " | ".join(f"**{ag['totals'][m][0]}/{ag['totals'][m][1]}**" for m in models) + " |")
+    md = tables(out)
+    print(md["agents"])
     print(json.dumps(ag["stats"], indent=2))
     for name, j in out["judge"].items():
         print(f"\njudge {name}: {json.dumps(j['overall'])}")
@@ -125,15 +167,11 @@ def main() -> None:
     mu = out["mutants"]
     print(f"\nmutants: {mu['graded']} graded, {mu['killed']} killed, {mu['broken']} broken, {mu['survived']} survived, "
           f"verifier kill rate {mu['verifier_kill_rate']}")
-    print("| Task | Hunks | Killed | Didn't build | Survived |\n|---|---|---|---|---|")
-    for t, m in mu["by_task"].items():
-        print(f"| {t} | {m['hunks']} | {m['killed']} | {m['broken']} | {m['survived']} |")
+    print(md["mutants"])
     print(f"verifier gaps found and closed: {mu['gaps_found']}")
     for x in mu["survivors"]:
         print(f"  {x['mutant']} {x['file']}: {x['class']}")
-    print("\n| Task | Gradings | p50 | p90 |\n|---|---|---|---|")
-    for t, m in {**out["timing"]["by_task"], "**all**": out["timing"]["all"]}.items():
-        print(f"| {t} | {m['n']} | {m['p50']:.0f} s | {m['p90']:.0f} s |")
+    print("\n" + md["timing"])
 
 
 if __name__ == "__main__":
