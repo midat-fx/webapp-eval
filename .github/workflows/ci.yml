@@ -18,7 +18,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: make test JOBS=2
+      - run: echo "kezek_sha=$(cat base/kezek.sha)" >> "$GITHUB_OUTPUT"
+        id: pin
+      # The image is ~2.5 GB and almost never changes; its layers live in the
+      # Actions cache, so only a changed layer (verify/lib, grade.sh) rebuilds.
+      - uses: docker/setup-buildx-action@v3
+      - name: Build grading image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          build-args: KEZEK_SHA=${{ steps.pin.outputs.kezek_sha }}
+          tags: webapp-eval-runner:dev
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # `make test` minus `image`, which the step above already did.
+      - run: make unit check-verifiers JOBS=2
       - if: always()
         uses: actions/upload-artifact@v4
         with:
