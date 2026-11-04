@@ -1,0 +1,12 @@
+{
+  "id": "agent/haiku/t01-phone-format/a1",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\": \"pass\", \"reason\": \"Both public routes now use `phoneSchema`, which strips spaces, dashes, dots, parentheses and Unicode dashes before applying the original 10\u201315 digit regex. It then normalizes to `+digits`, so `+7 (701) 555-12-34` and `+77015551234` are stored identically and match the existing unique (business, phone) client lookup. Inputs like `call me` and `+7 701` are still rejected. The wizard has no client-side phone validation that would block these inputs.\"}",
+  "cost_usd": 0.0775271,
+  "is_error": false,
+  "num_turns": 4,
+  "with_repo": true
+}

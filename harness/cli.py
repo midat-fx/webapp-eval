@@ -102,12 +102,12 @@ def cmd_judge(a: argparse.Namespace) -> int:
     from harness import judge
 
     model = MODELS.get(a.model, a.model)
-    out_root = ROOT / "results" / "judge" / a.model
-    todo = [it for it in judge.items() if not (out_root / f"{it['id']}.json").exists()]
+    out_root = ROOT / "results" / "judge" / (a.model + ("-repo" if a.repo else ""))
+    todo = [it for it in judge.items() if not (out_root / f"{it['id']}.json").exists() and (not a.ids or it["id"] in a.ids)]
     print(f"{len(todo)} patches to judge with {model}")
 
     def run(it):
-        r = judge.judge(it["task"], it["patch"], model)
+        r = judge.judge(it["task"], it["patch"], model, with_repo=a.repo)
         path = out_root / f"{it['id']}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {k: it[k] for k in ("id", "task", "source", "truth")} | r
@@ -252,6 +252,8 @@ def main(argv: list[str] | None = None) -> int:
     j = sub.add_parser("judge", help="LLM judge over every graded patch, scored against the verifiers")
     j.add_argument("--model", default="sonnet")
     j.add_argument("-j", "--jobs", type=int, default=3)
+    j.add_argument("--repo", action="store_true", help="give the judge read-only tools in the task's start state")
+    j.add_argument("--ids", nargs="+", help="judge only these item ids (e.g. selfcheck/t04-sse-subscriber-leak/alt)")
     j.set_defaults(fn=cmd_judge)
     fl = sub.add_parser("flake", help="grade one variant repeatedly")
     fl.add_argument("task")

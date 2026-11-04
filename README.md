@@ -53,7 +53,11 @@ yet and it isn't in the table. Some other details:
   59 graded runs plus one lost to a harness incident. That lost run is why
   Sonnet has only two attempts on t10: its third attempt would have been run 61.
 - 0/59 traces touched anything outside their workdir (`touched_outside_workdir`
-  in each `meta.json`).
+  in each `meta.json`). Two later runs used `--sandbox`, which enforces this
+  ([`results/agent-sandbox/`](results/agent-sandbox/), separate ledger). They
+  exposed a bug in my profile that broke the agent's shell: Haiku gave up
+  with an empty patch, and Sonnet passed t01 using only file tools. They aren't
+  in the table above. See DESIGN.md.
 - Two wave-1 failures turned out to be the verifiers' fault, not the
   agents'. Each one is in [`REGRADES.md`](results/agent/REGRADES.md); no
   agent was ever re-run to improve a score.
@@ -133,7 +137,11 @@ because there weren't any. Its three false rejects all
 come from missing context: it assumed `redisSub` didn't exist because the
 diff didn't define it, and twice it guessed that the browser blocks formatted
 phone numbers before the API sees them, which the wizard test shows it
-doesn't.
+doesn't. Given read-only access to the repository at the start state
+(`judge --repo`, tools `Read,Grep,Glob`), the judge accepted all three
+([`results/judge/sonnet-repo/`](results/judge/sonnet-repo/summary.json)). I
+haven't yet checked whether the same access makes it accept known-bad
+patches, so this only shows that context fixes those three rejects.
 
 The judge's first pass also beat my own verifiers twice. It rejected my
 alternative fixes for t09 (the admin card collapsed the note's line breaks)
@@ -152,7 +160,7 @@ stop early and are left out), on a shared Mac whose load ranged from idle to
 <!-- report:timing -->
 | Task | Gradings | p50 | p90 |
 |---|---|---|---|
-| t01-phone-format | 14 | 26 s | 39 s |
+| t01-phone-format | 15 | 26 s | 39 s |
 | t02-stale-slots | 13 | 30 s | 36 s |
 | t03-default-date-tz | 14 | 47 s | 83 s |
 | t04-sse-subscriber-leak | 14 | 30 s | 78 s |
@@ -163,7 +171,7 @@ stop early and are left out), on a shared Mac whose load ranged from idle to
 | t09-booking-note | 19 | 37 s | 82 s |
 | t10-wizard-a11y | 22 | 26 s | 56 s |
 | t11-decline-offer | 9 | 185 s | 221 s |
-| **all** | **197** | **28 s** | **81 s** |
+| **all** | **198** | **28 s** | **81 s** |
 <!-- /report:timing -->
 
 t11 is slow by design: its checks wait for outbox workers that poll every two

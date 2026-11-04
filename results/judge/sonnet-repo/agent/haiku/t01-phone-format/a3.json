@@ -1,0 +1,12 @@
+{
+  "id": "agent/haiku/t01-phone-format/a3",
+  "task": "t01-phone-format",
+  "source": "agent",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\":\"pass\",\"reason\":\"The new shared `phone` schema strips spaces, dashes, dots and parentheses, then applies the old `^\\\\+?\\\\d{10,15}$` check. Both public routes use the normalized `parsed.data.phone`, so booking and waitlist store `+77015551234` and upsert to one client. Inputs like `call me` and `+7 701` are still rejected.\"}",
+  "cost_usd": 0.09598789999999999,
+  "is_error": false,
+  "num_turns": 5,
+  "with_repo": true
+}

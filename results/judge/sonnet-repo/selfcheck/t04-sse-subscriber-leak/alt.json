@@ -1,0 +1,12 @@
+{
+  "id": "selfcheck/t04-sse-subscriber-leak/alt",
+  "task": "t04-sse-subscriber-leak",
+  "source": "reference",
+  "truth": "pass",
+  "verdict": "pass",
+  "raw": "{\"verdict\":\"pass\",\"reason\":\"Each stream now registers on one shared `redisSub()` subscriber and unregisters on abort or cancel. The heartbeat is cleared, and the channel is unsubscribed once its last listener leaves. Live fan-out to the open tabs still works, and the per-connection `duplicate()` pile-up is gone. One shared connection stays open per process, but it no longer grows with the number of tabs.\"}",
+  "cost_usd": 0.09498859999999998,
+  "is_error": false,
+  "num_turns": 4,
+  "with_repo": true
+}

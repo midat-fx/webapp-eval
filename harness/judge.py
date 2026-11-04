@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -37,17 +38,31 @@ Reply with one JSON object and nothing else:
 
 MAX_PATCH = 60_000
 
+REPO_NOTE = """
+The repository is in the current directory at the state *before* the patch.
+You may read it (Read, Grep, Glob) to check what the diff relies on.
+"""
 
-def judge(task: str, patch: Path, model: str) -> dict:
+
+def judge(task: str, patch: Path, model: str, with_repo: bool = False) -> dict:
+    """Without the repo: issue + diff only, no tools. With it: the same prompt,
+    plus read-only tools in a fresh copy of the task's start state."""
     issue = (ROOT / "tasks" / task / "issue.md").read_text()
     diff = patch.read_text()[:MAX_PATCH]
-    cmd = ["claude", "-p", PROMPT.format(issue=issue, patch=diff), "--model", model, "--safe-mode",
-           "--tools", "", "--output-format", "json", "--no-session-persistence"]
-    proc = subprocess.run(cmd, capture_output=True, text=True, env=agent.agent_env(), timeout=600, cwd="/")
+    prompt = PROMPT.format(issue=issue, patch=diff)
+    work = agent.prepare_workdir(task) if with_repo else None
+    cmd = ["claude", "-p", prompt + (REPO_NOTE if with_repo else ""), "--model", model, "--safe-mode",
+           "--tools", "Read,Grep,Glob" if with_repo else "", "--output-format", "json", "--no-session-persistence"]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, env=agent.agent_env(), timeout=900,
+                              cwd=work or "/")
+    finally:
+        if work:
+            shutil.rmtree(work, ignore_errors=True)
     out = json.loads(proc.stdout or "{}")
     text = out.get("result") or ""
     return {"verdict": parse_verdict(text), "raw": text[:1500], "cost_usd": out.get("total_cost_usd"),
-            "is_error": out.get("is_error")}
+            "is_error": out.get("is_error"), "num_turns": out.get("num_turns"), "with_repo": with_repo}
 
 
 def parse_verdict(text: str) -> str:
